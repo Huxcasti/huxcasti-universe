@@ -31,7 +31,7 @@ header{display:flex;justify-content:space-between;align-items:center;position:ab
 
 /* V2: progresive enhancement. A beautiful, usable HTML/CSS scene exists even with JS disabled. */
 #loading{display:none!important}
-#fallback{display:block;position:fixed;z-index:12;inset:0;overflow-y:auto;overscroll-behavior:contain;
+#fallback{display:block;position:fixed;z-index:12;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
   background:radial-gradient(ellipse at 55% 44%, #11354d 0%, #091525 42%, #040916 85%);
   padding:0 clamp(18px,4vw,55px) max(25px,env(safe-area-inset-bottom));
   color:#e7faff;text-align:center;isolation:isolate}
