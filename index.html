@@ -193,10 +193,10 @@ body.webgl-ready .card .back{margin-top:6px}
 -webkit-mask-size:contain;mask-size:contain;
 filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
 
-/* Gestos orbitales dentro de los planetas, sin cambiar el diseño. */
-#fallback .f-space{touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
-#fallback .f-space.is-orbit-dragging{cursor:grabbing}
-#fallback .f-space a.f-planet{touch-action:none;-webkit-user-drag:none}
+/* Solo los planetas reciben los gestos orbitales; los espacios vacíos no giran. */
+#fallback .f-space{touch-action:auto}
+#fallback .f-space a.f-planet{touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+#fallback .f-space.is-orbit-dragging a.f-planet{cursor:grabbing}
 </style>
 </head>
 <body>
@@ -253,22 +253,16 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
 
 <!-- Diseño V4 aprobado: vista de planetas flotantes permanente; sin reemplazo automático por WebGL. -->
 
-<!-- Huxcasti: swipe to orbit project planets. -->
+<!-- Huxcasti: planet-only drag, with direct finger-following orbital movement. -->
 <script>
-
 (() => {
   const space = document.querySelector('#fallback .f-space');
   if (!space || !window.PointerEvent) return;
   const worlds = [...space.querySelectorAll('a.f-planet')];
   if (worlds.length !== 3) return;
-  let angle = 0, points = [], drag = null, frame = 0, momentum = 0, lastFrame = 0, skipClick = null;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  function stopGlide() {
-    if (frame) cancelAnimationFrame(frame);
-    frame = 0;
-    momentum = 0;
-  }
+  let angle = 0, points = [], drag = null, skipClick = null;
+
   function originalPositions() {
     const old = worlds.map(p => [p.style.left, p.style.top]);
     worlds.forEach(p => { p.style.left = ''; p.style.top = ''; });
@@ -287,44 +281,50 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
       p.style.top = (cy + dx / ratio * s + dy * c) + 'px';
     });
   }
-  function glide() {
-    if (reduceMotion.matches || Math.abs(momentum) < .004) return;
-    lastFrame = performance.now();
-    const tick = now => {
-      const step = Math.min(2, Math.max(.5, (now - lastFrame) / 16.67));
-      lastFrame = now;
-      angle += momentum * step;
-      momentum *= Math.pow(.91, step);
-      draw();
-      if (Math.abs(momentum) > .001) frame = requestAnimationFrame(tick);
-      else { frame = 0; momentum = 0; }
-    };
-    frame = requestAnimationFrame(tick);
+  function fingerAngle(x, y) {
+    const box = space.getBoundingClientRect();
+    const w = space.clientWidth, h = space.clientHeight;
+    const ratio = (w * .425) / (h * .36);
+    const dx = (x - box.left - w * .5) / ratio;
+    const dy = y - box.top - h * .53;
+    return Math.atan2(dy, dx);
   }
+  function shortestTurn(from, to) {
+    const d = to - from;
+    return Math.atan2(Math.sin(d), Math.cos(d));
+  }
+
   originalPositions();
   window.addEventListener('resize', () => { originalPositions(); draw(); }, { passive: true });
 
-  space.addEventListener('pointerdown', e => {
-    if (!e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
-    stopGlide();
-    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lastX: e.clientX,
-      lastY: e.clientY, t: e.timeStamp, moved: false, lastMove: 0 };
+  worlds.forEach(planet => {
+    planet.addEventListener('pointerdown', e => {
+      if (drag || !e.isPrimary || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      drag = { id: e.pointerId, planet, x: e.clientX, y: e.clientY,
+        lastAngle: fingerAngle(e.clientX, e.clientY), moved: false };
+      try { planet.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    // Mouse/trackpad wheel only rotates when the pointer is over a planet.
+    planet.addEventListener('wheel', e => {
+      if (drag) return;
+      if (e.cancelable) e.preventDefault();
+      angle += Math.max(-200, Math.min(200, e.deltaY + e.deltaX)) * .005;
+      draw();
+    }, { passive: false });
   });
+
+  // Pointer capture on the touched planet keeps the drag working outside its bounds.
   space.addEventListener('pointermove', e => {
     if (!drag || e.pointerId !== drag.id) return;
     if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 8) return;
     if (!drag.moved) {
       drag.moved = true;
       space.classList.add('is-orbit-dragging');
-      try { space.setPointerCapture(e.pointerId); } catch (_) {}
     }
-    const delta = ((e.clientX - drag.lastX) - (e.clientY - drag.lastY)) * .011;
-    const elapsed = Math.max(8, e.timeStamp - drag.t);
-    angle += delta;
-    const speed = Math.max(-.12, Math.min(.12, delta * 16.67 / elapsed));
-    momentum = momentum * .55 + speed * .45;
-    drag.lastX = e.clientX; drag.lastY = e.clientY; drag.t = e.timeStamp;
-    drag.lastMove = performance.now();
+    const next = fingerAngle(e.clientX, e.clientY);
+    angle += shortestTurn(drag.lastAngle, next);
+    drag.lastAngle = next;
     draw();
     if (e.cancelable) e.preventDefault();
   }, { passive: false });
@@ -333,15 +333,14 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
     if (!drag || drag.id !== e.pointerId) return;
     if (drag.moved) {
       skipClick = { x: e.clientX, y: e.clientY, t: performance.now() };
-      if (performance.now() - drag.lastMove > 110) momentum = 0;
-      glide();
     }
+    const planet = drag.planet;
     drag = null;
     space.classList.remove('is-orbit-dragging');
-    try { if (space.hasPointerCapture(e.pointerId)) space.releasePointerCapture(e.pointerId); } catch (_) {}
+    try { if (planet.hasPointerCapture(e.pointerId)) planet.releasePointerCapture(e.pointerId); } catch (_) {}
   }
   space.addEventListener('pointerup', finish);
-  space.addEventListener('pointercancel', e => { momentum = 0; finish(e); });
+  space.addEventListener('pointercancel', finish);
 
   document.addEventListener('click', e => {
     if (!skipClick) return;
@@ -352,19 +351,7 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
       e.stopImmediatePropagation();
     }
   }, true);
-
-  space.addEventListener('wheel', e => {
-    e.preventDefault();
-    stopGlide();
-    angle += Math.max(-200, Math.min(200, e.deltaY + e.deltaX)) * .005;
-    draw();
-  }, { passive: false });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopGlide();
-  });
 })();
-
 </script>
 <!-- Huxcasti: dismiss selected planet on empty-space tap. -->
 <script>
