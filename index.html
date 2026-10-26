@@ -245,4 +245,25 @@ body.webgl-ready .card .back{margin-top:6px}
 
 <!-- Diseño V4 aprobado: vista de planetas flotantes permanente; sin reemplazo automático por WebGL. -->
 
+<!-- Huxcasti: dismiss selected planet on empty-space tap. -->
+<script>
+(() => {
+  const planetHashes = new Set(['#world-cine', '#world-flambo', '#world-just']);
+  function dismissPlanet() {
+    if (planetHashes.has(window.location.hash)) {
+      window.location.hash = 'fallback';
+    }
+  }
+  document.addEventListener('click', (event) => {
+    if (!planetHashes.has(window.location.hash)) return;
+    if (!(event.target instanceof Element)) return;
+    // Keep planet selectors, navigation links and the project's details interactive.
+    if (event.target.closest('a, button, input, select, textarea, [role="button"], .f-focus')) return;
+    dismissPlanet();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') dismissPlanet();
+  });
+})();
+</script>
 </body></html>
