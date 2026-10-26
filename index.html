@@ -212,6 +212,40 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
 #fallback .f-coming-ball{width:38px;height:38px;border-radius:50%;display:block;border:1px solid #bfdefc3d;background:radial-gradient(circle at 33% 29%,#b9c6e8 0%,#5c6a96 30%,#28304d 62%,#090f24 100%);box-shadow:inset -11px -9px 16px #020712b8,0 0 18px #7794f74c}
 @media(max-width:600px){#fallback .f-head{row-gap:7px}#fallback .f-head a.hx-contact{order:3;margin:1px auto 0!important;padding:8px 14px;font-size:10px}#fallback .f-title{margin-top:19px}#fallback .f-coming{left:87%;top:84%;font-size:7px;width:81px;opacity:.49}#fallback .f-coming-ball{width:30px;height:30px}}
 @media(prefers-reduced-motion:reduce){#fallback .f-core::before,#fallback .f-coming,#fallback .hx-shooting-star{animation:none!important}#fallback .hx-shooting-star{display:none}#fallback .hx-stars-depth{transition:none}}
+
+/* Ondas de energía desde la H hacia cada planeta; visual y sin capturar gestos. */
+#fallback .hx-energy-layer{
+  position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+  z-index:1;pointer-events:none;opacity:0
+}
+#fallback .hx-energy-layer.hx-energy-active{opacity:1}
+#fallback .hx-energy-trail{opacity:.38;filter:drop-shadow(0 0 4px #45edff)}
+#fallback .hx-energy-particle{opacity:.9;filter:drop-shadow(0 0 5px #9affff)}
+#fallback .hx-energy-core{opacity:.9;filter:drop-shadow(0 0 4px #e2ffff)}
+#fallback .f-core{z-index:2}
+#fallback .f-planet .f-ball::after{
+  content:"";position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid rgba(168,250,255,.9);box-shadow:0 0 23px #62ebff99;
+  opacity:0;pointer-events:none
+}
+#fallback .f-planet.hx-energy-received .f-ball::after{animation:hx-energy-arrive 1.05s ease-out both}
+@keyframes hx-energy-arrive{
+  0%{opacity:0;transform:scale(.82)}
+  26%{opacity:.95;transform:scale(1.04)}
+  100%{opacity:0;transform:scale(1.3)}
+}
+#fallback .f-core.hx-emitting .f-logo-clean{
+  animation:hx-logo-emit 1.25s ease-out
+}
+@keyframes hx-logo-emit{
+  0%,100%{filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
+  30%{filter:drop-shadow(0 0 29px rgba(137,252,255,1)) brightness(1.24)}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-energy-layer{display:none!important}
+  #fallback .f-core.hx-emitting .f-logo-clean,
+  #fallback .f-planet.hx-energy-received .f-ball::after{animation:none!important}
+}
 </style>
 </head>
 <body>
@@ -233,6 +267,18 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
   <div class="f-title"><div class="f-kicker">Creatividad × Tecnología</div><h1>Explora nuestro <em>universo.</em></h1><p>Donde cada proyecto es un mundo. Toca un planeta para descubrir lo que hemos construido.</p></div>
   <div class="f-space" aria-label="Tres planetas de proyectos">
     <div class="f-orbit"></div><div class="f-orbit two"></div>
+    <svg class="hx-energy-layer" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="hx-energy-dot">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="45%" stop-color="#c3fdff"/>
+          <stop offset="100%" stop-color="#3cdae9" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <path class="hx-energy-trail" fill="none" stroke="#57edff" stroke-width="1.8" stroke-linecap="round"/>
+      <circle class="hx-energy-particle" r="7" fill="url(#hx-energy-dot)"/>
+      <circle class="hx-energy-core" r="2.5" fill="#e5ffff"/>
+    </svg>
     <div class="f-core" aria-label="Logo de Huxcasti"><span class="f-logo-clean" aria-hidden="true"></span></div>
     <div class="f-coming" aria-label="Futuro proyecto: próximamente"><span class="f-coming-ball" aria-hidden="true"></span><span>Próximamente</span></div>
     <a class="f-planet f-cine" href="#world-cine" aria-label="Acercarse al planeta Cine Manuel Nieves"><span class="f-props" aria-hidden="true"><span class="f-prop">🎬</span><span class="f-prop">📷</span></span><span class="f-ball"></span><strong>Cine Manuel Nieves</strong><small>Cine & boletos · Acércate</small></a>
@@ -424,6 +470,99 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && frame) { cancelAnimationFrame(frame); frame = 0; }
   });
+})();
+</script>
+<!-- Huxcasti Universe: la H envía energía a cada planeta por turnos. -->
+<script>
+(() => {
+  const space = document.querySelector('#fallback .f-space');
+  const core = space && space.querySelector('.f-core');
+  const svg = space && space.querySelector('.hx-energy-layer');
+  if (!space || !core || !svg || !window.requestAnimationFrame) return;
+  const worlds = Array.from(space.querySelectorAll('a.f-planet'));
+  if (worlds.length !== 3) return;
+  const line = svg.querySelector('.hx-energy-trail');
+  const particle = svg.querySelector('.hx-energy-particle');
+  const glow = svg.querySelector('.hx-energy-core');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let turn = 0, frame = 0, timer = 0, arrivalTimer = 0;
+  let active = false;
+
+  function pos(el, containerRect) {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2 - containerRect.left,
+      y: rect.top + rect.height / 2 - containerRect.top
+    };
+  }
+  function render(from, to, progress) {
+    const dx = to.x - from.x, dy = to.y - from.y;
+    const bend = Math.min(32, Math.hypot(dx, dy) * .12);
+    const cx = (from.x + to.x) / 2 - dy / Math.max(1, Math.hypot(dx,dy)) * bend;
+    const cy = (from.y + to.y) / 2 + dx / Math.max(1, Math.hypot(dx,dy)) * bend;
+    line.setAttribute('d', 'M '+from.x+' '+from.y+' Q '+cx+' '+cy+' '+to.x+' '+to.y);
+    const t = progress, m = 1 - t;
+    const x = m*m*from.x + 2*m*t*cx + t*t*to.x;
+    const y = m*m*from.y + 2*m*t*cy + t*t*to.y;
+    particle.setAttribute('cx', x);
+    particle.setAttribute('cy', y);
+    glow.setAttribute('cx', x);
+    glow.setAttribute('cy', y);
+    // A soft pulse fades in and out instead of a permanent bright wire.
+    line.style.opacity = String(.2 + .33 * Math.sin(t * Math.PI));
+    particle.style.opacity = String(Math.sin(t * Math.PI) * .86);
+    glow.style.opacity = String(Math.sin(t * Math.PI) * .95);
+  }
+  function reset() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    active = false;
+    svg.classList.remove('hx-energy-active');
+    core.classList.remove('hx-emitting');
+  }
+  function send() {
+    if (active || document.hidden || reduce.matches) return;
+    const target = worlds[turn % worlds.length];
+    turn++;
+    const ball = target.querySelector('.f-ball');
+    if (!ball || !space.clientWidth || !space.clientHeight) return;
+    const duration = 1250;
+    let started;
+    active = true;
+    svg.classList.add('hx-energy-active');
+    core.classList.add('hx-emitting');
+
+    function tick(now) {
+      if (!active) return;
+      if (document.hidden || reduce.matches) { reset(); return; }
+      if (started === undefined) started = now;
+      const t = Math.min(1, (now - started) / duration);
+      const container = space.getBoundingClientRect();
+      svg.setAttribute('viewBox', '0 0 '+space.clientWidth+' '+space.clientHeight);
+      render(pos(core, container), pos(ball, container), t);
+      if (t < 1) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        frame = 0;
+        reset();
+        target.classList.remove('hx-energy-received');
+        // Force animation restart if the user is dragging during arrival.
+        void target.offsetWidth;
+        target.classList.add('hx-energy-received');
+        clearTimeout(arrivalTimer);
+        arrivalTimer = setTimeout(() => target.classList.remove('hx-energy-received'), 1100);
+      }
+    }
+    frame = requestAnimationFrame(tick);
+  }
+
+  // One planet at a time; the existing planet gestures remain untouched.
+  timer = setInterval(send, 6900);
+  setTimeout(send, 2200);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) reset();
+  });
+  if (reduce.addEventListener) reduce.addEventListener('change', () => { if (reduce.matches) reset(); });
 })();
 </script>
 </body></html>
