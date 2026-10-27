@@ -269,6 +269,7 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
   #fallback .f-title{margin-top:13px}
   #fallback .f-title h1{margin-top:10px;margin-bottom:6px}
   #fallback .f-title p{margin-top:7px}
+  #fallback .f-cine{left:20%;top:37%}
   #fallback .f-space{
     height:clamp(310px,43svh,430px);min-height:310px;
     margin-top:0;margin-bottom:0
@@ -364,33 +365,58 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
   const worlds = [...space.querySelectorAll('a.f-planet')];
   if (worlds.length !== 3) return;
 
+  const orbit = space.querySelector('.f-orbit:not(.two)');
+  if (!orbit) return;
   let angle = 0, points = [], drag = null, skipClick = null;
 
+  // La trayectoria de los planetas utiliza exactamente la elipse visible.
+  const tilt = -18 * Math.PI / 180;
+  const cosTilt = Math.cos(tilt), sinTilt = Math.sin(tilt);
+  function track() {
+    return {
+      cx: space.clientWidth * .5,
+      cy: space.clientHeight * .5,
+      a: orbit.offsetWidth * .5,
+      b: orbit.offsetHeight * .5
+    };
+  }
+  function ballOffset(planet) {
+    const ball = planet.querySelector('.f-ball');
+    return {
+      x: ball.offsetLeft + ball.offsetWidth * .5 - planet.offsetWidth * .5,
+      y: ball.offsetTop + ball.offsetHeight * .5 - planet.offsetHeight * .5
+    };
+  }
+  function ellipseAngle(dx, dy, t) {
+    const x = dx * cosTilt + dy * sinTilt;
+    const y = -dx * sinTilt + dy * cosTilt;
+    return Math.atan2(y / t.b, x / t.a);
+  }
   function originalPositions() {
     const old = worlds.map(p => [p.style.left, p.style.top]);
     worlds.forEach(p => { p.style.left = ''; p.style.top = ''; });
-    points = worlds.map(p => ({ x: p.offsetLeft, y: p.offsetTop }));
+    const t = track();
+    points = worlds.map(p => {
+      const offset = ballOffset(p);
+      return ellipseAngle(p.offsetLeft + offset.x - t.cx,
+                          p.offsetTop + offset.y - t.cy, t);
+    });
     worlds.forEach((p, i) => { p.style.left = old[i][0]; p.style.top = old[i][1]; });
   }
   function draw() {
-    const w = space.clientWidth, h = space.clientHeight;
-    if (!w || !h || points.length !== 3) return;
-    const cx = w * .5, cy = h * .53;
-    const ratio = (w * .425) / (h * .36);
-    const c = Math.cos(angle), s = Math.sin(angle);
+    const t = track();
+    if (!t.a || !t.b || points.length !== 3) return;
     worlds.forEach((p, i) => {
-      const dx = points[i].x - cx, dy = points[i].y - cy;
-      p.style.left = (cx + dx * c - dy * ratio * s) + 'px';
-      p.style.top = (cy + dx / ratio * s + dy * c) + 'px';
+      const phi = points[i] + angle;
+      const u = t.a * Math.cos(phi), v = t.b * Math.sin(phi);
+      const offset = ballOffset(p);
+      p.style.left = (t.cx + u * cosTilt - v * sinTilt - offset.x) + 'px';
+      p.style.top = (t.cy + u * sinTilt + v * cosTilt - offset.y) + 'px';
     });
   }
   function fingerAngle(x, y) {
-    const box = space.getBoundingClientRect();
-    const w = space.clientWidth, h = space.clientHeight;
-    const ratio = (w * .425) / (h * .36);
-    const dx = (x - box.left - w * .5) / ratio;
-    const dy = y - box.top - h * .53;
-    return Math.atan2(dy, dx);
+    const box = space.getBoundingClientRect(), t = track();
+    return ellipseAngle(x - box.left - t.cx, y - box.top - t.cy, t);
   }
   function shortestTurn(from, to) {
     const d = to - from;
@@ -398,6 +424,7 @@ filter:drop-shadow(0 0 16px rgba(31,223,235,.85))}
   }
 
   originalPositions();
+  draw();
   window.addEventListener('resize', () => { originalPositions(); draw(); }, { passive: true });
 
   worlds.forEach(planet => {
