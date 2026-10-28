@@ -403,21 +403,23 @@ body.webgl-ready .card .back{margin-top:6px}
   #fallback .f-space{height:298px;min-height:298px}
 }
 
-/* V6 — iPhone-safe round planets.
-   The texture lives on the circular ball itself, not a square GPU child. */
+/* V7: naturally shaded geological planets; procedural seamless terrain.
+   The texture remains on the circular element for reliable iOS Safari rendering. */
 #fallback .f-planet .f-ball.hx-textured{
   position:relative;isolation:isolate;
   border-radius:50%!important;
-  border:1px solid rgba(230,249,255,.34);
+  border:1px solid rgba(195,224,233,.25);
   background-repeat:repeat-x!important;
   background-size:200% 100%!important;
   background-position:0% center;
   background-clip:padding-box;
-  box-shadow:inset -16px -13px 18px rgba(1,2,13,.66),
-    inset 5px 5px 10px rgba(255,255,240,.16),
-    0 0 17px currentColor,
-    0 0 40px color-mix(in srgb,currentColor 24%,transparent);
-  animation:hx-world-spin var(--hx-world-day,68s) linear infinite;
+  box-shadow:
+    inset -14px -12px 20px rgba(1,3,13,.67),
+    inset 4px 6px 9px rgba(246,253,255,.10),
+    0 0 11px color-mix(in srgb,currentColor 35%,transparent),
+    0 0 26px color-mix(in srgb,currentColor 15%,transparent);
+  filter:contrast(1.07) saturate(.95);
+  animation:hx-world-spin var(--hx-world-day,72s) linear infinite;
 }
 @keyframes hx-world-spin{
   from{background-position:0% center}
@@ -426,26 +428,24 @@ body.webgl-ready .card .back{margin-top:6px}
 #fallback .f-planet .f-ball.hx-textured::before{
   content:"";position:absolute;inset:0;z-index:2;opacity:1;
   border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at var(--hx-light-x,36%) var(--hx-light-y,30%),
-    rgba(255,253,239,.52) 0%,
-    rgba(243,247,255,.21) 21%,
-    rgba(15,19,36,.06) 34%,
-    rgba(5,8,23,.39) 63%,
-    rgba(2,4,16,.84) 88%,
-    rgba(1,3,13,.97) 100%),
-    radial-gradient(circle at 50% 50%,transparent 52%,rgba(1,3,15,.45) 96%);
-  box-shadow:inset 3px 3px 10px rgba(255,255,255,.09),
-    inset -11px -11px 18px rgba(0,0,0,.30);
+  background:
+    radial-gradient(circle at var(--hx-light-x,36%) var(--hx-light-y,30%),
+      rgba(250,255,255,.22) 0%,rgba(219,239,248,.09) 23%,
+      rgba(40,51,78,.06) 40%,rgba(4,10,27,.41) 68%,
+      rgba(1,3,15,.81) 93%,rgba(0,2,10,.91) 100%),
+    radial-gradient(circle at 55% 50%,transparent 46%,rgba(1,3,15,.35) 98%);
+  box-shadow:
+    inset 4px 4px 8px rgba(244,252,255,.05),
+    inset -9px -13px 15px rgba(0,2,12,.40);
 }
 #fallback .f-planet .f-ball.hx-textured::after{z-index:4}
-#fallback .f-cine .f-ball.hx-textured{--hx-world-day:57s;color:#df826b}
-#fallback .f-flambo .f-ball.hx-textured{--hx-world-day:75s;color:#56dbae}
-#fallback .f-just .f-ball.hx-textured{--hx-world-day:66s;color:#bca4ff}
+#fallback .f-cine .f-ball.hx-textured{--hx-world-day:68s;color:#d27964}
+#fallback .f-flambo .f-ball.hx-textured{--hx-world-day:88s;color:#59c39c}
+#fallback .f-just .f-ball.hx-textured{--hx-world-day:78s;color:#b3a0da}
 body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
   #fallback .f-ball.hx-textured{animation:none!important}
 }
-
 
 /* Huxcasti commercial services — self-contained addition below the original universe and CTA. */
 #fallback .hx-services{position:relative;z-index:5;max-width:1040px;margin:12px auto 76px;padding:30px clamp(16px,3vw,34px) 25px;border:1px solid rgba(113,209,229,.2);border-radius:24px;background:linear-gradient(150deg,rgba(12,38,58,.88),rgba(4,16,30,.89));box-shadow:0 18px 55px rgba(0,0,0,.2);text-align:center}
@@ -1291,7 +1291,8 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     {selector:'.f-flambo', type:'flambo', seed:39},
     {selector:'.f-just', type:'just', seed:67}
   ];
-  const W = 480, H = 240;
+  // V7: detailed, seamless geological terrain; generated once per planet, no network images.
+  const W = 640, H = 320;
   const clamp = n => Math.max(0,Math.min(255,Math.round(n)));
   const hash = (x,y,seed) => {
     let n = Math.imul(x,374761393) + Math.imul(y,668265263) + Math.imul(seed,1442695041);
@@ -1302,14 +1303,38 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     const a=Math.floor(x), b=Math.floor(y), fx=x-a, fy=y-b;
     const sx=fx*fx*(3-2*fx), sy=fy*fy*(3-2*fy);
     const n=(dx,dy)=>hash(((a+dx)%period+period)%period,b+dy,seed);
-    const left=n(0,0)*(1-sx)+n(1,0)*sx;
-    const right=n(0,1)*(1-sx)+n(1,1)*sx;
-    return left*(1-sy)+right*sy;
+    const top=n(0,0)*(1-sx)+n(1,0)*sx;
+    const bottom=n(0,1)*(1-sx)+n(1,1)*sx;
+    return top*(1-sy)+bottom*sy;
   }
   function palette(t,stops) {
-    const k=Math.min(stops.length-2,Math.max(0,Math.floor(t*(stops.length-1))));
-    const m=Math.min(1,Math.max(0,t*(stops.length-1)-k));
-    return [0,1,2].map(i=>stops[k][i]*(1-m)+stops[k+1][i]*m);
+    const z=Math.max(0,Math.min(.9999,t))*(stops.length-1);
+    const k=Math.floor(z),f=z-k;
+    const a=stops[k],b=stops[k+1];
+    return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f];
+  }
+  const rock=[[13,16,28],[38,25,39],[76,39,52],[117,58,58],[157,83,65],[193,127,93],[222,177,134]];
+  const sea=[[4,22,43],[8,40,64],[12,65,81],[26,93,100],[55,119,111]];
+  const soil=[[20,66,65],[33,89,71],[59,111,75],[99,134,88],[151,153,101],[193,183,137],[221,211,170]];
+  const mineral=[[23,18,51],[49,33,83],[84,56,116],[119,77,147],[147,106,175],[185,149,204],[222,195,227]];
+  function drawCrater(ctx,x,y,r,seed,j,deep) {
+    const ry=r*(.65+.22*hash(j,33,seed));
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(1,ry/r);
+    const g=ctx.createRadialGradient(-r*.16,-r*.19,r*.10,0,0,r);
+    g.addColorStop(0,deep?'rgba(5,8,19,.51)':'rgba(20,14,53,.26)');
+    g.addColorStop(.61,deep?'rgba(12,11,24,.35)':'rgba(31,23,68,.18)');
+    g.addColorStop(.79,'rgba(227,212,196,.11)');
+    g.addColorStop(.91,'rgba(238,210,175,.06)');
+    g.addColorStop(1,'rgba(230,215,207,0)');
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();
+    // A partial sunlit lip reads as an impact rim without a cartoon outline.
+    ctx.strokeStyle=deep?'rgba(245,207,166,.13)':'rgba(215,198,244,.08)';
+    ctx.lineWidth=.5+Math.min(r*.04,.8);
+    ctx.beginPath();ctx.arc(0,0,r*.79,Math.PI*1.03,Math.PI*1.82);ctx.stroke();
+    ctx.restore();
   }
   function texture(type,seed) {
     const canvas=document.createElement('canvas');
@@ -1317,66 +1342,75 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     const ctx=canvas.getContext('2d',{willReadFrequently:false});
     if (!ctx) return '';
     const img=ctx.createImageData(W,H), pixels=img.data;
-    const palettes={
-      cine:[[22,19,46],[59,31,65],[111,46,81],[174,80,93],[225,132,99],[253,186,121]],
-      flambo:[[10,47,70],[18,87,91],[43,116,102],[52,116,70],[88,148,98],[176,201,153]],
-      just:[[32,26,72],[67,48,118],[110,79,158],[146,115,190],[199,167,222],[229,215,244]]
-    };
-    for(let y=0;y<H;y++){
-      const v=y/H;
-      const latitude=Math.abs(v-.5)*2;
-      for(let x=0;x<W;x++){
+    for(let y=0;y<H;y++) {
+      const v=y/H, polar=Math.abs(v-.5)*2;
+      for(let x=0;x<W;x++) {
         const u=x/W;
-        const broad=noise(u*4,v*2,4,seed);
-        const mid=noise(u*10,v*5,10,seed+7);
-        const detail=noise(u*24,v*12,24,seed+14);
-        const grain=noise(u*64,v*32,64,seed+21);
-        const elevation=.51*broad+.27*mid+.16*detail+.06*grain;
-        let t=elevation, rgb;
+        // Wrapped horizontal frequencies keep rotating surfaces seamless.
+        const warp=noise(u*3,v*2,3,seed+91)-.5;
+        const broad=noise(u*5+warp*.58,v*3+warp*.23,5,seed);
+        const mid=noise(u*15+warp*2.1,v*8+warp*.62,15,seed+7);
+        const fine=noise(u*44+warp*3.9,v*23+warp*1.4,44,seed+17);
+        const grain=noise(u*128,v*64,128,seed+27);
+        const elev=.44*broad+.34*mid+.18*fine+.04*grain;
+        let rgb;
         if(type==='cine') {
-          t=Math.min(1,Math.max(0,(elevation-.19)*1.42));
-          rgb=palette(t,palettes.cine);
-          const fault=Math.abs(mid-detail);
-          if(fault<.057 && elevation>.48) {
-            const glow=(.057-fault)/.057*(elevation-.34)*.58;
-            rgb[0]+=75*glow;rgb[1]+=31*glow;rgb[2]-=24*glow;
-          }
+          const e=Math.max(0,Math.min(1,(elev-.20)*1.55));
+          rgb=palette(e,rock);
+          const ridge=1-Math.abs(mid-fine)*2;
+          const strata=Math.sin((v+mid*.065)*94)*(2+3*ridge);
+          const fracture=Math.max(0,.085-Math.abs(mid-fine))/.085;
+          rgb[0]+=strata+fracture*10;
+          rgb[1]+=strata*.55+fracture*3;
+          rgb[2]+=strata*.23-fracture*7;
         } else if(type==='flambo') {
-          if(elevation<.455) {
-            const water=Math.max(0,Math.min(1,elevation/.455));
-            rgb=palette(water,[[5,39,68],[12,77,99],[25,111,110],[70,153,132]]);
+          if(elev<.50) {
+            const t=Math.max(0,Math.min(1,elev/.50));
+            rgb=palette(t,sea);
+            const seaRipples=(fine-.5)*12;
+            rgb[1]+=seaRipples;rgb[2]+=seaRipples;
           } else {
-            t=Math.min(1,(elevation-.455)/.38);
-            rgb=palette(t,[[25,91,73],[40,117,65],[78,145,79],[127,166,110],[204,204,172]]);
+            const t=Math.max(0,Math.min(1,(elev-.50)/.23));
+            rgb=palette(t,soil);
+            // Highlands and subtle coastlines, avoiding flat cartoon green.
+            const cliff=Math.max(0,mid-.63)*38;
+            rgb[0]+=cliff;rgb[1]+=cliff*.8;rgb[2]+=cliff*.5;
           }
-          const cloud=Math.max(0,mid*.5+grain*.5-.71)*.38;
-          rgb=rgb.map(c=>c*(1-cloud)+237*cloud);
+          const shore=Math.abs(elev-.50);
+          if(shore<.018){const surf=(1-shore/.018)*15;rgb[0]+=surf*.7;rgb[1]+=surf;rgb[2]+=surf*.9;}
+          // Thin discontinuous cloud strands over the surface.
+          const cloud=Math.max(0,(fine*.50+mid*.50-.66))*1.35;
+          const veil=Math.min(.24,cloud)*(1-polar*.38);
+          rgb=rgb.map(v=>(1-veil)*v+veil*229);
         } else {
-          t=Math.min(1,Math.max(0,(elevation-.19)*1.52));
-          rgb=palette(t,palettes.just);
-          if(detail>.66 && mid>.48){const glint=(detail-.66)*.75;rgb=rgb.map(c=>c+(252-c)*glint);}
+          const e=Math.max(0,Math.min(1,(elev-.22)*1.48));
+          rgb=palette(e,mineral);
+          const vein=Math.abs(fine-mid*.87-.073);
+          const threads=Math.max(0,.052-vein)/.052;
+          const ridge=1-Math.abs(2*fine-1);
+          rgb[0]+=threads*21+ridge*5;
+          rgb[1]+=threads*14+ridge*5;
+          rgb[2]+=threads*25+ridge*7;
         }
-        const polar=1-latitude*.14;
-        const micro=(grain-.5)*15;
-        const index=(y*W+x)*4;
-        pixels[index]=clamp(rgb[0]*polar+micro);
-        pixels[index+1]=clamp(rgb[1]*polar+micro);
-        pixels[index+2]=clamp(rgb[2]*polar+micro);
-        pixels[index+3]=255;
+        const micro=(grain-.5)*22 + (fine-.5)*9;
+        const latitude=1-polar*.13;
+        const i=(y*W+x)*4;
+        pixels[i]=clamp(rgb[0]*latitude+micro);
+        pixels[i+1]=clamp(rgb[1]*latitude+micro);
+        pixels[i+2]=clamp(rgb[2]*latitude+micro);
+        pixels[i+3]=255;
       }
     }
     ctx.putImageData(img,0,0);
-    if(type==='cine'){
-      // A few muted circular impact basins complete the volcanic surface.
-      for(let j=0;j<19;j++){
-        const cx=hash(j,4,seed)*W, cy=(.13+hash(j,7,seed)*.74)*H;
-        const radius=3+hash(j,10,seed)*11;
-        const grad=ctx.createRadialGradient(cx,cy,radius*.26,cx,cy,radius);
-        grad.addColorStop(0,'rgba(6,5,24,.36)');
-        grad.addColorStop(.66,'rgba(13,5,25,.32)');
-        grad.addColorStop(.83,'rgba(247,171,138,.18)');
-        grad.addColorStop(1,'rgba(247,171,138,0)');
-        ctx.fillStyle=grad;ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.fill();
+    if(type==='cine'||type==='just'){
+      const total=type==='cine'?95:33;
+      for(let j=0;j<total;j++){
+        const cx=hash(j,4,seed)*W;
+        const cy=(.085+hash(j,7,seed)*.83)*H;
+        const radius=(j<18?4.5:1.6)+hash(j,10,seed)*(j<18?11:4.3);
+        drawCrater(ctx,cx,cy,radius,seed,j,type==='cine');
+        if(cx<radius)drawCrater(ctx,cx+W,cy,radius,seed,j,type==='cine');
+        if(cx>W-radius)drawCrater(ctx,cx-W,cy,radius,seed,j,type==='cine');
       }
     }
     return canvas.toDataURL('image/png');
