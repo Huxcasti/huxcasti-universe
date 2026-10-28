@@ -260,6 +260,47 @@ body.webgl-ready .card .back{margin-top:6px}
   }
 }
 
+
+/* Resplandor energético: luz azul detrás del emblema, sin placa ni sombras sólidas. */
+#fallback .f-core.hx-minimal-core .hx-energy-aura{
+  position:absolute;z-index:0;pointer-events:none;
+  inset:-45px;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 48%,
+      rgba(184,251,255,.30) 0%,
+      rgba(74,233,252,.36) 19%,
+      rgba(29,177,224,.30) 37%,
+      rgba(19,118,187,.13) 58%,
+      rgba(15,86,155,0) 76%);
+  filter:blur(7px);opacity:.91;
+  box-shadow:0 0 31px rgba(28,170,227,.13);
+  transform:scale(.92);
+  animation:hx-aura-breathe 5.5s ease-in-out infinite;
+}
+#fallback .f-core.hx-minimal-core .f-h-scene{
+  z-index:1;
+}
+#fallback .f-core.hx-minimal-core .f-logo-clean{
+  filter:drop-shadow(0 0 6px rgba(87,242,255,.78)) drop-shadow(0 0 18px rgba(45,197,246,.32));
+}
+#fallback .f-core.hx-minimal-core::before{
+  border-color:rgba(114,232,255,.48);
+  box-shadow:0 0 17px rgba(44,202,248,.24), inset 0 0 15px rgba(43,197,248,.12);
+}
+#fallback .f-core.hx-minimal-core.hx-emitting .hx-energy-aura{
+  animation-duration:3.5s;filter:blur(7px) brightness(1.22);
+}
+@keyframes hx-aura-breathe{
+  0%,100%{transform:scale(.88);opacity:.76}
+  50%{transform:scale(1.09);opacity:1}
+}
+@media(max-width:600px){
+  #fallback .f-core.hx-minimal-core .hx-energy-aura{inset:-35px;filter:blur(6px)}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .f-core.hx-minimal-core .hx-energy-aura{animation:none!important;transform:scale(1)}
+}
+
 /* Solo los planetas reciben los gestos orbitales; los espacios vacíos no giran. */
 #fallback .f-space{touch-action:auto}
 #fallback .f-space a.f-planet{touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
@@ -799,7 +840,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       <circle class="hx-energy-particle" r="7" fill="url(#hx-energy-dot)"/>
       <circle class="hx-energy-core" r="2.5" fill="#e5ffff"/>
     </svg>
-    <div class="f-core hx-minimal-core" aria-label="Logo de Huxcasti"><span class="f-h-scene" aria-hidden="true"><span class="f-logo-clean"></span></span></div>
+    <div class="f-core hx-minimal-core" aria-label="Logo de Huxcasti"><span class="hx-energy-aura" aria-hidden="true"></span><span class="f-h-scene" aria-hidden="true"><span class="f-logo-clean"></span></span></div>
     <div class="f-coming" aria-label="Futuro proyecto: próximamente"><span class="f-coming-ball" aria-hidden="true"></span><span>Próximamente</span></div>
     <a class="f-planet f-cine" href="#world-cine" aria-label="Acercarse al planeta Cine Manuel Nieves"><span class="f-props" aria-hidden="true"><span class="f-prop">🎬</span><span class="f-prop">📷</span></span><span class="f-ball"></span><strong>Cine Manuel Nieves</strong></a>
     <a class="f-planet f-flambo" href="#world-flambo" aria-label="Explorar Hacienda El Flambo"><span class="f-props" aria-hidden="true"><span class="f-prop">🐎</span><span class="f-prop">🐐</span></span><span class="f-ball"></span><strong>Hacienda El Flambo</strong></a>
