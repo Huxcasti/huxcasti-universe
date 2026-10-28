@@ -1579,27 +1579,27 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 }
 
 
-/* Huxcasti Universe — plasma volumétrico, no cables (v3).
+/* Huxcasti Universe — plasma etéreo equilibrado y sutil (v4).
    El resplandor del planeta y sus imágenes originales quedan intactos. */
 #fallback .hx-portfolio .hx-plasma-canvas{
   position:absolute;inset:0;width:100%;height:100%;display:block;
   z-index:2;pointer-events:none;user-select:none;-webkit-user-select:none;
-  mix-blend-mode:screen;background:transparent!important;
+  opacity:.72;mix-blend-mode:screen;background:transparent!important;
 }
 #fallback .hx-portfolio .hx-energy-layer.hx-energy-feeder{display:none!important}
 #fallback .hx-portfolio a.f-planet.hx-energy-feeding .f-ball::after{
   content:"";animation:none!important;transform:none!important;
-  opacity:var(--hx-feed-opacity,.48)!important;
+  opacity:var(--hx-feed-opacity,.22)!important;
   background:radial-gradient(circle at var(--hx-feed-x,40%) var(--hx-feed-y,48%),
-    rgba(208,253,255,.96) 0%,
-    rgba(88,205,255,.66) 13%,
-    rgba(25,129,244,.25) 32%,
+    rgba(184,249,255,.68) 0%,
+    rgba(76,178,255,.38) 13%,
+    rgba(25,117,226,.15) 32%,
     transparent 65%)!important;
   mix-blend-mode:screen;pointer-events:none;
   border:0!important;outline:0!important;box-shadow:none!important;
 }
 @media(prefers-reduced-motion:reduce){
-  #fallback .hx-portfolio .hx-plasma-canvas{opacity:.72}
+  #fallback .hx-portfolio .hx-plasma-canvas{opacity:.54}
 }
 
 </style>
@@ -2058,7 +2058,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     const dx=b.x-a.x,dy=b.y-a.y;
     const length=Math.max(1,Math.hypot(dx,dy));
     const normalX=-dy/length,normalY=dx/length;
-    // Fuertes corrientes anchas y turbulentas, sin línea central recta.
+    // Corrientes tenues y ondulantes, sin formar un cable luminoso.
     // Las puntas se funden físicamente en las superficies.
     const f=filament;
     const turn=(world.index===1?-1:1);
@@ -2108,11 +2108,11 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     if(Math.hypot(b.x-a.x,b.y-a.y)<3)return;
     world.time=time;
 
-    // La anchura de la nube depende del espacio real entre mundos.
+    // Brillo estrecho y transparente, proporcional al espacio entre mundos.
     const span=Math.hypot(b.x-a.x,b.y-a.y);
-    const plume=clamp(span*.24,9,23);
+    const plume=clamp(span*.075,3,6.2);
     ctx.save();
-    ctx.globalCompositeOperation='lighter';
+    ctx.globalCompositeOperation='source-over';
     // Luz de plasma suave, sin un cable blanco sólido.
     const deep=gradient(a,b,[[0,'rgba(14,104,243,.78)'],
       [.50,'rgba(8,78,222,.92)'],[1,'rgba(38,165,255,.72)']]);
@@ -2121,57 +2121,57 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     const bright=gradient(a,b,[[0,'rgba(82,198,255,.85)'],
       [.55,'rgba(81,216,255,.93)'],[1,'rgba(191,254,255,.90)']]);
 
-    // Halo disperso: varias corrientes superpuestas parecen niebla luminosa.
-    line(a,b,world,-2,deep,plume*2.0,.12,8);
-    line(a,b,world,3,deep,plume*1.65,.11,7);
-    line(a,b,world,0,azure,plume*.95,.12,5);
-    for(let j=0;j<7;j++){
-      const strand=(j-3)*1.55;
-      line(a,b,world,strand,j%2?azure:deep,clamp(plume*.5,4,11),.065,3);
+    // Resplandor atmosférico tenue: evitar acumulación de luminosidad.
+    line(a,b,world,-1.4,deep,plume*1.45,.10,3.5);
+    line(a,b,world,1.8,deep,plume*1.15,.09,3);
+    line(a,b,world,0,azure,plume*.78,.13,2);
+    for(let j=0;j<4;j++){
+      const strand=(j-1.5)*1.15;
+      line(a,b,world,strand,j%2?azure:deep,clamp(plume*.38,1.1,2.4),.10,1.5);
     }
 
     // Ríos de energía: múltiples fibras desordenadas en vez de tres rayos.
-    for(let j=0;j<22;j++){
-      const strand=(j-10.5)*.87;
+    for(let j=0;j<8;j++){
+      const strand=(j-3.5)*.85;
       const phase=Math.sin(time*.63+j*2.3+world.index);
-      const shimmer=.44+.24*phase;
-      const thick=j%5===0?1.35:.50+(j%3)*.13;
+      const shimmer=.23+.10*phase;
+      const thick=j%4===0?.69:.35+(j%3)*.11;
       line(a,b,world,strand,j%4===0?bright:azure,thick,shimmer);
     }
     // Columna clara imperfecta, dividida en varias hebras, sin línea recta central.
-    for(let j=0;j<3;j++){
-      line(a,b,world,(j-1)*2.9,bright,.85,.31,1.8);
+    for(let j=0;j<2;j++){
+      line(a,b,world,(j-.5)*2.3,bright,.61,.24,.9);
     }
 
     if(!reduced.matches){
       // Relámpagos que fluyen hacia afuera por el interior del plasma,
       // con colas suaves; nunca hay un relámpago rígido y estático.
-      for(let j=0;j<4;j++){
+      for(let j=0;j<2;j++){
         const head=(time*(.25+j*.022)+world.index*.24+j*.245)%1;
         const tail=Math.max(0,head-(.12+j*.013));
         if(head<.04||head>.98)continue;
         const strand=(j-1.5)*2.3;
-        ctx.globalAlpha=.33+.28*Math.sin(Math.PI*head);
+        ctx.globalAlpha=.22+.13*Math.sin(Math.PI*head);
         ctx.strokeStyle=j%2?bright:'rgba(163,244,255,.85)';
-        ctx.lineWidth=j===0?1.65:1.15;
-        ctx.shadowColor='#37c5ff';ctx.shadowBlur=4;
+        ctx.lineWidth=j===0?1.05:.7;
+        ctx.shadowColor='#37c5ff';ctx.shadowBlur=2;
         paintCurve(a,b,world,strand,tail,head);ctx.stroke();ctx.shadowBlur=0;
       }
       // Chispas muy pequeñas, colocadas sobre los filamentos naturales.
-      for(let j=0;j<10;j++){
+      for(let j=0;j<5;j++){
         const t=(time*(.13+j*.007)+world.index*.17+j*.14)%1;
         if(t<.05||t>.97)continue;
         const point=makeCurve(a,b,world,t,(j-5)*1.5);
-        const flicker=.3+.5*Math.sin(Math.PI*t);
+        const flicker=.17+.2*Math.sin(Math.PI*t);
         ctx.globalAlpha=flicker;
         ctx.fillStyle=j%3===0?'#dbffff':'#5fcbff';
-        ctx.beginPath();ctx.arc(point.x,point.y,j%3===0?1.2:.68,0,TAU);ctx.fill();
+        ctx.beginPath();ctx.arc(point.x,point.y,j%3===0?.85:.5,0,TAU);ctx.fill();
       }
     }
     ctx.globalAlpha=1;
     // La energía sale de la corteza del planeta y se difumina al tocar el siguiente.
-    bloom(a.x,a.y,clamp(plume*.95,10,20),.55);
-    bloom(b.x,b.y,clamp(plume*1.3,11,24),.52);
+    bloom(a.x,a.y,clamp(plume*1.3,5,11),.24);
+    bloom(b.x,b.y,clamp(plume*1.5,6,13),.22);
     ctx.restore();
 
     const lightX=clamp(50-nx*45,4,96);
@@ -2179,7 +2179,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     world.ball.style.setProperty('--hx-feed-x',lightX.toFixed(1)+'%');
     world.ball.style.setProperty('--hx-feed-y',lightY.toFixed(1)+'%');
     world.ball.style.setProperty('--hx-feed-opacity',
-      (.47+.08*Math.sin(time*1.75+world.index)).toFixed(2));
+      (.21+.04*Math.sin(time*1.75+world.index)).toFixed(2));
   }
   worlds.forEach(w=>w.planet.classList.add('hx-energy-feeding'));
   function render(now){
