@@ -1531,7 +1531,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 }
 #fallback .hx-portfolio .hx-energy-beam-outer{
   opacity:.56;
-  filter:blur(4px);
+  filter:blur(4.5px);
 }
 #fallback .hx-portfolio .hx-energy-trail{
   filter:drop-shadow(0 0 5px #3ad7ff);
@@ -1576,39 +1576,6 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight{
     transition:none!important;
   }
-}
-
-
-
-/* HUXCASTI PLASMA LINK v2: irregular electric current, not a moving line or a circular halo. */
-#fallback .hx-portfolio .hx-energy-layer{isolation:isolate;mix-blend-mode:screen;pointer-events:none!important;overflow:visible}
-#fallback .hx-portfolio .hx-energy-plasma-haze{opacity:0;filter:blur(12px)}
-#fallback .hx-portfolio .hx-energy-beam-outer{opacity:0;filter:blur(5.5px)}
-#fallback .hx-portfolio .hx-energy-trail{opacity:0;filter:drop-shadow(0 0 5px rgba(58,223,255,.85))}
-#fallback .hx-portfolio .hx-energy-beam-inner{opacity:0;filter:drop-shadow(0 0 3px #ecffff)}
-#fallback .hx-portfolio .hx-energy-arc{opacity:0;filter:drop-shadow(0 0 3px #5feaff)}
-#fallback .hx-portfolio .hx-energy-origin-aura,
-#fallback .hx-portfolio .hx-energy-impact-aura{opacity:0;filter:blur(2.5px)}
-#fallback .hx-portfolio .hx-energy-origin-hot,
-#fallback .hx-portfolio .hx-energy-impact-hot{opacity:0;filter:drop-shadow(0 0 6px #d6ffff)}
-#fallback .hx-portfolio .hx-energy-particle,
-#fallback .hx-portfolio .hx-energy-core,
-#fallback .hx-portfolio .hx-energy-surge,
-#fallback .hx-portfolio .hx-energy-fragment,
-#fallback .hx-portfolio .hx-energy-impact-sparks circle{opacity:0;filter:drop-shadow(0 0 4px #7cedff)}
-#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-cosmos-backlight{filter:brightness(1.16) saturate(1.22)}
-#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-cosmos-backlight{filter:brightness(1.38) saturate(1.34)}
-/* The original H sphere and its outline never scale, pulse or acquire an external ring. */
-#fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-logo{transform:none!important;animation:none!important}
-#fallback .hx-portfolio .f-planet.hx-energy-received .f-ball.hx-textured::after{
-  animation:hx-world-charge-surface 1.35s ease-out both!important;
-}
-@media(max-width:600px){
-  #fallback .hx-portfolio .hx-energy-plasma-haze{filter:blur(8px)}
-  #fallback .hx-portfolio .hx-energy-beam-outer{filter:blur(4px)}
-}
-@media(prefers-reduced-motion:reduce){
-  #fallback .hx-portfolio .hx-energy-layer{display:none!important}
 }
 
 </style>
@@ -1743,60 +1710,32 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     <div class="f-orbit two"><span class="hx-orbit-glint hx-orbit-glint-inner" aria-hidden="true"></span></div>
     <svg class="hx-energy-layer" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="hx-energy-tail" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#27aeeb" stop-opacity=".36"/>
-          <stop offset="46%" stop-color="#19befe" stop-opacity=".82"/>
-          <stop offset="78%" stop-color="#8afaff" stop-opacity=".96"/>
-          <stop offset="100%" stop-color="#eaffff"/>
-        </linearGradient>
         <radialGradient id="hx-energy-dot">
           <stop offset="0%" stop-color="#ffffff"/>
-          <stop offset="24%" stop-color="#dcffff"/>
-          <stop offset="55%" stop-color="#5ceaff" stop-opacity=".88"/>
-          <stop offset="100%" stop-color="#1ba7ef" stop-opacity="0"/>
+          <stop offset="45%" stop-color="#c3fdff"/>
+          <stop offset="100%" stop-color="#3cdae9" stop-opacity="0"/>
         </radialGradient>
+        <linearGradient id="hx-energy-tail" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#34caec" stop-opacity="0"/>
+          <stop offset="48%" stop-color="#51ddf4" stop-opacity=".45"/>
+          <stop offset="100%" stop-color="#d7ffff" stop-opacity=".94"/>
+        </linearGradient>
         <radialGradient id="hx-energy-launch-glow">
-          <stop offset="0%" stop-color="#f9ffff" stop-opacity=".96"/>
-          <stop offset="24%" stop-color="#b7faff" stop-opacity=".74"/>
-          <stop offset="55%" stop-color="#30c9ff" stop-opacity=".3"/>
-          <stop offset="100%" stop-color="#079bfc" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="hx-energy-impact-glow">
-          <stop offset="0%" stop-color="#f5ffff" stop-opacity=".9"/>
-          <stop offset="22%" stop-color="#91fcff" stop-opacity=".75"/>
-          <stop offset="52%" stop-color="#30c6ff" stop-opacity=".35"/>
-          <stop offset="100%" stop-color="#00a1ff" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#ffffff" stop-opacity=".98"/>
+          <stop offset="20%" stop-color="#bbffff" stop-opacity=".82"/>
+          <stop offset="52%" stop-color="#38ceff" stop-opacity=".38"/>
+          <stop offset="100%" stop-color="#17a9ef" stop-opacity="0"/>
         </radialGradient>
       </defs>
-      <!-- Multiple turbulent light layers, all confined to the space between planet surfaces. -->
-      <path class="hx-energy-plasma-haze" fill="none" stroke="#159ffa" stroke-width="29" stroke-linecap="round"/>
-      <path class="hx-energy-beam-outer" fill="none" stroke="#25d0ff" stroke-width="14" stroke-linecap="round"/>
-      <path class="hx-energy-trail" fill="none" stroke="url(#hx-energy-tail)" stroke-width="4.6" stroke-linecap="round"/>
-      <path class="hx-energy-arc hx-energy-arc-a" fill="none" stroke="#62e9ff" stroke-width="1.8" stroke-linecap="round"/>
-      <path class="hx-energy-arc hx-energy-arc-b" fill="none" stroke="#3ecbff" stroke-width="1.45" stroke-linecap="round"/>
-      <path class="hx-energy-arc hx-energy-arc-c" fill="none" stroke="#c4ffff" stroke-width=".95" stroke-linecap="round"/>
-      <path class="hx-energy-beam-inner" fill="none" stroke="#f2ffff" stroke-width="1.45" stroke-linecap="round"/>
-      <circle class="hx-energy-origin-aura" r="22" fill="url(#hx-energy-launch-glow)"/>
-      <circle class="hx-energy-origin-hot" r="3.3" fill="#eeffff"/>
-      <circle class="hx-energy-impact-aura" r="22" fill="url(#hx-energy-impact-glow)"/>
-      <circle class="hx-energy-impact-hot" r="3.8" fill="#f4ffff"/>
-      <circle class="hx-energy-particle" r="10" fill="url(#hx-energy-dot)"/>
-      <circle class="hx-energy-core" r="2.9" fill="#f8ffff"/>
-      <circle class="hx-energy-surge" r="7.5" fill="url(#hx-energy-dot)"/>
-      <circle class="hx-energy-surge" r="6" fill="url(#hx-energy-dot)"/>
-      <circle class="hx-energy-surge" r="5" fill="url(#hx-energy-dot)"/>
-      <circle class="hx-energy-fragment" r="1.8" fill="#c8ffff"/>
-      <circle class="hx-energy-fragment" r="1.5" fill="#70ebff"/>
-      <circle class="hx-energy-fragment" r="1.35" fill="#eeffff"/>
-      <circle class="hx-energy-fragment" r="1.25" fill="#5ce6ff"/>
-      <circle class="hx-energy-fragment" r="1.6" fill="#b6ffff"/>
-      <circle class="hx-energy-fragment" r="1.3" fill="#6edaff"/>
-      <g class="hx-energy-impact-sparks">
-        <circle r="1.75" fill="#deffff"/><circle r="1.3" fill="#8bedff"/>
-        <circle r="1.55" fill="#eeffff"/><circle r="1.2" fill="#4ad6ff"/>
-        <circle r="1.6" fill="#bfffff"/><circle r="1.3" fill="#8ce9ff"/>
-        <circle r="1.5" fill="#f2ffff"/><circle r="1.2" fill="#52d2ff"/>
-      </g>
+      <path class="hx-energy-beam-outer" fill="none" stroke="#29c8ff" stroke-width="11" stroke-linecap="round"/>
+      <path class="hx-energy-trail" fill="none" stroke="url(#hx-energy-tail)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle class="hx-energy-particle" r="7" fill="url(#hx-energy-dot)"/>
+      <path class="hx-energy-beam-inner" fill="none" stroke="#e5ffff" stroke-width="1.05" stroke-linecap="round"/>
+      <circle class="hx-energy-origin-aura" r="15" fill="url(#hx-energy-launch-glow)"/>
+      <circle class="hx-energy-origin-hot" r="2.5" fill="#e8ffff"/>
+      <circle class="hx-energy-fragment hx-fragment-a" r="1.55" fill="#bcffff"/>
+      <circle class="hx-energy-fragment hx-fragment-b" r="1.2" fill="#9ceeff"/>
+      <circle class="hx-energy-core" r="2.5" fill="#e5ffff"/>
     </svg>
     <div class="f-core hx-minimal-core" aria-label="Logo de Huxcasti, núcleo energético del portafolio">
       <span class="hx-energy-aura" aria-hidden="true"></span>
@@ -2032,224 +1971,176 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   });
 })();
 </script>
-<!-- Huxcasti Universe · descargas de plasma orgánico ancladas a los planetas. -->
+<!-- Huxcasti Universe: la H envía energía a cada planeta por turnos. -->
 <script>
 (() => {
-  'use strict';
   const space = document.querySelector('#fallback .f-space');
   const core = space && space.querySelector('.f-core');
   const svg = space && space.querySelector('.hx-energy-layer');
   if (!space || !core || !svg || !window.requestAnimationFrame) return;
   const worlds = Array.from(space.querySelectorAll('a.f-planet'));
   if (worlds.length !== 3) return;
+  const line = svg.querySelector('.hx-energy-trail');
+  const particle = svg.querySelector('.hx-energy-particle');
+  const glow = svg.querySelector('.hx-energy-core');
+  const outerBeam = svg.querySelector('.hx-energy-beam-outer');
+  const innerBeam = svg.querySelector('.hx-energy-beam-inner');
+  const launchAura = svg.querySelector('.hx-energy-origin-aura');
+  const launchHot = svg.querySelector('.hx-energy-origin-hot');
+  const fragments = Array.from(svg.querySelectorAll('.hx-energy-fragment'));
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let turn = 0, frame = 0, timer = 0, arrivalTimer = 0, chargeTimer = 0;
+  let active = false;
 
-  const q = selector => svg.querySelector(selector);
-  const plume = q('.hx-energy-plasma-haze');
-  const halo = q('.hx-energy-beam-outer');
-  const river = q('.hx-energy-trail');
-  const wire = q('.hx-energy-beam-inner');
-  const forks = Array.from(svg.querySelectorAll('.hx-energy-arc'));
-  const launchAura = q('.hx-energy-origin-aura');
-  const launchHot = q('.hx-energy-origin-hot');
-  const impactAura = q('.hx-energy-impact-aura');
-  const impactHot = q('.hx-energy-impact-hot');
-  const headGlow = q('.hx-energy-particle');
-  const headHot = q('.hx-energy-core');
-  const surges = Array.from(svg.querySelectorAll('.hx-energy-surge'));
-  const motes = Array.from(svg.querySelectorAll('.hx-energy-fragment'));
-  const impacts = Array.from(svg.querySelectorAll('.hx-energy-impact-sparks circle'));
-  const gradient = q('#hx-energy-tail');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mobile = window.matchMedia('(max-width: 600px)');
-  const clamp = (x, a=0, b=1) => Math.min(b, Math.max(a, x));
-  const ease = x => { x=clamp(x);return x*x*(3-2*x); };
-  const setPos = (node, point) => {
-    node.setAttribute('cx', point.x.toFixed(1));
-    node.setAttribute('cy', point.y.toFixed(1));
-  };
-  const setOpacity = (node, value) => {
-    node.style.opacity = String(clamp(value));
-  };
-  let currentWorld=0, raf=0, chargeTimer=0, arrivalTimer=0, running=false, tickStart=0;
-  let impacted=null;
-
-  function center(el, root) {
-    const r=el.getBoundingClientRect();
-    return {x:r.left-root.left+r.width*.5,y:r.top-root.top+r.height*.5,r:Math.min(r.width,r.height)*.46};
+  function pos(el, containerRect) {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2 - containerRect.left,
+      y: rect.top + rect.height / 2 - containerRect.top
+    };
   }
-  function hideLayer() {
-    svg.classList.remove('hx-energy-active');
-    [plume,halo,river,wire,...forks,launchAura,launchHot,impactAura,impactHot,headGlow,headHot,...surges,...motes,...impacts].forEach(node=>setOpacity(node,0));
+  // La descarga se libera de la superficie del planeta, nunca del centro.
+  // Cada cuadro recalcula el borde del origen y del destino (flotacion y arrastre).
+  const tailGradient = svg.querySelector('#hx-energy-tail');
+  function render(from, to, progress) {
+    const dx = to.x - from.x, dy = to.y - from.y;
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    const nx = dx / distance, ny = dy / distance;
+    const bend = Math.min(27, distance * .10);
+    const cx = (from.x + to.x) / 2 - ny * bend;
+    const cy = (from.y + to.y) / 2 + nx * bend;
+    const point = t => {
+      const m = 1 - t;
+      return {x:m*m*from.x + 2*m*t*cx + t*t*to.x,
+              y:m*m*from.y + 2*m*t*cy + t*t*to.y};
+    };
+    const t = progress;
+    const head = point(t);
+    const behind = Math.max(0, t - Math.min(.40, 66 / distance));
+    const tail = point(behind);
+    const mid = point((t + behind) / 2);
+    const d = 'M '+tail.x+' '+tail.y+' Q '+mid.x+' '+mid.y+' '+head.x+' '+head.y;
+    line.setAttribute('d', d);
+    outerBeam.setAttribute('d', d);
+    innerBeam.setAttribute('d', d);
+    if (tailGradient) {
+      tailGradient.setAttribute('x1', tail.x);
+      tailGradient.setAttribute('y1', tail.y);
+      tailGradient.setAttribute('x2', head.x);
+      tailGradient.setAttribute('y2', head.y);
+    }
+    particle.setAttribute('cx', head.x);
+    particle.setAttribute('cy', head.y);
+    glow.setAttribute('cx', head.x);
+    glow.setAttribute('cy', head.y);
+    // El nacimiento queda anclado en el borde real del globo.
+    for(const node of [launchAura,launchHot]){
+      node.setAttribute('cx',from.x);
+      node.setAttribute('cy',from.y);
+    }
+    const release=Math.max(0,1-t/.34);
+    launchAura.style.opacity=String(release*.88);
+    launchHot.style.opacity=String(release*.95);
+    launchAura.setAttribute('r',String(10+8*Math.sin(Math.min(1,t/.34)*Math.PI)));
+    // Dos chispas se desprenden de la cola, sin interferir con los gestos.
+    fragments.forEach((node,i)=>{
+      const at=point(Math.max(0,t-(i+1)*.06));
+      const wobble=Math.sin(t*20+i*2.2)*(2.5+i*1.5);
+      node.setAttribute('cx',at.x-ny*wobble);
+      node.setAttribute('cy',at.y+nx*wobble);
+      node.style.opacity=String(Math.max(0,Math.min(1,t/.10,(1-t)/.07))*(i===0?.75:.53));
+    });
+    const fadeIn=Math.min(1,t/.08);
+    const fadeOut=Math.min(1,(1-t)/.045);
+    const fade=Math.max(0,Math.min(fadeIn,fadeOut));
+    line.style.opacity=String(fade*.95);
+    outerBeam.style.opacity=String(fade*.58);
+    innerBeam.style.opacity=String(fade*.93);
+    particle.style.opacity=String(fade*.91);
+    glow.style.opacity=String(fade);
   }
   function reset() {
-    running=false;
-    if(raf)cancelAnimationFrame(raf);
-    raf=0;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    active = false;
+    svg.classList.remove('hx-energy-active');
+    launchAura.style.opacity='0';
+    launchHot.style.opacity='0';
+    fragments.forEach(node=>{node.style.opacity='0';});
+    line.style.opacity='0';
+    outerBeam.style.opacity='0';
+    innerBeam.style.opacity='0';
+    core.classList.remove('hx-emitting', 'hx-charging');
     clearTimeout(chargeTimer);
-    chargeTimer=0;
-    core.classList.remove('hx-charging','hx-emitting');
-    hideLayer();
+    chargeTimer = 0;
   }
-  function trace(from,to,t,time,channel=0,extra=0) {
-    // Curved current: multi-frequency magnetic turbulence, fading to zero at both surfaces.
-    const dx=to.x-from.x, dy=to.y-from.y, dist=Math.max(1,Math.hypot(dx,dy));
-    const nx=-dy/dist, ny=dx/dist;
-    const bend=Math.min(dist*.13,37)*(Math.sin(time*.00032+channel*.45)>.0?1:-1);
-    const curve=p=>{
-      const inv=1-p;
-      const x=inv*inv*from.x+2*inv*p*((from.x+to.x)*.5+nx*bend)+p*p*to.x;
-      const y=inv*inv*from.y+2*inv*p*((from.y+to.y)*.5+ny*bend)+p*p*to.y;
-      const envelope=Math.pow(Math.max(0,Math.sin(Math.PI*p)),.82);
-      const phase=time*.009;
-      const flutter=Math.sin(p*39-phase*1.14+channel*2.6)*.48+
-        Math.sin(p*78+phase*.78+channel*1.4)*.26+
-        Math.sin(p*23-phase*.55+channel*2.9)*.26;
-      const wobble=envelope*((mobile.matches?4.4:7.6)*flutter+extra*Math.sin(p*21+phase*.85+channel)*1.05);
-      return {x:x+nx*wobble,y:y+ny*wobble};
-    };
-    return {point:curve,perp:{x:nx,y:ny},distance:dist};
-  }
-  function pathSegment(trace, fromT, endT, samples, branch=0) {
-    const span=endT-fromT;
-    if(span<=0)return '';
-    let d='';
-    for(let i=0;i<=samples;i++){
-      const p=fromT+span*i/samples;
-      const v=trace.point(p);
-      const arc=branch*Math.sin(Math.PI*i/samples);
-      const x=v.x+trace.perp.x*arc;
-      const y=v.y+trace.perp.y*arc;
-      d+=(i?' L ':'M ')+x.toFixed(1)+' '+y.toFixed(1);
-    }
-    return d;
-  }
-  function animate(from,to,t,time) {
-    const jitter=trace(from,to,t,time);
-    // Plasma grows out of Huxcasti, forms a conductive bridge, then fades after delivery.
-    const extent=ease(t/.52);
-    const intensity=clamp(t/.11)*(1-ease((t-.85)/.15));
-    const d=pathSegment(jitter,0,extent,mobile.matches?19:32);
-    for(const p of [plume,halo,river,wire])p.setAttribute('d',d);
-    setOpacity(plume,intensity*.75);
-    setOpacity(halo,intensity*.72);
-    setOpacity(river,intensity*.98);
-    setOpacity(wire,intensity*.90);
-    const arcCount=mobile.matches?2:3;
-    forks.forEach((fork,i)=>{
-      const lo=.09+i*.085, hi=Math.min(extent,.73+i*.07);
-      const amount=hi>lo+.07?intensity*(.58+i*.09):0;
-      if(i<arcCount&&amount>0){
-        const branch=(i%2===0?1:-1)*(mobile.matches?7.5:12.5)*(1+.15*Math.sin(time*.014+i));
-        fork.setAttribute('d',pathSegment(jitter,lo,hi,mobile.matches?9:13,branch));
-      }
-      setOpacity(fork,i<arcCount?amount:0);
-    });
-    gradient.setAttribute('x1',from.x);
-    gradient.setAttribute('y1',from.y);
-    gradient.setAttribute('x2',to.x);
-    gradient.setAttribute('y2',to.y);
-
-    // Bright ion packets run over the entire conductive channel; not just a single traveling ball.
-    const front=jitter.point(extent);
-    setPos(headGlow,front);setPos(headHot,front);
-    setOpacity(headGlow,intensity*.92*(1-ease((t-.50)/.13)));
-    setOpacity(headHot,intensity*.96*(1-ease((t-.53)/.10)));
-    surges.forEach((s,i)=>{
-      const run=(t*1.65+.86-i*.24)%1;
-      const p=run<=extent?run:extent;
-      const v=jitter.point(p);
-      setPos(s,v);
-      s.setAttribute('r',String((mobile.matches?3.3:5.6)+i*.7));
-      setOpacity(s,extent>.08 && run<extent?intensity*(.55+.38*Math.sin(time*.018+i)**2):0);
-    });
-
-    // At the source: small irregular discharge, not a ring around the planet.
-    setPos(launchAura,from);setPos(launchHot,from);
-    const sourcePower=intensity*(.70+.24*Math.sin(time*.028)**2);
-    launchAura.setAttribute('r',String(18+5*Math.sin(time*.015)**2));
-    setOpacity(launchAura,sourcePower*.84);setOpacity(launchHot,sourcePower*.92);
-    motes.forEach((m,i)=>{
-      const cycle=(t*1.9+i*.17)%1;
-      const p=Math.min(extent,cycle);
-      const v=jitter.point(p);
-      const lateral=Math.sin(i*2.37+time*.012)*(3+4*(i%3));
-      setPos(m,{x:v.x+jitter.perp.x*lateral,y:v.y+jitter.perp.y*lateral});
-      setOpacity(m,intensity*(cycle<extent?(.45+.40*Math.sin(i*1.8+time*.02)**2):0));
-    });
-
-    // Destination reacts as the charge arrives, with a diffuse surface flash and escaping sparks.
-    const arrival=ease((t-.49)/.09)*(1-ease((t-.88)/.12));
-    setPos(impactAura,to);setPos(impactHot,to);
-    impactAura.setAttribute('r',String(16+13*ease((t-.50)/.18)));
-    setOpacity(impactAura,arrival*.90);
-    setOpacity(impactHot,arrival*.90);
-    const spread=ease((t-.52)/.34);
-    impacts.forEach((spark,i)=>{
-      const angle=i*Math.PI*2/impacts.length+(i%2)*.24;
-      const radius=(4+spread*(12+7*(i%3)))*(mobile.matches?.72:1);
-      setPos(spark,{x:to.x+Math.cos(angle)*radius,y:to.y+Math.sin(angle)*radius});
-      setOpacity(spark,arrival*(.65+.3*Math.sin(time*.015+i)**2));
-    });
-  }
-  function deliver() {
-    if(running||document.hidden||reduced.matches)return;
-    const target=worlds[currentWorld%worlds.length];
-    currentWorld++;
-    const ball=target.querySelector('.f-ball');
-    if(!ball||!space.clientWidth||!space.clientHeight)return;
-    running=true;
-    tickStart=0;
+  function send() {
+    if (active || document.hidden || reduce.matches) return;
+    const target = worlds[turn % worlds.length];
+    turn++;
+    const ball = target.querySelector('.f-ball');
+    if (!ball || !space.clientWidth || !space.clientHeight) return;
+    const duration = 1440;
+    let started;
+    active = true;
     svg.classList.add('hx-energy-active');
     core.classList.add('hx-emitting');
-    let received=false;
-    function frame(now){
-      if(!running)return;
-      if(document.hidden||reduced.matches){reset();return}
-      if(!tickStart)tickStart=now;
-      const t=clamp((now-tickStart)/1750);
-      const rect=space.getBoundingClientRect();
-      svg.setAttribute('viewBox','0 0 '+space.clientWidth+' '+space.clientHeight);
-      const source=center(core,rect),dest=center(ball,rect);
-      const dx=dest.x-source.x,dy=dest.y-source.y,length=Math.max(1,Math.hypot(dx,dy));
-      const from={x:source.x+dx/length*source.r,y:source.y+dy/length*source.r};
-      const to={x:dest.x-dx/length*dest.r,y:dest.y-dy/length*dest.r};
-      animate(from,to,t,now);
-      if(!received&&t>=.54){
-        received=true;
-        if(impacted)impacted.classList.remove('hx-energy-received');
-        impacted=target;
+
+    function tick(now) {
+      if (!active) return;
+      if (document.hidden || reduce.matches) { reset(); return; }
+      if (started === undefined) started = now;
+      const t = Math.min(1, (now - started) / duration);
+      const container = space.getBoundingClientRect();
+      svg.setAttribute('viewBox', '0 0 '+space.clientWidth+' '+space.clientHeight);
+      const origin = pos(core, container);
+      const destination = pos(ball, container);
+      const coreBounds = core.getBoundingClientRect();
+      const ballBounds = ball.getBoundingClientRect();
+      const vx = destination.x-origin.x, vy = destination.y-origin.y;
+      const length = Math.max(1,Math.hypot(vx,vy));
+      const nx = vx/length, ny = vy/length;
+      const sourceRadius = Math.min(coreBounds.width,coreBounds.height)*.46;
+      const targetRadius = Math.min(ballBounds.width,ballBounds.height)*.45;
+      render(
+        {x:origin.x+nx*sourceRadius,y:origin.y+ny*sourceRadius},
+        {x:destination.x-nx*targetRadius,y:destination.y-ny*targetRadius},
+        t
+      );
+      if (t < 1) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        frame = 0;
+        reset();
         target.classList.remove('hx-energy-received');
+        // Force animation restart if the user is dragging during arrival.
         void target.offsetWidth;
         target.classList.add('hx-energy-received');
         clearTimeout(arrivalTimer);
-        arrivalTimer=setTimeout(()=>{
-          target.classList.remove('hx-energy-received');
-          if(impacted===target)impacted=null;
-        },1400);
+        arrivalTimer = setTimeout(() => target.classList.remove('hx-energy-received'), 1300);
       }
-      if(t<1)raf=requestAnimationFrame(frame);
-      else reset();
     }
-    raf=requestAnimationFrame(frame);
+    frame = requestAnimationFrame(tick);
   }
-  function chargeThenDeliver() {
-    if(running||chargeTimer||document.hidden||reduced.matches)return;
+
+  // The H charges briefly before releasing each pulse to a single planet.
+  // Existing paths, timing and drag/tap behavior remain untouched.
+  function chargeThenSend() {
+    if (active || document.hidden || reduce.matches) return;
     core.classList.add('hx-charging');
-    chargeTimer=setTimeout(()=>{
-      chargeTimer=0;
+    clearTimeout(chargeTimer);
+    chargeTimer = setTimeout(() => {
+      chargeTimer = 0;
       core.classList.remove('hx-charging');
-      if(!document.hidden&&!reduced.matches)deliver();
-    },740);
+      if (!document.hidden && !reduce.matches) send();
+    }, 920);
   }
-  // Round-robin feeding of Cine, Hacienda El Flambo and Just Be You.
-  setInterval(chargeThenDeliver,6800);
-  setTimeout(chargeThenDeliver,1200);
-  document.addEventListener('visibilitychange',()=>{
-    if(document.hidden)reset();
+  timer = setInterval(chargeThenSend, 7100);
+  setTimeout(chargeThenSend, 1150);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) reset();
   });
-  if(reduced.addEventListener)reduced.addEventListener('change',()=>{
-    if(reduced.matches){reset();if(impacted)impacted.classList.remove('hx-energy-received');}
-  });
+  if (reduce.addEventListener) reduce.addEventListener('change', () => { if (reduce.matches) reset(); });
 })();
 </script>
 
