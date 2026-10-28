@@ -924,8 +924,13 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
           <stop offset="45%" stop-color="#c3fdff"/>
           <stop offset="100%" stop-color="#3cdae9" stop-opacity="0"/>
         </radialGradient>
+        <linearGradient id="hx-energy-tail" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#34caec" stop-opacity="0"/>
+          <stop offset="48%" stop-color="#51ddf4" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#d7ffff" stop-opacity=".82"/>
+        </linearGradient>
       </defs>
-      <path class="hx-energy-trail" fill="none" stroke="#57edff" stroke-width="1.8" stroke-linecap="round"/>
+      <path class="hx-energy-trail" fill="none" stroke="url(#hx-energy-tail)" stroke-width="2.2" stroke-linecap="round"/>
       <circle class="hx-energy-particle" r="7" fill="url(#hx-energy-dot)"/>
       <circle class="hx-energy-core" r="2.5" fill="#e5ffff"/>
     </svg>
@@ -1175,23 +1180,40 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       y: rect.top + rect.height / 2 - containerRect.top
     };
   }
+  // Una esfera viaja sola con una estela corta: nunca se dibuja el trayecto completo.
+  const tailGradient = svg.querySelector('#hx-energy-tail');
   function render(from, to, progress) {
     const dx = to.x - from.x, dy = to.y - from.y;
-    const bend = Math.min(32, Math.hypot(dx, dy) * .12);
-    const cx = (from.x + to.x) / 2 - dy / Math.max(1, Math.hypot(dx,dy)) * bend;
-    const cy = (from.y + to.y) / 2 + dx / Math.max(1, Math.hypot(dx,dy)) * bend;
-    line.setAttribute('d', 'M '+from.x+' '+from.y+' Q '+cx+' '+cy+' '+to.x+' '+to.y);
-    const t = progress, m = 1 - t;
-    const x = m*m*from.x + 2*m*t*cx + t*t*to.x;
-    const y = m*m*from.y + 2*m*t*cy + t*t*to.y;
-    particle.setAttribute('cx', x);
-    particle.setAttribute('cy', y);
-    glow.setAttribute('cx', x);
-    glow.setAttribute('cy', y);
-    // A soft pulse fades in and out instead of a permanent bright wire.
-    line.style.opacity = String(.2 + .33 * Math.sin(t * Math.PI));
-    particle.style.opacity = String(Math.sin(t * Math.PI) * .86);
-    glow.style.opacity = String(Math.sin(t * Math.PI) * .95);
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    const bend = Math.min(32, distance * .12);
+    const cx = (from.x + to.x) / 2 - dy / distance * bend;
+    const cy = (from.y + to.y) / 2 + dx / distance * bend;
+    const point = t => {
+      const m = 1 - t;
+      return { x: m*m*from.x + 2*m*t*cx + t*t*to.x,
+               y: m*m*from.y + 2*m*t*cy + t*t*to.y };
+    };
+    const t = progress;
+    const head = point(t);
+    // Aproximadamente 30 píxeles de estela, independiente del planeta elegido.
+    const behind = Math.max(0, t - Math.min(.23, 30 / distance));
+    const tail = point(behind);
+    const mid = point((t + behind) / 2);
+    line.setAttribute('d', 'M '+tail.x+' '+tail.y+' Q '+mid.x+' '+mid.y+' '+head.x+' '+head.y);
+    if (tailGradient) {
+      tailGradient.setAttribute('x1', tail.x);
+      tailGradient.setAttribute('y1', tail.y);
+      tailGradient.setAttribute('x2', head.x);
+      tailGradient.setAttribute('y2', head.y);
+    }
+    particle.setAttribute('cx', head.x);
+    particle.setAttribute('cy', head.y);
+    glow.setAttribute('cx', head.x);
+    glow.setAttribute('cy', head.y);
+    const fade = Math.sin(t * Math.PI);
+    line.style.opacity = String(fade * .8);
+    particle.style.opacity = String(fade * .95);
+    glow.style.opacity = String(fade);
   }
   function reset() {
     if (frame) cancelAnimationFrame(frame);
