@@ -1201,6 +1201,94 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 #fallback .hx-maintenance-explainer a:hover,#fallback .hx-maintenance-explainer a:focus-visible{background:rgba(72,217,229,.19);color:#fff}
 @media(max-width:680px){#fallback .hx-services .hx-service-maintenance{margin-bottom:8px}#fallback .hx-maintenance-explainer{flex-direction:column;align-items:stretch;gap:13px;padding:17px 16px;margin-top:16px}#fallback .hx-maintenance-explainer a{width:100%}}
 
+/* Huxcasti Universe · núcleo planetario: la marca elegida vive en el centro.
+   El asset no añade una capa rectangular; conserva las órbitas y el pulso JS existente. */
+#fallback .hx-portfolio .f-core.hx-minimal-core{
+  width:136px;height:136px;
+  border-radius:50%;background:transparent!important;
+  box-shadow:none!important;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene{
+  width:132px;height:132px;
+  transform:none!important;transform-style:flat!important;
+  isolation:isolate;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-extrusion,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-bevel,
+#fallback .hx-portfolio .f-core.hx-minimal-core .f-logo-clean,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-current,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-plasma,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition,
+#fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene::before,
+#fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene::after{display:none!important}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-logo{
+  display:block!important;position:absolute;inset:0;width:100%!important;height:100%!important;
+  max-width:none;max-height:none;object-fit:contain;z-index:6;pointer-events:none;
+  filter:drop-shadow(0 0 8px rgba(35,189,249,.38)) brightness(1);
+  animation:hx-planet-breathe 4.8s ease-in-out infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-spark{
+  position:absolute;inset:0;z-index:7;border-radius:50%;pointer-events:none;
+  clip-path:circle(45% at 50% 49%);
+  background:linear-gradient(105deg,transparent 24%,rgba(167,253,255,.04) 34%,rgba(234,255,255,.27) 46%,rgba(62,203,251,.06) 54%,transparent 72%);
+  background-size:250% 100%;background-position:130% 50%;
+  opacity:.36;mix-blend-mode:screen;
+  animation:hx-planet-sweep 5.6s linear infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core::before{display:none!important}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura{
+  inset:-24px;opacity:.46;filter:blur(8px);
+  background:radial-gradient(circle,rgba(56,172,252,.24),rgba(32,124,217,.10) 48%,transparent 72%);
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-reactor-haze{inset:-20px;z-index:0}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-core-planet-logo{
+  animation:hx-planet-charge .92s ease-in both;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-core-planet-spark{
+  animation-duration:.8s;opacity:.92;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-core-planet-logo{
+  animation:hx-planet-release 1.25s ease-out both;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-core-planet-spark{
+  animation-duration:.54s;opacity:1;
+}
+@keyframes hx-planet-breathe{
+  0%,100%{filter:drop-shadow(0 0 7px rgba(25,156,229,.32)) brightness(.98)}
+  45%{filter:drop-shadow(0 0 13px rgba(62,222,252,.60)) brightness(1.12)}
+}
+@keyframes hx-planet-sweep{
+  0%{background-position:120% 50%}
+  100%{background-position:-100% 50%}
+}
+@keyframes hx-planet-charge{
+  0%{filter:drop-shadow(0 0 11px rgba(54,214,253,.48)) brightness(1)}
+  100%{filter:drop-shadow(0 0 24px rgba(103,244,255,.90)) brightness(1.30)}
+}
+@keyframes hx-planet-release{
+  0%{filter:drop-shadow(0 0 25px rgba(104,253,255,.95)) brightness(1.42)}
+  28%{filter:drop-shadow(0 0 16px rgba(67,219,255,.71)) brightness(1.21)}
+  100%{filter:drop-shadow(0 0 8px rgba(43,184,241,.35)) brightness(1)}
+}
+@media(max-width:600px){
+  #fallback .hx-portfolio .f-core.hx-minimal-core{width:116px;height:116px}
+  #fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene{width:112px;height:112px}
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura{inset:-20px}
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-reactor-haze{inset:-15px}
+}
+@media(max-width:375px){
+  #fallback .hx-portfolio .f-core.hx-minimal-core{width:108px;height:108px}
+  #fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene{width:104px;height:104px}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-logo,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-core-planet-logo,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-core-planet-logo,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-spark{
+    animation:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1354,7 +1442,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       <span class="hx-reactor-mote hx-mote-a" aria-hidden="true"></span>
       <span class="hx-reactor-mote hx-mote-b" aria-hidden="true"></span>
       <span class="hx-reactor-mote hx-mote-c" aria-hidden="true"></span>
-      <span class="f-h-scene" aria-hidden="true"><span class="hx-h-extrusion"></span><span class="hx-h-bevel"></span><span class="f-logo-clean"></span><span class="hx-h-current"></span><span class="hx-h-plasma hx-plasma-x"></span><span class="hx-h-plasma hx-plasma-y"></span><span class="hx-h-ignition"></span></span>
+      <span class="f-h-scene" aria-hidden="true"><span class="hx-h-extrusion"></span><span class="hx-h-bevel"></span><span class="f-logo-clean"></span><span class="hx-h-current"></span><span class="hx-h-plasma hx-plasma-x"></span><span class="hx-h-plasma hx-plasma-y"></span><span class="hx-h-ignition"></span><img class="hx-core-planet-logo" src="assets/huxcasti-core-logo.svg" alt="" width="320" height="320" decoding="async"><span class="hx-core-planet-spark" aria-hidden="true"></span></span>
     </div>
     <div class="f-coming" aria-label="Futuro proyecto: próximamente"><span class="f-coming-ball" aria-hidden="true"></span><span>Próximamente</span></div>
     <a class="f-planet f-cine" href="#world-cine" aria-label="Acercarse al planeta Cine Manuel Nieves"><span class="f-props" aria-hidden="true"><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcl-body" x1="11" y1="26" x2="53" y2="55" gradientUnits="userSpaceOnUse"><stop stop-color="#7e9cac"/><stop offset=".42" stop-color="#263d54"/><stop offset="1" stop-color="#101c31"/></linearGradient><linearGradient id="xcl-top" x1="14" y1="12" x2="48" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#d9f6fc"/><stop offset=".5" stop-color="#6e8494"/><stop offset="1" stop-color="#293a4e"/></linearGradient></defs><ellipse cx="32" cy="56" rx="23" ry="3.5" fill="#040911" opacity=".55"/><rect x="9" y="24" width="47" height="31" rx="5" fill="url(#xcl-body)" stroke="#8da7b8" stroke-width="1.4"/><path d="M13 31H52" stroke="#89f4ff" stroke-width="1.2" opacity=".6"/><path d="M16 39H39M16 45H48" stroke="#a8c6d4" stroke-width="1.5" opacity=".55" stroke-linecap="round"/><path d="M9 21L47 9a4 4 0 0 1 5 2.7l2 6.5L13 32l-4-11Z" fill="url(#xcl-top)" stroke="#bdd4dd" stroke-width="1.5"/><path d="M14 20L20 30M25 17L31 27M36 13L42 23M47 11L52 19" stroke="#101c2c" stroke-width="6"/><path d="M12 22 48 11" stroke="#efffff" stroke-width="1.2" opacity=".72"/><circle cx="15" cy="35" r="1.5" fill="#66f4fd"/><circle cx="48" cy="48" r="2" fill="#d3eaff" opacity=".7"/></svg></span><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcam-metal" x1="12" y1="19" x2="53" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#b5dce7"/><stop offset=".28" stop-color="#4d7890"/><stop offset=".73" stop-color="#1f344e"/><stop offset="1" stop-color="#0d192c"/></linearGradient><radialGradient id="xcam-reel"><stop stop-color="#8edbe9"/><stop offset=".35" stop-color="#345068"/><stop offset=".82" stop-color="#142438"/><stop offset="1" stop-color="#94aabb"/></radialGradient></defs><ellipse cx="32" cy="58" rx="23" ry="3.5" fill="#040911" opacity=".6"/><path d="M28 49v7M40 49v7M20 57h28" stroke="#607d91" stroke-width="3.5" stroke-linecap="round"/><rect x="11" y="29" width="39" height="25" rx="5" fill="url(#xcam-metal)" stroke="#b1dce8" stroke-width="1.2"/><path d="m48 35 10-7v25l-10-7Z" fill="#2e5266" stroke="#95c3cb" stroke-width="1.2"/><circle cx="21" cy="23" r="13" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><circle cx="43" cy="20" r="12" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><g fill="#a4c6d1" opacity=".82"><circle cx="21" cy="15.5" r="3.2"/><circle cx="14" cy="26" r="3.2"/><circle cx="27.5" cy="27" r="3.2"/><circle cx="43" cy="13.5" r="3"/><circle cx="36.8" cy="22.6" r="3"/><circle cx="49.5" cy="24" r="3"/></g><circle cx="21" cy="23" r="2.6" fill="#0d1c30"/><circle cx="43" cy="20" r="2.4" fill="#0d1c30"/><path d="M15 35h29" stroke="#d0faff" opacity=".5"/><circle cx="17" cy="46" r="2" fill="#63f5ff"/></svg></span></span><span class="f-ball"></span><strong>Cine Manuel Nieves</strong></a>
