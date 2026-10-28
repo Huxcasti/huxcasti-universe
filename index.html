@@ -1461,6 +1461,123 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   }
 }
 
+
+/* ENERGÍA VIVA DEL PLANETA CENTRAL — iluminacion espacial, sin anillos ni latidos. */
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight{
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  top:50%;left:50%;
+  width:218%;height:190%;
+  transform:translate(-50%,-50%);
+  border:0;border-radius:0;
+  background:none;
+  box-shadow:none;
+  overflow:visible;
+}
+/* Resplandor irregular detrás del planeta: brillos en diferentes direcciones,
+   siempre difuminados; nada se dibuja como una esfera exterior. */
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::before{
+  content:"";
+  position:absolute;inset:0;
+  border:0;border-radius:0;
+  background:
+    radial-gradient(ellipse 36% 31% at 25% 29%,rgba(66,215,255,.38),rgba(16,119,209,.15) 51%,transparent 91%),
+    radial-gradient(ellipse 35% 31% at 76% 72%,rgba(42,178,255,.36),rgba(22,107,226,.12) 52%,transparent 92%),
+    radial-gradient(ellipse 41% 32% at 59% 18%,rgba(122,243,255,.18),transparent 82%),
+    radial-gradient(ellipse 47% 34% at 36% 83%,rgba(14,130,240,.24),transparent 87%);
+  filter:blur(17px);
+  opacity:.92;
+  transform-origin:50% 50%;
+  animation:hx-cosmos-light-drift 21s ease-in-out infinite alternate;
+}
+/* Filamentos ambientales: luz en movimiento, no pulso de brillo. */
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::after{
+  content:"";
+  position:absolute;inset:-3%;
+  border:0;border-radius:0;
+  background:
+    radial-gradient(ellipse 15% 25% at 23% 41%,rgba(148,252,255,.34),transparent 95%),
+    radial-gradient(ellipse 18% 24% at 79% 46%,rgba(69,217,255,.30),transparent 96%),
+    radial-gradient(ellipse 17% 12% at 53% 10%,rgba(38,156,252,.22),transparent 97%);
+  filter:blur(14px);
+  transform-origin:50% 50%;
+  animation:hx-cosmos-light-crossflow 17s ease-in-out infinite alternate;
+}
+@keyframes hx-cosmos-light-drift{
+  from{transform:rotate(-11deg) translate3d(-4px,3px,0)}
+  to{transform:rotate(19deg) translate3d(7px,-5px,0)}
+}
+@keyframes hx-cosmos-light-crossflow{
+  from{transform:rotate(9deg) translate3d(3px,2px,0)}
+  to{transform:rotate(-23deg) translate3d(-6px,-5px,0)}
+}
+/* La nube de energía se enciende levemente durante la descarga;
+   el planeta Huxcasti nunca cambia de tamaño, forma ni luminancia. */
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight{
+  transition:filter .35s ease!important;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-cosmos-backlight{
+  filter:brightness(1.27) saturate(1.14);
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-logo{
+  animation:none!important;
+  transition:none!important;
+}
+/* Las estelas salen del BORDE del planeta y avanzan con una guía luminosa. */
+#fallback .hx-portfolio .hx-energy-layer{
+  z-index:3;
+  pointer-events:none;
+}
+#fallback .hx-portfolio .hx-energy-beam-outer{
+  opacity:.56;
+  filter:blur(4px);
+}
+#fallback .hx-portfolio .hx-energy-trail{
+  filter:drop-shadow(0 0 5px #3ad7ff);
+  opacity:.92;
+}
+#fallback .hx-portfolio .hx-energy-beam-inner{
+  opacity:.91;
+  filter:drop-shadow(0 0 3px #a6ffff);
+}
+#fallback .hx-portfolio .hx-energy-origin-aura{
+  filter:drop-shadow(0 0 8px rgba(70,225,255,.65));
+  opacity:0;
+}
+#fallback .hx-portfolio .hx-energy-origin-hot{
+  filter:drop-shadow(0 0 7px #8afbff);
+  opacity:0;
+}
+#fallback .hx-portfolio .hx-energy-fragment{
+  filter:drop-shadow(0 0 4px #83eeff);
+  opacity:0;
+}
+#fallback .hx-portfolio .hx-energy-particle{
+  filter:drop-shadow(0 0 8px #70f4ff);
+}
+#fallback .hx-portfolio .hx-energy-core{
+  filter:drop-shadow(0 0 6px #e9ffff);
+}
+@media(max-width:600px){
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight{
+    width:195%;height:182%;
+  }
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::before,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::after{
+    filter:blur(13px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::before,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight::after{
+    animation:none!important;
+  }
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-cosmos-backlight{
+    transition:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1603,13 +1720,26 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
           <stop offset="48%" stop-color="#51ddf4" stop-opacity=".35"/>
           <stop offset="100%" stop-color="#d7ffff" stop-opacity=".82"/>
         </linearGradient>
+        <radialGradient id="hx-energy-launch-glow">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity=".98"/>
+          <stop offset="20%" stop-color="#bbffff" stop-opacity=".82"/>
+          <stop offset="52%" stop-color="#38ceff" stop-opacity=".38"/>
+          <stop offset="100%" stop-color="#17a9ef" stop-opacity="0"/>
+        </radialGradient>
       </defs>
+      <path class="hx-energy-beam-outer" fill="none" stroke="#29c8ff" stroke-width="11" stroke-linecap="round"/>
       <path class="hx-energy-trail" fill="none" stroke="url(#hx-energy-tail)" stroke-width="2.2" stroke-linecap="round"/>
       <circle class="hx-energy-particle" r="7" fill="url(#hx-energy-dot)"/>
+      <path class="hx-energy-beam-inner" fill="none" stroke="#e5ffff" stroke-width="1.05" stroke-linecap="round"/>
+      <circle class="hx-energy-origin-aura" r="15" fill="url(#hx-energy-launch-glow)"/>
+      <circle class="hx-energy-origin-hot" r="2.5" fill="#e8ffff"/>
+      <circle class="hx-energy-fragment hx-fragment-a" r="1.55" fill="#bcffff"/>
+      <circle class="hx-energy-fragment hx-fragment-b" r="1.2" fill="#9ceeff"/>
       <circle class="hx-energy-core" r="2.5" fill="#e5ffff"/>
     </svg>
     <div class="f-core hx-minimal-core" aria-label="Logo de Huxcasti, núcleo energético del portafolio">
       <span class="hx-energy-aura" aria-hidden="true"></span>
+      <span class="hx-cosmos-backlight" aria-hidden="true"></span>
       <span class="hx-reactor-haze" aria-hidden="true"></span>
       <span class="hx-planet-glint hx-planet-glint-a" aria-hidden="true"></span>
       <span class="hx-planet-glint hx-planet-glint-b" aria-hidden="true"></span>
@@ -1853,6 +1983,11 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   const line = svg.querySelector('.hx-energy-trail');
   const particle = svg.querySelector('.hx-energy-particle');
   const glow = svg.querySelector('.hx-energy-core');
+  const outerBeam = svg.querySelector('.hx-energy-beam-outer');
+  const innerBeam = svg.querySelector('.hx-energy-beam-inner');
+  const launchAura = svg.querySelector('.hx-energy-origin-aura');
+  const launchHot = svg.querySelector('.hx-energy-origin-hot');
+  const fragments = Array.from(svg.querySelectorAll('.hx-energy-fragment'));
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   let turn = 0, frame = 0, timer = 0, arrivalTimer = 0, chargeTimer = 0;
   let active = false;
@@ -1864,26 +1999,30 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       y: rect.top + rect.height / 2 - containerRect.top
     };
   }
-  // Una esfera viaja sola con una estela corta: nunca se dibuja el trayecto completo.
+  // La descarga se libera de la superficie del planeta, nunca del centro.
+  // Cada cuadro recalcula el borde del origen y del destino (flotacion y arrastre).
   const tailGradient = svg.querySelector('#hx-energy-tail');
   function render(from, to, progress) {
     const dx = to.x - from.x, dy = to.y - from.y;
     const distance = Math.max(1, Math.hypot(dx, dy));
+    const nx = dx / distance, ny = dy / distance;
     const bend = Math.min(32, distance * .12);
-    const cx = (from.x + to.x) / 2 - dy / distance * bend;
-    const cy = (from.y + to.y) / 2 + dx / distance * bend;
+    const cx = (from.x + to.x) / 2 - ny * bend;
+    const cy = (from.y + to.y) / 2 + nx * bend;
     const point = t => {
       const m = 1 - t;
-      return { x: m*m*from.x + 2*m*t*cx + t*t*to.x,
-               y: m*m*from.y + 2*m*t*cy + t*t*to.y };
+      return {x:m*m*from.x + 2*m*t*cx + t*t*to.x,
+              y:m*m*from.y + 2*m*t*cy + t*t*to.y};
     };
     const t = progress;
     const head = point(t);
-    // Aproximadamente 30 píxeles de estela, independiente del planeta elegido.
-    const behind = Math.max(0, t - Math.min(.23, 30 / distance));
+    const behind = Math.max(0, t - Math.min(.37, 52 / distance));
     const tail = point(behind);
     const mid = point((t + behind) / 2);
-    line.setAttribute('d', 'M '+tail.x+' '+tail.y+' Q '+mid.x+' '+mid.y+' '+head.x+' '+head.y);
+    const d = 'M '+tail.x+' '+tail.y+' Q '+mid.x+' '+mid.y+' '+head.x+' '+head.y;
+    line.setAttribute('d', d);
+    outerBeam.setAttribute('d', d);
+    innerBeam.setAttribute('d', d);
     if (tailGradient) {
       tailGradient.setAttribute('x1', tail.x);
       tailGradient.setAttribute('y1', tail.y);
@@ -1894,16 +2033,43 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     particle.setAttribute('cy', head.y);
     glow.setAttribute('cx', head.x);
     glow.setAttribute('cy', head.y);
-    const fade = Math.sin(t * Math.PI);
-    line.style.opacity = String(fade * .8);
-    particle.style.opacity = String(fade * .95);
-    glow.style.opacity = String(fade);
+    // El nacimiento queda anclado en el borde real del globo.
+    for(const node of [launchAura,launchHot]){
+      node.setAttribute('cx',from.x);
+      node.setAttribute('cy',from.y);
+    }
+    const release=Math.max(0,1-t/.34);
+    launchAura.style.opacity=String(release*.88);
+    launchHot.style.opacity=String(release*.95);
+    launchAura.setAttribute('r',String(10+8*Math.sin(Math.min(1,t/.34)*Math.PI)));
+    // Dos chispas se desprenden de la cola, sin interferir con los gestos.
+    fragments.forEach((node,i)=>{
+      const at=point(Math.max(0,t-(i+1)*.06));
+      const wobble=Math.sin(t*23+i*2.2)*(3+i*2);
+      node.setAttribute('cx',at.x-ny*wobble);
+      node.setAttribute('cy',at.y+nx*wobble);
+      node.style.opacity=String(Math.max(0,Math.min(1,t/.10,(1-t)/.07))*(i===0?.75:.53));
+    });
+    const fadeIn=Math.min(1,t/.08);
+    const fadeOut=Math.min(1,(1-t)/.045);
+    const fade=Math.max(0,Math.min(fadeIn,fadeOut));
+    line.style.opacity=String(fade*.95);
+    outerBeam.style.opacity=String(fade*.53);
+    innerBeam.style.opacity=String(fade*.93);
+    particle.style.opacity=String(fade*.96);
+    glow.style.opacity=String(fade);
   }
   function reset() {
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     active = false;
     svg.classList.remove('hx-energy-active');
+    launchAura.style.opacity='0';
+    launchHot.style.opacity='0';
+    fragments.forEach(node=>{node.style.opacity='0';});
+    line.style.opacity='0';
+    outerBeam.style.opacity='0';
+    innerBeam.style.opacity='0';
     core.classList.remove('hx-emitting', 'hx-charging');
     clearTimeout(chargeTimer);
     chargeTimer = 0;
@@ -1927,7 +2093,20 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       const t = Math.min(1, (now - started) / duration);
       const container = space.getBoundingClientRect();
       svg.setAttribute('viewBox', '0 0 '+space.clientWidth+' '+space.clientHeight);
-      render(pos(core, container), pos(ball, container), t);
+      const origin = pos(core, container);
+      const destination = pos(ball, container);
+      const coreBounds = core.getBoundingClientRect();
+      const ballBounds = ball.getBoundingClientRect();
+      const vx = destination.x-origin.x, vy = destination.y-origin.y;
+      const length = Math.max(1,Math.hypot(vx,vy));
+      const nx = vx/length, ny = vy/length;
+      const sourceRadius = Math.min(coreBounds.width,coreBounds.height)*.46;
+      const targetRadius = Math.min(ballBounds.width,ballBounds.height)*.45;
+      render(
+        {x:origin.x+nx*sourceRadius,y:origin.y+ny*sourceRadius},
+        {x:destination.x-nx*targetRadius,y:destination.y-ny*targetRadius},
+        t
+      );
       if (t < 1) {
         frame = requestAnimationFrame(tick);
       } else {
