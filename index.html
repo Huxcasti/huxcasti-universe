@@ -1343,134 +1343,121 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 }
 
 
-/* Huxcasti · planeta central aprobado: disco limpio, sin latidos;
-   energía eléctrica independiente (el logo, la esfera y el texto permanecen fijos). */
+
+/* HUXCASTI ORIGINAL: planeta libre en gravedad cero.
+   Sin halos circulares externos, bordes de esfera, latidos ni parpadeos.
+   Solo flota el globo completo; el emblema y su textura permanecen intactos. */
 #fallback .hx-portfolio .f-core.hx-minimal-core,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting{
-  animation:none!important;transition:none!important;
   transform:translate(-50%,-50%)!important;
-  background:transparent!important;box-shadow:none!important;
-  overflow:visible!important;border-radius:50%!important;
+  animation:hx-huxcasti-weightless 6.8s ease-in-out infinite!important;
+  transition:none!important;
+  will-change:translate;
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;border-radius:50%!important;
+  overflow:visible!important;
+}
+/* Movimiento vertical real y progresivo, sin escalar ni cambiar el brillo. */
+@keyframes hx-huxcasti-weightless{
+  0%,100%{translate:0px 3px}
+  25%{translate:1px -4px}
+  50%{translate:0px -10px}
+  75%{translate:-1px -5px}
 }
 #fallback .hx-portfolio .f-core.hx-minimal-core .f-h-scene,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .f-h-scene,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .f-h-scene{
-  position:relative;z-index:2;overflow:visible;
-  background:transparent!important;border:0!important;
-  border-radius:50%!important;box-shadow:none!important;
-  animation:none!important;transition:none!important;
+  position:relative;z-index:2;
+  overflow:visible;background:transparent!important;
+  border:none!important;border-radius:50%!important;
+  box-shadow:none!important;
   transform:none!important;translate:none!important;scale:1!important;
-  filter:none!important;will-change:auto;
+  animation:none!important;transition:none!important;
+  filter:none!important;
 }
-/* La imagen aprobada tiene restos del fondo en sus esquinas: clip circular
-   físico y suave, no un rectángulo con sombra. */
+/* Recorte circular de la imagen original: esquinas rectangulares invisibles. */
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-logo,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-core-planet-logo,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-core-planet-logo{
   display:block!important;position:absolute;inset:0;
   width:100%!important;height:100%!important;
-  object-fit:cover!important;object-position:center;
-  border:0!important;border-radius:50%!important;
+  object-fit:cover!important;object-position:center!important;
   -webkit-clip-path:circle(48.5% at 50% 50%)!important;
   clip-path:circle(48.5% at 50% 50%)!important;
+  border:0!important;border-radius:50%!important;
+  box-shadow:none!important;
   filter:brightness(1.055) saturate(1.06)!important;
   opacity:1!important;transform:none!important;scale:1!important;
   animation:none!important;transition:none!important;
-  box-shadow:none!important;z-index:2;
+  z-index:2;
 }
-/* Se eliminan los efectos antiguos que hacían respirar o parpadear el globo. */
-#fallback .hx-portfolio .f-core.hx-minimal-core::before{display:none!important}
-#fallback .hx-portfolio .f-core.hx-minimal-core::after{
-  animation:none!important;transition:none!important;
-  opacity:.64!important;transform:none!important;
-}
+/* Remover por completo los anillos y coronas añadidos anteriormente. */
+#fallback .hx-portfolio .f-core.hx-minimal-core::before,
+#fallback .hx-portfolio .f-core.hx-minimal-core::after,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona,
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-core-planet-spark,
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-reactor-haze,
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-reactor-mote{
-  display:none!important;animation:none!important;
+  display:none!important;
+  animation:none!important;
 }
+/* Luz difusa detrás de la esfera, SIN contorno ni círculo visible. */
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-energy-aura,
 #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-energy-aura{
-  display:block;inset:-25px;z-index:0;border-radius:50%;
-  background:radial-gradient(circle closest-side,
-    rgba(26,176,243,.18) 0%,rgba(24,166,242,.19) 62%,
-    rgba(30,172,255,.27) 75%,rgba(44,181,255,.13) 90%,transparent 100%)!important;
-  box-shadow:0 0 22px rgba(43,192,255,.26),0 0 42px rgba(32,135,252,.13)!important;
-  filter:blur(8px)!important;opacity:.75!important;
+  display:block!important;position:absolute;
+  inset:-25px!important;z-index:0!important;
+  border:0!important;
+  background:radial-gradient(ellipse at 50% 50%,
+    rgba(23,178,255,.21) 0%,
+    rgba(16,130,213,.15) 33%,
+    rgba(13,96,170,.065) 51%,
+    transparent 72%)!important;
+  box-shadow:none!important;
+  filter:blur(15px)!important;
+  opacity:.72!important;
   transform:none!important;scale:1!important;
   animation:none!important;transition:none!important;
 }
-/* Una corona eléctrica se desliza suavemente alrededor del borde.
-   No escala, ilumina ni modifica el planeta: gira solamente la luz exterior. */
-#fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona{
-  position:absolute;inset:-2px;z-index:1;display:block;
-  pointer-events:none;border-radius:50%;
-  border:1px solid rgba(101,232,255,.50);
-  box-shadow:0 0 8px rgba(77,217,255,.58),
-             0 0 19px rgba(25,174,249,.34),
-             0 0 32px rgba(8,92,202,.20),
-             inset 0 0 9px rgba(60,205,255,.24);
-  background:transparent;
-  animation:none!important;
-}
-#fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona::before{
-  content:"";position:absolute;inset:-7px;border-radius:50%;
-  background:conic-gradient(from 0deg,
-     transparent 0deg,rgba(43,203,255,.10) 35deg,rgba(139,255,255,.84) 59deg,
-     rgba(60,195,255,.10) 86deg,transparent 118deg,
-     transparent 196deg,rgba(62,198,255,.10) 216deg,
-     rgba(153,254,255,.65) 252deg,rgba(37,181,250,.12) 273deg,transparent 300deg);
-  -webkit-mask:radial-gradient(circle closest-side,transparent 83%,#000 90% 100%);
-  mask:radial-gradient(circle closest-side,transparent 83%,#000 90% 100%);
-  filter:blur(2px);opacity:.86;pointer-events:none;
-  animation:hx-planet-energy-orbit 22s linear infinite;
-}
-#fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona::after{
-  content:"";position:absolute;inset:1px;border-radius:50%;
-  border:1px solid rgba(134,245,255,.20);
-  box-shadow:0 0 13px rgba(70,202,255,.23);
-  pointer-events:none;
-}
-@keyframes hx-planet-energy-orbit{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
-}
-/* Pequeños puntos eléctricos externos: se deslizan, no laten. */
+/* Destellos independientes de energía (no forman anillo ni laten). */
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-glint{
-  position:absolute;z-index:4;display:block;pointer-events:none;
-  width:3px;height:3px;border-radius:50%;
-  background:#e3ffff;
-  box-shadow:0 0 4px 1px #8ff6ff,0 0 12px 3px rgba(40,191,252,.70);
-  opacity:.83;animation:hx-planet-glint-drift 8s ease-in-out infinite alternate;
+  display:block;position:absolute;z-index:4;
+  pointer-events:none;border-radius:50%;
+  width:2.5px;height:2.5px;
+  background:#dcffff;
+  box-shadow:0 0 6px 1px rgba(152,250,255,.95),
+             0 0 14px 3px rgba(40,192,255,.50);
+  opacity:.86;
+  animation:hx-huxcasti-electric-drift 5.5s ease-in-out infinite alternate;
 }
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-glint-a{
-  top:14%;left:12%;animation-duration:7.5s;
+  top:12%;left:13%;animation-delay:-1.8s;animation-duration:6.2s;
 }
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-glint-b{
-  top:72%;right:4%;width:2px;height:2px;animation-duration:9s;animation-delay:-3s;
+  top:72%;right:2%;width:2px;height:2px;animation-delay:-3s;animation-duration:7s;
 }
 #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-glint-c{
-  bottom:3%;left:31%;width:2px;height:2px;animation-duration:10s;animation-delay:-5s;
+  bottom:0%;left:28%;width:2px;height:2px;animation-delay:-4.2s;animation-duration:6.8s;
 }
-@keyframes hx-planet-glint-drift{
-  from{transform:translate3d(-2px,1px,0)}
-  to{transform:translate3d(4px,-3px,0)}
+@keyframes hx-huxcasti-electric-drift{
+  from{transform:translate3d(-3px,2px,0)}
+  to{transform:translate3d(4px,-5px,0)}
 }
 @media(max-width:600px){
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura,
   #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-energy-aura,
   #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-energy-aura{
-    inset:-19px;filter:blur(6px)!important;
+    inset:-18px!important;filter:blur(12px)!important;
   }
-  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona{inset:-1px}
-  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona::before{inset:-5px}
 }
 @media(prefers-reduced-motion:reduce){
-  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-corona::before,
+  #fallback .hx-portfolio .f-core.hx-minimal-core,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting,
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-planet-glint{
-    animation:none!important;
+    animation:none!important;translate:none!important;
   }
 }
 
@@ -1624,7 +1611,6 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     <div class="f-core hx-minimal-core" aria-label="Logo de Huxcasti, núcleo energético del portafolio">
       <span class="hx-energy-aura" aria-hidden="true"></span>
       <span class="hx-reactor-haze" aria-hidden="true"></span>
-      <span class="hx-planet-corona" aria-hidden="true"></span>
       <span class="hx-planet-glint hx-planet-glint-a" aria-hidden="true"></span>
       <span class="hx-planet-glint hx-planet-glint-b" aria-hidden="true"></span>
       <span class="hx-planet-glint hx-planet-glint-c" aria-hidden="true"></span>
