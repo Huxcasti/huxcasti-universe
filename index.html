@@ -1578,6 +1578,70 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   }
 }
 
+
+/* Huxcasti Universe — alimentación plasmática continua (v2).
+   No modifica las fotografías, órbitas ni el globo central. */
+#fallback .hx-portfolio .hx-energy-layer.hx-energy-feeder{
+  opacity:1;
+  z-index:3;
+  pointer-events:none;
+  overflow:visible;
+}
+#fallback .hx-energy-feeder .hx-feed-halo{
+  fill:none;stroke:#0b7fec;stroke-width:13;
+  stroke-linecap:round;stroke-linejoin:round;
+  opacity:.29;filter:blur(5px);
+}
+#fallback .hx-energy-feeder .hx-feed-body{
+  fill:none;stroke:#219cf9;stroke-width:4.4;
+  stroke-linecap:round;stroke-linejoin:round;
+  opacity:.55;filter:drop-shadow(0 0 3px rgba(34,165,255,.8));
+}
+#fallback .hx-energy-feeder .hx-feed-spine{
+  fill:none;stroke:#9aedff;stroke-width:1.15;
+  stroke-linecap:round;stroke-linejoin:round;
+  opacity:.76;
+}
+#fallback .hx-energy-feeder .hx-feed-filament{
+  fill:none;stroke:#56cfff;stroke-width:1;
+  stroke-linecap:round;stroke-linejoin:round;
+  opacity:.56;filter:drop-shadow(0 0 2px #3bbcff);
+}
+#fallback .hx-energy-feeder .hx-feed-pulse{
+  fill:none;stroke:#d7ffff;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 0 5px #54dfff);
+}
+#fallback .hx-energy-feeder .hx-feed-spark{
+  fill:url(#hx-energy-dot);
+  filter:drop-shadow(0 0 4px #54dfff);
+}
+#fallback .hx-energy-feeder .hx-feed-touch,
+#fallback .hx-energy-feeder .hx-feed-source{
+  fill:url(#hx-energy-launch-glow);
+  mix-blend-mode:screen;
+}
+#fallback .hx-portfolio a.f-planet.hx-energy-feeding .f-ball::after{
+  content:"";animation:none!important;transform:none!important;
+  opacity:var(--hx-feed-opacity,.56)!important;
+  background:radial-gradient(circle at var(--hx-feed-x,35%) var(--hx-feed-y,48%),
+    rgba(235,255,255,.92) 0%,
+    rgba(113,228,255,.63) 12%,
+    rgba(26,152,244,.28) 34%,
+    rgba(26,152,244,0) 63%)!important;
+  mix-blend-mode:screen;
+  border:0!important;outline:0!important;box-shadow:none!important;
+}
+@media(max-width:600px){
+  #fallback .hx-energy-feeder .hx-feed-halo{stroke-width:9;filter:blur(3px)}
+  #fallback .hx-energy-feeder .hx-feed-body{stroke-width:3.5}
+  #fallback .hx-energy-feeder .hx-feed-filament{stroke-width:.8}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-energy-feeder .hx-feed-pulse,
+  #fallback .hx-energy-feeder .hx-feed-spark{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -1971,176 +2035,165 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   });
 })();
 </script>
-<!-- Huxcasti Universe: la H envía energía a cada planeta por turnos. -->
+<!-- Huxcasti Universe: corrientes de energía azul que alimentan simultáneamente los otros mundos. -->
 <script>
 (() => {
+  'use strict';
   const space = document.querySelector('#fallback .f-space');
-  const core = space && space.querySelector('.f-core');
+  const core = space && space.querySelector('.f-core.hx-minimal-core');
   const svg = space && space.querySelector('.hx-energy-layer');
   if (!space || !core || !svg || !window.requestAnimationFrame) return;
-  const worlds = Array.from(space.querySelectorAll('a.f-planet'));
-  if (worlds.length !== 3) return;
-  const line = svg.querySelector('.hx-energy-trail');
-  const particle = svg.querySelector('.hx-energy-particle');
-  const glow = svg.querySelector('.hx-energy-core');
-  const outerBeam = svg.querySelector('.hx-energy-beam-outer');
-  const innerBeam = svg.querySelector('.hx-energy-beam-inner');
-  const launchAura = svg.querySelector('.hx-energy-origin-aura');
-  const launchHot = svg.querySelector('.hx-energy-origin-hot');
-  const fragments = Array.from(svg.querySelectorAll('.hx-energy-fragment'));
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let turn = 0, frame = 0, timer = 0, arrivalTimer = 0, chargeTimer = 0;
-  let active = false;
 
-  function pos(el, containerRect) {
-    const rect = el.getBoundingClientRect();
-    return {
-      x: rect.left + rect.width / 2 - containerRect.left,
-      y: rect.top + rect.height / 2 - containerRect.top
-    };
-  }
-  // La descarga se libera de la superficie del planeta, nunca del centro.
-  // Cada cuadro recalcula el borde del origen y del destino (flotacion y arrastre).
-  const tailGradient = svg.querySelector('#hx-energy-tail');
-  function render(from, to, progress) {
-    const dx = to.x - from.x, dy = to.y - from.y;
-    const distance = Math.max(1, Math.hypot(dx, dy));
-    const nx = dx / distance, ny = dy / distance;
-    const bend = Math.min(27, distance * .10);
-    const cx = (from.x + to.x) / 2 - ny * bend;
-    const cy = (from.y + to.y) / 2 + nx * bend;
-    const point = t => {
-      const m = 1 - t;
-      return {x:m*m*from.x + 2*m*t*cx + t*t*to.x,
-              y:m*m*from.y + 2*m*t*cy + t*t*to.y};
-    };
-    const t = progress;
-    const head = point(t);
-    const behind = Math.max(0, t - Math.min(.40, 66 / distance));
-    const tail = point(behind);
-    const mid = point((t + behind) / 2);
-    const d = 'M '+tail.x+' '+tail.y+' Q '+mid.x+' '+mid.y+' '+head.x+' '+head.y;
-    line.setAttribute('d', d);
-    outerBeam.setAttribute('d', d);
-    innerBeam.setAttribute('d', d);
-    if (tailGradient) {
-      tailGradient.setAttribute('x1', tail.x);
-      tailGradient.setAttribute('y1', tail.y);
-      tailGradient.setAttribute('x2', head.x);
-      tailGradient.setAttribute('y2', head.y);
-    }
-    particle.setAttribute('cx', head.x);
-    particle.setAttribute('cy', head.y);
-    glow.setAttribute('cx', head.x);
-    glow.setAttribute('cy', head.y);
-    // El nacimiento queda anclado en el borde real del globo.
-    for(const node of [launchAura,launchHot]){
-      node.setAttribute('cx',from.x);
-      node.setAttribute('cy',from.y);
-    }
-    const release=Math.max(0,1-t/.34);
-    launchAura.style.opacity=String(release*.88);
-    launchHot.style.opacity=String(release*.95);
-    launchAura.setAttribute('r',String(10+8*Math.sin(Math.min(1,t/.34)*Math.PI)));
-    // Dos chispas se desprenden de la cola, sin interferir con los gestos.
-    fragments.forEach((node,i)=>{
-      const at=point(Math.max(0,t-(i+1)*.06));
-      const wobble=Math.sin(t*20+i*2.2)*(2.5+i*1.5);
-      node.setAttribute('cx',at.x-ny*wobble);
-      node.setAttribute('cy',at.y+nx*wobble);
-      node.style.opacity=String(Math.max(0,Math.min(1,t/.10,(1-t)/.07))*(i===0?.75:.53));
-    });
-    const fadeIn=Math.min(1,t/.08);
-    const fadeOut=Math.min(1,(1-t)/.045);
-    const fade=Math.max(0,Math.min(fadeIn,fadeOut));
-    line.style.opacity=String(fade*.95);
-    outerBeam.style.opacity=String(fade*.58);
-    innerBeam.style.opacity=String(fade*.93);
-    particle.style.opacity=String(fade*.91);
-    glow.style.opacity=String(fade);
-  }
-  function reset() {
-    if (frame) cancelAnimationFrame(frame);
-    frame = 0;
-    active = false;
-    svg.classList.remove('hx-energy-active');
-    launchAura.style.opacity='0';
-    launchHot.style.opacity='0';
-    fragments.forEach(node=>{node.style.opacity='0';});
-    line.style.opacity='0';
-    outerBeam.style.opacity='0';
-    innerBeam.style.opacity='0';
-    core.classList.remove('hx-emitting', 'hx-charging');
-    clearTimeout(chargeTimer);
-    chargeTimer = 0;
-  }
-  function send() {
-    if (active || document.hidden || reduce.matches) return;
-    const target = worlds[turn % worlds.length];
-    turn++;
-    const ball = target.querySelector('.f-ball');
-    if (!ball || !space.clientWidth || !space.clientHeight) return;
-    const duration = 1440;
-    let started;
-    active = true;
-    svg.classList.add('hx-energy-active');
-    core.classList.add('hx-emitting');
-
-    function tick(now) {
-      if (!active) return;
-      if (document.hidden || reduce.matches) { reset(); return; }
-      if (started === undefined) started = now;
-      const t = Math.min(1, (now - started) / duration);
-      const container = space.getBoundingClientRect();
-      svg.setAttribute('viewBox', '0 0 '+space.clientWidth+' '+space.clientHeight);
-      const origin = pos(core, container);
-      const destination = pos(ball, container);
-      const coreBounds = core.getBoundingClientRect();
-      const ballBounds = ball.getBoundingClientRect();
-      const vx = destination.x-origin.x, vy = destination.y-origin.y;
-      const length = Math.max(1,Math.hypot(vx,vy));
-      const nx = vx/length, ny = vy/length;
-      const sourceRadius = Math.min(coreBounds.width,coreBounds.height)*.46;
-      const targetRadius = Math.min(ballBounds.width,ballBounds.height)*.45;
-      render(
-        {x:origin.x+nx*sourceRadius,y:origin.y+ny*sourceRadius},
-        {x:destination.x-nx*targetRadius,y:destination.y-ny*targetRadius},
-        t
-      );
-      if (t < 1) {
-        frame = requestAnimationFrame(tick);
-      } else {
-        frame = 0;
-        reset();
-        target.classList.remove('hx-energy-received');
-        // Force animation restart if the user is dragging during arrival.
-        void target.offsetWidth;
-        target.classList.add('hx-energy-received');
-        clearTimeout(arrivalTimer);
-        arrivalTimer = setTimeout(() => target.classList.remove('hx-energy-received'), 1300);
-      }
-    }
-    frame = requestAnimationFrame(tick);
-  }
-
-  // The H charges briefly before releasing each pulse to a single planet.
-  // Existing paths, timing and drag/tap behavior remain untouched.
-  function chargeThenSend() {
-    if (active || document.hidden || reduce.matches) return;
-    core.classList.add('hx-charging');
-    clearTimeout(chargeTimer);
-    chargeTimer = setTimeout(() => {
-      chargeTimer = 0;
-      core.classList.remove('hx-charging');
-      if (!document.hidden && !reduce.matches) send();
-    }, 920);
-  }
-  timer = setInterval(chargeThenSend, 7100);
-  setTimeout(chargeThenSend, 1150);
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) reset();
+  const destinations = Array.from(space.querySelectorAll('a.f-planet'))
+    .map(planet => ({planet, ball:planet.querySelector('.f-ball')}))
+    .filter(world => world.ball);
+  if (!destinations.length) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Conservar los gradientes SVG originales; sustituir solo la descarga antigua.
+  Array.from(svg.children).forEach(child => {
+    if (child.tagName.toLowerCase() !== 'defs') child.remove();
   });
-  if (reduce.addEventListener) reduce.addEventListener('change', () => { if (reduce.matches) reset(); });
+  svg.classList.add('hx-energy-active','hx-energy-feeder');
+  svg.setAttribute('preserveAspectRatio','none');
+
+  function node(tag, css, parent, attrs) {
+    const el = document.createElementNS(ns, tag);
+    if (css) el.setAttribute('class', css);
+    if (attrs) for (const [key, value] of Object.entries(attrs))
+      el.setAttribute(key, String(value));
+    parent.appendChild(el);
+    return el;
+  }
+  const streams = destinations.map((world, i) => {
+    const group = node('g', 'hx-feed-stream', svg);
+    const source = node('circle', 'hx-feed-source', group, {r:13});
+    const halo = node('path','hx-feed-halo',group);
+    const body = node('path','hx-feed-body',group);
+    const filaments = [
+      node('path','hx-feed-filament',group),
+      node('path','hx-feed-filament',group)
+    ];
+    const spine = node('path','hx-feed-spine',group);
+    const pulses = [
+      node('path','hx-feed-pulse',group),
+      node('path','hx-feed-pulse',group)
+    ];
+    const sparks = Array.from({length:4}, () =>
+      node('circle','hx-feed-spark',group,{r:3.5}));
+    const impact = node('circle','hx-feed-touch',group,{r:17});
+    world.planet.classList.add('hx-energy-feeding');
+    return {...world,i,source,halo,body,filaments,spine,pulses,sparks,impact};
+  });
+
+  function centerOf(el,container) {
+    const r=el.getBoundingClientRect();
+    return {x:r.left+r.width/2-container.left,
+            y:r.top+r.height/2-container.top,
+            radius:Math.min(r.width,r.height)*.46};
+  }
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+  function pathFor(a,b,i,seconds,strand,first=0,last=1) {
+    const dx=b.x-a.x,dy=b.y-a.y,length=Math.max(1,Math.hypot(dx,dy));
+    const px=-dy/length,py=dx/length;
+    // Curva de marea + finas vibraciones. Los extremos se quedan sobre las superficies.
+    const curve=Math.min(10,length*.065)*(i%2===0?1:-1);
+    const wave=Math.min(3.9,length*.025);
+    const steps=Math.max(3,Math.ceil(20*(last-first)));
+    const point=t => {
+      const taper=Math.sin(Math.PI*t);
+      const base=curve*taper*Math.sin(Math.PI*t*.92);
+      const flow=Math.sin(t*14.6-seconds*2.3+i*1.7+strand*1.55);
+      const twist=Math.sin(t*21.0+seconds*1.7+i*.91+strand*.66);
+      const offset=base + taper*(flow*wave*(strand===0?.42:.75)
+        + twist*wave*.45 + (strand===1?2.8:strand===-1?-2.8:0));
+      return {x:a.x+dx*t+px*offset,y:a.y+dy*t+py*offset};
+    };
+    let d='';
+    for(let j=0;j<=steps;j++){
+      const t=first+(last-first)*j/steps;
+      const p=point(t);
+      d+=(j===0?'M':' L')+p.x.toFixed(2)+' '+p.y.toFixed(2);
+    }
+    return {d,point};
+  }
+  let frame=0,lastPaint=0;
+  function render(now) {
+    frame=0;
+    if(document.hidden) return;
+    // 30 fps como máximo para conservar batería en teléfonos.
+    if(!reduced.matches && lastPaint && now-lastPaint<32){
+      frame=requestAnimationFrame(render);return;
+    }
+    lastPaint=now;
+    const rect=space.getBoundingClientRect();
+    if(rect.width<10 || rect.height<10) return;
+    svg.setAttribute('viewBox','0 0 '+rect.width+' '+rect.height);
+    const sourceCenter=centerOf(core,rect);
+    const seconds=reduced.matches?0:now/1000;
+
+    for(const s of streams){
+      const destCenter=centerOf(s.ball,rect);
+      const vx=destCenter.x-sourceCenter.x,vy=destCenter.y-sourceCenter.y;
+      const distance=Math.max(1,Math.hypot(vx,vy));
+      const nx=vx/distance,ny=vy/distance;
+      const fromRadius=Math.min(sourceCenter.radius,distance*.30);
+      const toRadius=Math.min(destCenter.radius,distance*.28);
+      const from={x:sourceCenter.x+nx*fromRadius,y:sourceCenter.y+ny*fromRadius};
+      const to={x:destCenter.x-nx*toRadius,y:destCenter.y-ny*toRadius};
+      const body=pathFor(from,to,s.i,seconds,0);
+      s.halo.setAttribute('d',body.d);
+      s.body.setAttribute('d',body.d);
+      s.spine.setAttribute('d',body.d);
+      s.filaments[0].setAttribute('d',pathFor(from,to,s.i,seconds,1).d);
+      s.filaments[1].setAttribute('d',pathFor(from,to,s.i,seconds,-1).d);
+
+      s.source.setAttribute('cx',from.x);
+      s.source.setAttribute('cy',from.y);
+      s.source.setAttribute('r',String(11+1.6*Math.sin(seconds*2+s.i)));
+      s.impact.setAttribute('cx',to.x);
+      s.impact.setAttribute('cy',to.y);
+      s.impact.setAttribute('r',String(14+2*Math.sin(seconds*3.3-s.i)));
+      s.impact.style.opacity=String(.47+.17*Math.sin(seconds*3.3-s.i));
+
+      s.ball.style.setProperty('--hx-feed-x',(50-nx*44).toFixed(1)+'%');
+      s.ball.style.setProperty('--hx-feed-y',(50-ny*44).toFixed(1)+'%');
+      s.ball.style.setProperty('--hx-feed-opacity',(.48+.12*Math.sin(seconds*2.7-s.i)).toFixed(2));
+
+      s.pulses.forEach((el,k)=>{
+        if(reduced.matches){el.setAttribute('d','');return;}
+        const head=(seconds*.23+s.i*.24+k*.51)%1;
+        const tail=Math.max(0,head-.17);
+        const p=pathFor(from,to,s.i,seconds,0,tail,head);
+        el.setAttribute('d',p.d);
+        el.style.opacity=String(clamp(Math.min(head/.12,(1-head)/.12),0,.9));
+      });
+      s.sparks.forEach((el,k)=>{
+        if(reduced.matches){el.style.opacity='0';return;}
+        const t=(seconds*(.19+k*.013)+s.i*.22+k*.21)%1;
+        const strand=k%2===0?1:-1;
+        const point=pathFor(from,to,s.i,seconds,strand,t,Math.min(1,t+.001)).point(t);
+        el.setAttribute('cx',point.x);
+        el.setAttribute('cy',point.y);
+        el.setAttribute('r',String(k===0?3.7:2.1));
+        el.style.opacity=String(clamp(Math.min(t/.08,(1-t)/.1),0,k===0?.91:.63));
+      });
+    }
+    if(!reduced.matches)frame=requestAnimationFrame(render);
+  }
+  function schedule(){
+    if(frame) cancelAnimationFrame(frame);
+    frame=requestAnimationFrame(render);
+  }
+  window.addEventListener('resize',schedule,{passive:true});
+  space.addEventListener('pointermove',()=>{if(reduced.matches)schedule();},{passive:true});
+  space.addEventListener('pointerup',schedule,{passive:true});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){cancelAnimationFrame(frame);frame=0;}
+    else schedule();
+  });
+  reduced.addEventListener?.('change',schedule);
+  schedule();
 })();
 </script>
 
