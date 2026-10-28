@@ -595,6 +595,86 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
  #fallback .hx-browser-bar{font-size:5px}
 }
 
+
+/* Cinema-inspired anonymous demonstration on Huxcasti's laptop. No client data or branding. */
+#fallback .hx-cinema-app{display:grid;grid-template-columns:22% minmax(0,1fr);height:89%;text-align:left;background:#f1f6f9}
+#fallback .hx-cinema-nav{background:#0b1f36;display:flex;flex-direction:column;gap:4px;padding:9px 6px;color:#aac6d9}
+#fallback .hx-cinema-brand{color:#ecffff;font-size:15px;line-height:1.2;font-weight:950;padding:0 5px 9px}
+#fallback .hx-cinema-brand span{color:#5ceaf0}
+#fallback .hx-cinema-navitem{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:7px;padding:6px 4px;border-radius:4px}
+#fallback .hx-cinema-navitem i{font-style:normal;font-size:8px;color:#80a7c0}
+#fallback .hx-cinema-navitem.active{background:#185b72;color:#edffff}
+#fallback .hx-cinema-content{min-width:0;overflow:hidden;padding:8px;color:#214357}
+#fallback .hx-cinema-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:7px}
+#fallback .hx-cinema-head>div{min-width:0}
+#fallback .hx-cinema-head small{display:block;font-size:6px;letter-spacing:.07em;color:#758c9e;font-weight:800;white-space:nowrap}
+#fallback .hx-cinema-head b{display:block;font-size:11px;line-height:1.2;margin-top:3px;white-space:nowrap;color:#183b52}
+#fallback .hx-cinema-head-status{font-size:6px;white-space:nowrap;padding:4px 6px;background:#dff8ef;color:#21917a;border-radius:4px}
+#fallback .hx-cinema-main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.82fr);gap:7px;height:calc(100% - 34px)}
+#fallback .hx-cinema-seating{min-width:0;background:#fff;border:1px solid #dceaf1;border-radius:6px;padding:6px 7px 4px;overflow:hidden}
+#fallback .hx-cinema-film{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+#fallback .hx-cinema-film-art{display:grid;place-items:center;flex:none;width:21px;height:23px;border-radius:3px;background:linear-gradient(145deg,#6c8cd9,#1b385c);color:#e8faff;font-size:11px}
+#fallback .hx-cinema-film b{display:block;font-size:7px;white-space:nowrap;color:#294c5b}
+#fallback .hx-cinema-film small{display:block;font-size:6px;color:#8399a4;white-space:nowrap;margin-top:2px}
+#fallback .hx-cinema-screenbar{height:7px;line-height:7px;text-align:center;font-size:5px;letter-spacing:.18em;font-weight:800;color:#4f8296;background:linear-gradient(90deg,transparent,#d3e8f0,transparent);border-top:2px solid #9fcbdc;border-radius:60% 60% 0 0;margin:4px 5px 6px}
+#fallback .hx-cinema-seats{display:grid;grid-template-columns:repeat(7,8px);gap:4px 5px;justify-content:center}
+#fallback .hx-cinema-seats span{display:block;width:8px;height:7px;border-radius:2px 2px 3px 3px;background:#c5d8e0;box-shadow:inset 0 -2px rgba(77,110,126,.15)}
+#fallback .hx-cinema-seats span.busy{background:#9ca8bd}
+#fallback .hx-cinema-seats span.chosen{background:#19b5bc;box-shadow:0 0 5px #32cbd87a}
+#fallback .hx-cinema-legend{display:flex;gap:4px;justify-content:space-around;align-items:center;margin-top:7px}
+#fallback .hx-cinema-legend span{display:inline-flex;align-items:center;gap:2px;white-space:nowrap;font-size:5px;color:#728d9a}
+#fallback .hx-cinema-legend i{display:block;width:5px;height:5px;border-radius:1px;background:#c5d8e0}
+#fallback .hx-cinema-legend i.chosen{background:#19b5bc}
+#fallback .hx-cinema-legend i.busy{background:#9ca8bd}
+#fallback .hx-cinema-order{min-width:0;overflow:hidden;border:1px solid #dceaf1;border-radius:6px;background:#fff;padding:8px 7px}
+#fallback .hx-cinema-order>strong{font-size:8px;color:#2a4859;display:block;padding-bottom:4px;border-bottom:1px solid #ebf2f6}
+#fallback .hx-cinema-order-label{display:block;margin-top:7px;font-size:5px;letter-spacing:.04em;color:#8aa3ad;font-weight:800}
+#fallback .hx-cinema-order-item{display:flex;justify-content:space-between;gap:3px;margin-top:3px;font-size:7px;color:#426274}
+#fallback .hx-cinema-order-item b{color:#206576}
+#fallback .hx-cinema-order-seats{display:flex;gap:3px;margin-top:4px}
+#fallback .hx-cinema-order-seats span{font-size:7px;padding:4px;border-radius:4px;background:#d8f6f5;color:#137f88;font-weight:800}
+#fallback .hx-cinema-qr{display:flex;align-items:center;gap:5px;color:#5e7e8c;font-size:6px;margin-top:8px}
+#fallback .hx-cinema-qr-icon{font-size:21px;color:#206982}
+#fallback .hx-cinema-action{text-align:center;background:#169eac;color:white;padding:6px 2px;border-radius:4px;font-size:7px;font-weight:800;margin-top:6px}
+@media(max-width:700px){
+ #fallback .hx-cinema-nav{padding:6px 3px;gap:2px}
+ #fallback .hx-cinema-brand{font-size:12px;padding:0 3px 6px}
+ #fallback .hx-cinema-navitem{font-size:5px;padding:5px 3px;gap:3px}
+ #fallback .hx-cinema-navitem i{font-size:6px}
+ #fallback .hx-cinema-content{padding:5px}
+ #fallback .hx-cinema-head{margin-bottom:5px}
+ #fallback .hx-cinema-head small{font-size:4px}
+ #fallback .hx-cinema-head b{font-size:8px}
+ #fallback .hx-cinema-head-status{font-size:4px;padding:3px 4px}
+ #fallback .hx-cinema-main{grid-template-columns:minmax(0,1.7fr) minmax(0,.8fr);gap:4px;height:calc(100% - 26px)}
+ #fallback .hx-cinema-seating{padding:4px}
+ #fallback .hx-cinema-film{gap:3px;margin-bottom:3px}
+ #fallback .hx-cinema-film-art{width:16px;height:19px;font-size:9px}
+ #fallback .hx-cinema-film b{font-size:5.5px}
+ #fallback .hx-cinema-film small{font-size:5px}
+ #fallback .hx-cinema-screenbar{margin:3px 4px 5px;height:6px;line-height:6px;font-size:4px}
+ #fallback .hx-cinema-seats{grid-template-columns:repeat(7,6px);gap:3px 4px}
+ #fallback .hx-cinema-seats span{width:6px;height:6px}
+ #fallback .hx-cinema-legend{gap:2px;margin-top:4px}
+ #fallback .hx-cinema-legend span{font-size:4px;gap:1px}
+ #fallback .hx-cinema-legend i{width:4px;height:4px}
+ #fallback .hx-cinema-order{padding:5px 4px}
+ #fallback .hx-cinema-order>strong{font-size:6px}
+ #fallback .hx-cinema-order-label{font-size:4px;margin-top:5px}
+ #fallback .hx-cinema-order-item{font-size:5px}
+ #fallback .hx-cinema-order-seats span{font-size:5px;padding:3px}
+ #fallback .hx-cinema-qr{font-size:4px;gap:2px;margin-top:6px}
+ #fallback .hx-cinema-qr-icon{font-size:16px}
+ #fallback .hx-cinema-action{font-size:5px;padding:4px 2px;margin-top:4px}
+}
+@media(max-width:390px){
+ #fallback .hx-cinema-navitem{font-size:4px}
+ #fallback .hx-cinema-seats{grid-template-columns:repeat(7,5px);gap:3px}
+ #fallback .hx-cinema-seats span{width:5px;height:5px}
+ #fallback .hx-cinema-legend span{font-size:3px}
+ #fallback .hx-cinema-order>strong{font-size:5px}
+}
+
 </style>
 </head>
 <body>
@@ -633,16 +713,38 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       <span class="hx-product-eyebrow">VISTA CONCEPTUAL · SISTEMAS A TU MEDIDA</span>
       <div class="hx-device-laptop" aria-hidden="true">
         <div class="hx-laptop-screen">
-          <div class="hx-browser-bar"><span class="hx-browser-dots"><i></i><i></i><i></i></span><span>huxcasti / demo</span></div>
-          <div class="hx-dash-layout">
-            <div class="hx-dash-sidebar"><b>H<span>.</span></b><small class="active">▦ &nbsp; Inicio</small><small>□ &nbsp; Reservas</small><small>▣ &nbsp; Calendario</small><small>◯ &nbsp; Clientes</small></div>
-            <div class="hx-dash-main">
-              <div class="hx-dash-heading"><div><small>PANEL ADMINISTRATIVO</small><b>Gestión de reservas</b></div><i>HC</i></div>
-              <div class="hx-dash-stats"><div><small>Solicitudes</small><b>08</b></div><div><small>Confirmadas</small><b>06</b></div><div><small>Por revisar</small><b>02</b></div></div>
-              <div class="hx-dash-list"><div class="hx-dash-list-title"><b>Próximas reservas</b><small>Ver agenda ↗</small></div>
-                <div class="hx-dash-entry"><i>01</i><div><b>Evento privado</b><small>Reserva de espacio</small></div><em>Confirmada</em></div>
-                <div class="hx-dash-entry"><i>02</i><div><b>Sesión fotográfica</b><small>Solicitud recibida</small></div><em class="pending">Pendiente</em></div>
-                <div class="hx-dash-entry"><i>03</i><div><b>Celebración</b><small>Reserva de espacio</small></div><em>Confirmada</em></div>
+          <div class="hx-browser-bar"><span class="hx-browser-dots"><i></i><i></i><i></i></span><span>huxcasti / demo de boletería</span></div>
+          <div class="hx-cinema-app">
+            <aside class="hx-cinema-nav">
+              <div class="hx-cinema-brand">H<span>•</span></div>
+              <div class="hx-cinema-navitem active"><i>▦</i><span>Boletos</span></div>
+              <div class="hx-cinema-navitem"><i>▤</i><span>Funciones</span></div>
+              <div class="hx-cinema-navitem"><i>⌗</i><span>Acceso QR</span></div>
+              <div class="hx-cinema-navitem"><i>◫</i><span>Reportes</span></div>
+            </aside>
+            <div class="hx-cinema-content">
+              <div class="hx-cinema-head"><div><small>DEMO · VENTA DE BOLETOS</small><b>Selecciona tus asientos</b></div><span class="hx-cinema-head-status">● En línea</span></div>
+              <div class="hx-cinema-main">
+                <section class="hx-cinema-seating">
+                  <div class="hx-cinema-film"><span class="hx-cinema-film-art">✦</span><div><b>Función de muestra</b><small>Sala 01 &nbsp;·&nbsp; 7:30 PM</small></div></div>
+                  <div class="hx-cinema-screenbar">PANTALLA</div>
+                  <div class="hx-cinema-seats">
+                    <span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="free"></span>
+                    <span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span>
+                    <span class="free"></span><span class="free"></span><span class="free"></span><span class="chosen"></span><span class="chosen"></span><span class="free"></span><span class="free"></span>
+                    <span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="free"></span>
+                  </div>
+                  <div class="hx-cinema-legend"><span><i class="free"></i> Disponible</span><span><i class="chosen"></i> Seleccionado</span><span><i class="busy"></i> Ocupado</span></div>
+                </section>
+                <aside class="hx-cinema-order">
+                  <strong>Tu selección</strong>
+                  <span class="hx-cinema-order-label">BOLETOS</span>
+                  <div class="hx-cinema-order-item"><span>Adulto</span><b>× 2</b></div>
+                  <span class="hx-cinema-order-label">ASIENTOS</span>
+                  <div class="hx-cinema-order-seats"><span>D4</span><span>D5</span></div>
+                  <div class="hx-cinema-qr"><span class="hx-cinema-qr-icon">▦</span><span>Acceso<br>con QR</span></div>
+                  <div class="hx-cinema-action">Continuar ↗</div>
+                </aside>
               </div>
             </div>
           </div>
