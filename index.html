@@ -1176,6 +1176,17 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition{opacity:.1}
 }
 
+/* Huxcasti: precios transparentes sin convertir los sistemas a paquetes cerrados. */
+#fallback .hx-services .hx-service{position:relative}
+#fallback .hx-services .hx-service p{margin-bottom:18px}
+#fallback .hx-services .hx-service-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 7px;width:100%;border-top:1px solid rgba(127,216,232,.17);padding-top:16px;margin-top:auto;margin-bottom:10px}
+#fallback .hx-services .hx-price-from{color:#a9c8d8;font-weight:650;font-size:12px}
+#fallback .hx-services .hx-service-price strong{font-size:clamp(25px,2.5vw,32px);color:#8cf2ef;font-weight:850;letter-spacing:-.045em;line-height:1.1;font-variant-numeric:tabular-nums}
+#fallback .hx-services .hx-price-unit{color:#8baabd;font-size:10px;white-space:nowrap}
+#fallback .hx-services .hx-service>a{display:inline-flex;align-items:center;min-height:38px;margin-top:4px;padding:7px 0;font-size:12px}
+#fallback .hx-services .hx-services-foot{max-width:810px;margin-top:22px}
+@media(max-width:680px){#fallback .hx-services .hx-service{padding:19px 17px}#fallback .hx-services .hx-service-price{padding-top:13px;margin-bottom:7px}#fallback .hx-services .hx-service-price strong{font-size:30px}#fallback .hx-services .hx-service p{margin-bottom:11px}}
+
 </style>
 </head>
 <body>
@@ -1269,11 +1280,29 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
     <h2 id="hx-services-title">Tu próxima idea merece hacerse realidad.</h2>
     <p class="hx-services-lead">Diseñamos experiencias digitales que ayudan a negocios en Puerto Rico a presentar sus servicios, organizar reservas y simplificar su operación.</p>
     <div class="hx-services-grid">
-      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">↗</span><h3>Páginas web</h3><p>Sitios profesionales y adaptados al celular para dar a conocer tu negocio.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20una%20p%C3%A1gina%20web%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
-      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">▦</span><h3>Reservas y citas</h3><p>Soluciones para gestionar solicitudes, fechas, disponibilidad e invitados.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20un%20sistema%20de%20reservas%20o%20citas%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
-      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">⌘</span><h3>Sistemas administrativos</h3><p>Herramientas personalizadas para organizar procesos, expedientes y operaciones.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20un%20sistema%20administrativo%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
+      <article class="hx-service">
+        <span class="hx-service-icon" aria-hidden="true">↗</span>
+        <h3>Páginas web</h3>
+        <p>Sitios modernos, adaptados al celular y diseñados para que tus clientes conozcan tu negocio y te contacten.</p>
+        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$799</strong><span class="hx-price-unit">por proyecto</span></div>
+        <a href="https://wa.me/17875490777?text=Hola%2C%20vi%20que%20las%20p%C3%A1ginas%20web%20comienzan%20desde%20%24799.%20Me%20gustar%C3%ADa%20una%20cotizaci%C3%B3n%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a>
+      </article>
+      <article class="hx-service">
+        <span class="hx-service-icon" aria-hidden="true">▦</span>
+        <h3>Reservas y citas</h3>
+        <p>Soluciones para organizar solicitudes, disponibilidad y clientes desde un mismo lugar.</p>
+        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$1,499</strong><span class="hx-price-unit">por proyecto</span></div>
+        <a href="https://wa.me/17875490777?text=Hola%2C%20vi%20que%20los%20sistemas%20de%20reservas%20comienzan%20desde%20%241%2C499.%20Me%20gustar%C3%ADa%20una%20cotizaci%C3%B3n%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a>
+      </article>
+      <article class="hx-service">
+        <span class="hx-service-icon" aria-hidden="true">⌘</span>
+        <h3>Sistemas administrativos</h3>
+        <p>Herramientas a medida para gestionar expedientes, procesos, operaciones y equipos.</p>
+        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$2,499</strong><span class="hx-price-unit">por proyecto</span></div>
+        <a href="https://wa.me/17875490777?text=Hola%2C%20vi%20que%20los%20sistemas%20administrativos%20comienzan%20desde%20%242%2C499.%20Me%20gustar%C3%ADa%20una%20cotizaci%C3%B3n%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a>
+      </article>
     </div>
-    <p class="hx-services-foot">Cuéntanos qué necesitas y evaluamos contigo una solución y su costo antes de comenzar.</p>
+    <p class="hx-services-foot">Precios iniciales orientativos en USD para proyectos de alcance básico. El costo final depende de las funciones requeridas. Dominio, hospedaje, integraciones de pago y mantenimiento se cotizan por separado cuando apliquen.</p>
   </section>
   <section class="hx-portfolio" id="proyectos" aria-labelledby="hx-projects-title">
     <div class="f-title"><div class="f-kicker">NUESTRO PORTAFOLIO</div><h2 id="hx-projects-title">Explora nuestros <em>proyectos.</em></h2><p>Cada proyecto es un mundo. Toca un planeta para conocer algunas de las soluciones que hemos desarrollado.</p></div>
