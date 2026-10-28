@@ -1054,6 +1054,128 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-current{background-position:45% 50%,50% 50%;opacity:.4}
 }
 
+/* El núcleo H de Huxcasti se comporta como un reactor.
+   Corrientes visibles únicamente DENTRO de la silueta original. No crea anillos. */
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-plasma,
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition {
+  position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;
+  -webkit-mask-image:var(--hx-h-mark);mask-image:var(--hx-h-mark);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain;
+  mix-blend-mode:screen;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-plasma{z-index:5;will-change:background-position;opacity:.82}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-plasma-x{
+  background:
+    linear-gradient(100deg,transparent 26%,rgba(48,176,242,.06) 35%,rgba(221,255,255,.97) 43%,rgba(104,252,255,.54) 46%,rgba(38,182,243,.10) 51%,transparent 64%),
+    repeating-linear-gradient(175deg,transparent 0px,rgba(177,249,255,.24) 2px,transparent 4px,transparent 13px);
+  background-size:300% 100%,100% 100%;
+  animation:hx-reactor-horizontal 3.35s linear infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-plasma-y{
+  background:
+    linear-gradient(8deg,transparent 21%,rgba(23,136,220,.10) 35%,rgba(199,255,255,.88) 46%,rgba(96,246,255,.28) 50%,transparent 64%),
+    radial-gradient(ellipse at 50% 50%,rgba(131,242,255,.17),transparent 65%);
+  background-size:100% 300%,100% 100%;
+  animation:hx-reactor-vertical 4.1s ease-in-out infinite;
+  opacity:.53;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition{
+  z-index:6;
+  background:radial-gradient(ellipse at 48% 48%,rgba(238,255,255,.98) 0%,rgba(140,255,255,.68) 23%,rgba(37,190,254,.24) 51%,transparent 72%);
+  opacity:.09;
+  animation:hx-reactor-living-beat 4.6s ease-in-out infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .f-logo-clean{
+  animation:hx-reactor-metal-breath 4.6s ease-in-out infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura{
+  animation:hx-aura-breathe 4s ease-in-out infinite;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-plasma-x,
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-plasma-y{
+  animation-duration:.80s;opacity:1;
+  filter:brightness(1.3) drop-shadow(0 0 3px #b1ffff);
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-h-ignition{
+  animation:hx-reactor-charge .92s ease-in both;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .f-logo-clean{
+  animation:hx-reactor-charge-metal .92s ease-in both;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-reactor-mote{
+  opacity:1;filter:brightness(1.5);
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-h-ignition{
+  animation:hx-reactor-discharge 1.25s ease-out both;
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-plasma-x,
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-plasma-y{
+  animation-duration:.58s;opacity:.96;
+  filter:brightness(1.3) drop-shadow(0 0 3px rgba(162,253,255,.9));
+}
+#fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .f-logo-clean{
+  animation:hx-reactor-metal-release 1.25s ease-out both!important;
+}
+#fallback .hx-portfolio .f-planet.hx-energy-received .f-ball.hx-textured::after{
+  animation:hx-world-charge-surface 1.3s ease-out both!important;
+  background:
+    radial-gradient(circle at var(--hx-light-x,38%) var(--hx-light-y,30%),rgba(228,255,255,.9) 0%,rgba(111,247,252,.58) 16%,rgba(40,187,252,.27) 38%,transparent 73%),
+    linear-gradient(127deg,transparent 15%,rgba(198,254,255,.22) 46%,transparent 68%);
+  mix-blend-mode:screen;
+}
+#fallback .hx-portfolio .f-planet.hx-energy-received .f-ball.hx-textured{
+  animation:hx-world-ignition 1.3s ease-out both;
+}
+@keyframes hx-reactor-horizontal{from{background-position:108% 50%,0 0}to{background-position:-55% 50%,0 0}}
+@keyframes hx-reactor-vertical{0%,100%{background-position:50% 110%,0 0}55%{background-position:50% -60%,0 0}}
+@keyframes hx-reactor-living-beat{0%,100%{opacity:.06}18%{opacity:.23}27%{opacity:.13}44%{opacity:.36}60%{opacity:.10}}
+@keyframes hx-reactor-metal-breath{
+  0%,100%{filter:drop-shadow(0 0 6px rgba(87,242,255,.68)) drop-shadow(0 0 12px rgba(45,197,246,.28)) brightness(1)}
+  44%{filter:drop-shadow(0 0 11px rgba(128,251,255,.95)) drop-shadow(0 0 18px rgba(63,218,249,.53)) brightness(1.15)}
+}
+@keyframes hx-reactor-charge{0%{opacity:.12;filter:brightness(1)}58%{opacity:.46;filter:brightness(1.25)}100%{opacity:.86;filter:brightness(1.75)}}
+@keyframes hx-reactor-charge-metal{
+  0%{filter:drop-shadow(0 0 7px rgba(87,242,255,.75)) brightness(1)}
+  100%{filter:drop-shadow(0 0 17px rgba(186,255,255,.95)) brightness(1.32)}
+}
+@keyframes hx-reactor-discharge{
+  0%{opacity:.98;filter:brightness(2)}
+  18%{opacity:1;filter:brightness(2.3)}
+  50%{opacity:.56;filter:brightness(1.2)}
+  100%{opacity:.08;filter:brightness(1)}
+}
+@keyframes hx-reactor-metal-release{
+  0%{filter:drop-shadow(0 0 19px rgba(183,255,255,.98)) brightness(1.45)}
+  23%{filter:drop-shadow(0 0 13px rgba(103,242,255,.8)) brightness(1.18)}
+  100%{filter:drop-shadow(0 0 6px rgba(67,230,248,.65)) brightness(1)}
+}
+@keyframes hx-world-ignition{
+  0%,100%{transform:scale(1)}
+  24%{transform:scale(1.065)}
+  54%{transform:scale(1.025)}
+}
+@media(max-width:600px){
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-plasma{opacity:.9}
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-plasma-y{opacity:.64}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-plasma,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .f-logo-clean,
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-energy-aura,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-plasma-x,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-charging .hx-plasma-y,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .hx-h-ignition,
+  #fallback .hx-portfolio .f-core.hx-minimal-core.hx-emitting .f-logo-clean,
+  #fallback .hx-portfolio .f-planet.hx-energy-received .f-ball.hx-textured,
+  #fallback .hx-portfolio .f-planet.hx-energy-received .f-ball.hx-textured::after{
+    animation:none!important;
+  }
+  #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition{opacity:.1}
+}
+
 </style>
 </head>
 <body>
@@ -1182,7 +1304,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       <span class="hx-reactor-mote hx-mote-a" aria-hidden="true"></span>
       <span class="hx-reactor-mote hx-mote-b" aria-hidden="true"></span>
       <span class="hx-reactor-mote hx-mote-c" aria-hidden="true"></span>
-      <span class="f-h-scene" aria-hidden="true"><span class="hx-h-extrusion"></span><span class="hx-h-bevel"></span><span class="f-logo-clean"></span><span class="hx-h-current"></span></span>
+      <span class="f-h-scene" aria-hidden="true"><span class="hx-h-extrusion"></span><span class="hx-h-bevel"></span><span class="f-logo-clean"></span><span class="hx-h-current"></span><span class="hx-h-plasma hx-plasma-x"></span><span class="hx-h-plasma hx-plasma-y"></span><span class="hx-h-ignition"></span></span>
     </div>
     <div class="f-coming" aria-label="Futuro proyecto: próximamente"><span class="f-coming-ball" aria-hidden="true"></span><span>Próximamente</span></div>
     <a class="f-planet f-cine" href="#world-cine" aria-label="Acercarse al planeta Cine Manuel Nieves"><span class="f-props" aria-hidden="true"><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcl-body" x1="11" y1="26" x2="53" y2="55" gradientUnits="userSpaceOnUse"><stop stop-color="#7e9cac"/><stop offset=".42" stop-color="#263d54"/><stop offset="1" stop-color="#101c31"/></linearGradient><linearGradient id="xcl-top" x1="14" y1="12" x2="48" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#d9f6fc"/><stop offset=".5" stop-color="#6e8494"/><stop offset="1" stop-color="#293a4e"/></linearGradient></defs><ellipse cx="32" cy="56" rx="23" ry="3.5" fill="#040911" opacity=".55"/><rect x="9" y="24" width="47" height="31" rx="5" fill="url(#xcl-body)" stroke="#8da7b8" stroke-width="1.4"/><path d="M13 31H52" stroke="#89f4ff" stroke-width="1.2" opacity=".6"/><path d="M16 39H39M16 45H48" stroke="#a8c6d4" stroke-width="1.5" opacity=".55" stroke-linecap="round"/><path d="M9 21L47 9a4 4 0 0 1 5 2.7l2 6.5L13 32l-4-11Z" fill="url(#xcl-top)" stroke="#bdd4dd" stroke-width="1.5"/><path d="M14 20L20 30M25 17L31 27M36 13L42 23M47 11L52 19" stroke="#101c2c" stroke-width="6"/><path d="M12 22 48 11" stroke="#efffff" stroke-width="1.2" opacity=".72"/><circle cx="15" cy="35" r="1.5" fill="#66f4fd"/><circle cx="48" cy="48" r="2" fill="#d3eaff" opacity=".7"/></svg></span><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcam-metal" x1="12" y1="19" x2="53" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#b5dce7"/><stop offset=".28" stop-color="#4d7890"/><stop offset=".73" stop-color="#1f344e"/><stop offset="1" stop-color="#0d192c"/></linearGradient><radialGradient id="xcam-reel"><stop stop-color="#8edbe9"/><stop offset=".35" stop-color="#345068"/><stop offset=".82" stop-color="#142438"/><stop offset="1" stop-color="#94aabb"/></radialGradient></defs><ellipse cx="32" cy="58" rx="23" ry="3.5" fill="#040911" opacity=".6"/><path d="M28 49v7M40 49v7M20 57h28" stroke="#607d91" stroke-width="3.5" stroke-linecap="round"/><rect x="11" y="29" width="39" height="25" rx="5" fill="url(#xcam-metal)" stroke="#b1dce8" stroke-width="1.2"/><path d="m48 35 10-7v25l-10-7Z" fill="#2e5266" stroke="#95c3cb" stroke-width="1.2"/><circle cx="21" cy="23" r="13" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><circle cx="43" cy="20" r="12" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><g fill="#a4c6d1" opacity=".82"><circle cx="21" cy="15.5" r="3.2"/><circle cx="14" cy="26" r="3.2"/><circle cx="27.5" cy="27" r="3.2"/><circle cx="43" cy="13.5" r="3"/><circle cx="36.8" cy="22.6" r="3"/><circle cx="49.5" cy="24" r="3"/></g><circle cx="21" cy="23" r="2.6" fill="#0d1c30"/><circle cx="43" cy="20" r="2.4" fill="#0d1c30"/><path d="M15 35h29" stroke="#d0faff" opacity=".5"/><circle cx="17" cy="46" r="2" fill="#63f5ff"/></svg></span></span><span class="f-ball"></span><strong>Cine Manuel Nieves</strong></a>
@@ -1503,7 +1625,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
         void target.offsetWidth;
         target.classList.add('hx-energy-received');
         clearTimeout(arrivalTimer);
-        arrivalTimer = setTimeout(() => target.classList.remove('hx-energy-received'), 1100);
+        arrivalTimer = setTimeout(() => target.classList.remove('hx-energy-received'), 1300);
       }
     }
     frame = requestAnimationFrame(tick);
@@ -1519,10 +1641,10 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       chargeTimer = 0;
       core.classList.remove('hx-charging');
       if (!document.hidden && !reduce.matches) send();
-    }, 620);
+    }, 920);
   }
-  timer = setInterval(chargeThenSend, 6900);
-  setTimeout(chargeThenSend, 1580);
+  timer = setInterval(chargeThenSend, 7100);
+  setTimeout(chargeThenSend, 1150);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) reset();
   });
