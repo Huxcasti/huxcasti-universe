@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#050b17">
-<meta name="description" content="Explora el universo digital de Huxcasti: experiencias web hechas con creatividad y tecnología.">
-<title>Huxcasti Universe V4 — Donde las ideas cobran vida</title>
+<meta name="description" content="Huxcasti crea páginas web, sistemas de reservas y herramientas administrativas para negocios en Puerto Rico. Explora nuestros proyectos y solicita una cotización.">
+<title>Huxcasti | Páginas web y sistemas para negocios en Puerto Rico</title>
 <style>
 :root { --cyan:#27e0eb; --white:#eaf7ff; --muted:#9ab7cd; --night:#050b17; --line:rgba(129,220,243,.19); }
 *{box-sizing:border-box} html,body{height:100%;margin:0;background:var(--night);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
@@ -386,6 +386,22 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   #fallback .f-ball.hx-textured{animation:none!important}
 }
 
+
+/* Huxcasti commercial services — self-contained addition below the original universe and CTA. */
+#fallback .hx-services{position:relative;z-index:5;max-width:1040px;margin:12px auto 76px;padding:30px clamp(16px,3vw,34px) 25px;border:1px solid rgba(113,209,229,.2);border-radius:24px;background:linear-gradient(150deg,rgba(12,38,58,.88),rgba(4,16,30,.89));box-shadow:0 18px 55px rgba(0,0,0,.2);text-align:center}
+#fallback .hx-services-eyebrow{font-size:10px;color:#61e6ee;letter-spacing:.2em;font-weight:800}
+#fallback .hx-services h2{font-size:clamp(24px,4vw,38px);line-height:1.15;letter-spacing:-.04em;margin:12px auto;max-width:580px}
+#fallback .hx-services-lead{font-size:13px;color:#b5d0e0;max-width:600px;line-height:1.7;margin:0 auto 23px}
+#fallback .hx-services-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;text-align:left}
+#fallback .hx-service{min-width:0;border:1px solid rgba(116,207,226,.2);background:rgba(5,22,39,.78);border-radius:17px;padding:20px 17px;display:flex;flex-direction:column;align-items:flex-start}
+#fallback .hx-service-icon{color:#5ae6ef;font-size:22px;font-weight:800}
+#fallback .hx-service h3{font-size:16px;line-height:1.3;margin:10px 0 6px;color:#f0fcff}
+#fallback .hx-service p{font-size:12px;line-height:1.65;color:#b5d0e0;margin:0 0 19px;flex:1}
+#fallback .hx-service a{font-size:12px;color:#6eeef4;text-decoration:none;font-weight:750;padding:5px 0}
+#fallback .hx-service a:hover,#fallback .hx-service a:focus-visible{color:#fff;text-decoration:underline}
+#fallback .hx-services-foot{font-size:11px;line-height:1.55;color:#91aebd;margin:22px auto 0}
+@media(max-width:680px){#fallback .hx-services{margin:14px auto 44px;padding:23px 15px 19px;border-radius:18px}#fallback .hx-services-grid{grid-template-columns:1fr;gap:9px}#fallback .hx-service{padding:15px 16px}#fallback .hx-service h3{margin:6px 0}#fallback .hx-service p{margin-bottom:10px}#fallback .hx-services-lead{margin-bottom:17px}}
+
 </style>
 </head>
 <body>
@@ -428,6 +444,17 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   <div class="f-action" aria-label="Contacto de Huxcasti">
     <a class="hx-contact" href="https://wa.me/17875490777?text=Hola%2C%20vi%20Huxcasti%20Universe%20y%20quisiera%20informaci%C3%B3n%20para%20crear%20una%20p%C3%A1gina%20web%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" aria-label="Crea tu universo: contactar a Huxcasti por WhatsApp al 787-549-0777">✦ Crea tu universo ↗</a>
   </div>
+  <section id="servicios" class="hx-services" aria-labelledby="hx-services-title">
+    <div class="hx-services-eyebrow">SOLUCIONES PARA TU NEGOCIO</div>
+    <h2 id="hx-services-title">Tu próxima idea merece hacerse realidad.</h2>
+    <p class="hx-services-lead">Diseñamos experiencias digitales que ayudan a negocios en Puerto Rico a presentar sus servicios, organizar reservas y simplificar su operación.</p>
+    <div class="hx-services-grid">
+      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">↗</span><h3>Páginas web</h3><p>Sitios profesionales y adaptados al celular para dar a conocer tu negocio.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20una%20p%C3%A1gina%20web%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
+      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">▦</span><h3>Reservas y citas</h3><p>Soluciones para gestionar solicitudes, fechas, disponibilidad e invitados.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20un%20sistema%20de%20reservas%20o%20citas%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
+      <article class="hx-service"><span class="hx-service-icon" aria-hidden="true">⌘</span><h3>Sistemas administrativos</h3><p>Herramientas personalizadas para organizar procesos, expedientes y operaciones.</p><a href="https://wa.me/17875490777?text=Hola%2C%20quiero%20cotizar%20un%20sistema%20administrativo%20con%20Huxcasti." target="_blank" rel="noopener noreferrer">Solicitar cotización ↗</a></article>
+    </div>
+    <p class="hx-services-foot">Cuéntanos qué necesitas y evaluamos contigo una solución y su costo antes de comenzar.</p>
+  </section>
   <article id="world-cine" class="f-focus focus-cine" role="region" aria-label="Vista cercana de Cine Manuel Nieves">
     <div class="f-focus-inner">
       <a href="#fallback" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
