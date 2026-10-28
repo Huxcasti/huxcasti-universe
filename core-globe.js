@@ -95,8 +95,8 @@
   function draw(now){
     raf=0;
     if(document.hidden)return;
-    if(!last)last=now;
-    const elapsed=Math.min(110,now-last);
+    if(last && now-last<42){raf=requestAnimationFrame(draw);return;}
+    const elapsed=last ? Math.min(110,now-last) : 0;
     last=now;
     if(!reduced.matches)phase=(phase+elapsed/75000)%1;
     paint(phase);
