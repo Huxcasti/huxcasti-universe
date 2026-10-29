@@ -53,12 +53,12 @@ const supabase=createClient(URL,PUB,{auth:{autoRefreshToken:true,persistSession:
 window.__businessLoaded=true;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
-const state={user:null,session:null,mode:"login",loading:false,reset:false,businesses:[],activeId:null,clients:[],notes:[],clientId:null,section:"dashboard",role:"",master:false,overview:null,masterBusinesses:[],masterLoaded:false,masterLoading:false,masterError:'',masterSearch:'',masterStatus:'all',masterPage:0,masterTotal:0,selectedBusiness:null,masterRequest:0,myRequests:[],myRequestsLoaded:false,myRequestsError:'',accessRequests:[],accessRequestsLoaded:false,accessRequestsLoading:false,accessRequestsError:'',reviewRequestId:null,reviewDecision:null,productInterests:[],productInterestsLoaded:false,productInterestsError:'',platformInterests:[],platformInterestsLoaded:false,platformInterestsError:'',platformInterestsLoading:false,productRequestBusy:false};
+const state={user:null,session:null,mode:"login",loading:false,reset:false,businesses:[],activeId:null,clients:[],notes:[],clientId:null,section:"dashboard",role:"",master:false,overview:null,masterBusinesses:[],masterLoaded:false,masterLoading:false,masterError:'',masterSearch:'',masterStatus:'all',masterPage:0,masterTotal:0,selectedBusiness:null,masterRequest:0,myRequests:[],myRequestsLoaded:false,myRequestsError:'',accessRequests:[],accessRequestsLoaded:false,accessRequestsLoading:false,accessRequestsError:'',reviewRequestId:null,reviewDecision:null,productInterests:[],productInterestsLoaded:false,productInterestsError:'',platformInterests:[],platformInterestsLoaded:false,platformInterestsError:'',platformInterestsLoading:false,productRequestBusy:false,adminProductFilter:"all"};
 function flash(msg,error=false){const local=$("authFeedback");if(local)local.innerHTML=msg?'<div class="message '+(error?'error':'')+'" role="alert">'+esc(msg)+'</div>':'';$("flash").innerHTML=msg?'<div class="message '+(error?'error':'')+'">'+esc(msg)+'</div>':'';if(msg)setTimeout(()=>{$("flash").innerHTML=""},9500)}
 function locked(v){state.loading=v;document.querySelectorAll("button").forEach(x=>x.disabled=v)}
 function setMain(html){$("main").innerHTML=html;renderHead()}
 function renderHead(){$("headend").innerHTML=state.user?'<span class="tag">'+esc(state.user.email)+'</span><button class="btn alt slim" id="logout">Salir</button>':'';if(state.user)$("logout").onclick=async()=>{await supabase.auth.signOut();clear();renderAuth()}}
-function clear(){state.user=null;state.session=null;state.businesses=[];state.activeId=null;state.clients=[];state.notes=[];state.clientId=null;state.master=false;state.role="";state.overview=null;state.masterBusinesses=[];state.masterLoaded=false;state.masterRequest++;state.myRequests=[];state.myRequestsLoaded=false;state.myRequestsError='';state.accessRequests=[];state.accessRequestsLoaded=false;state.reviewRequestId=null;state.reviewDecision=null;state.productInterests=[];state.productInterestsLoaded=false;state.platformInterests=[];state.platformInterestsLoaded=false;state.platformInterestsError='';}
+function clear(){state.user=null;state.session=null;state.businesses=[];state.activeId=null;state.clients=[];state.notes=[];state.clientId=null;state.master=false;state.role="";state.overview=null;state.masterBusinesses=[];state.masterLoaded=false;state.masterRequest++;state.myRequests=[];state.myRequestsLoaded=false;state.myRequestsError='';state.accessRequests=[];state.accessRequestsLoaded=false;state.reviewRequestId=null;state.reviewDecision=null;state.productInterests=[];state.productInterestsLoaded=false;state.platformInterests=[];state.platformInterestsLoaded=false;state.platformInterestsError='';state.adminProductFilter='all';}
 function field(id,label,type="text",req=true){return '<label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+type+'" '+(req?'required':'')+' autocomplete="'+(id==='password'?'current-password':'on')+'>'}
 function registerHandlers(){const auth=$("authForm");if(auth)auth.onsubmit=handleAuth;const action=$("authAction");if(action)action.onclick=()=>{const status=$("authStatus");if(status)status.textContent="Procesando solicitud…";void handleAuth({preventDefault(){}});};const switcher=$("switchMode");if(switcher)switcher.onclick=()=>{state.mode=state.mode==="login"?"signup":"login";renderAuth()};const forgot=$("forgot");if(forgot)forgot.onclick=resetMail;const change=$("resetForm");if(change)change.onsubmit=changePassword;const explore=$("exploreProducts");if(explore)explore.onclick=showPublicCatalog;}
 function renderAuth(){
@@ -229,6 +229,7 @@ function renderApp(){
  const refresh=$("refresh");if(refresh)refresh.onclick=async()=>{await loadClients();renderApp();flash("Datos actualizados.")};
  const overview=$("loadOverview");if(overview)overview.onclick=loadOverview;
  const productInquiriesRefresh=$("productInquiriesRefresh");if(productInquiriesRefresh)productInquiriesRefresh.onclick=()=>void loadPlatformInterests();
+ const productAdminFilter=$("adminProductFilter");if(productAdminFilter)productAdminFilter.onchange=()=>{state.adminProductFilter=productAdminFilter.value;renderApp()};
  const requestsReload=$("accessRequestsRefresh");if(requestsReload)requestsReload.onclick=()=>void loadAccessRequests();
  document.querySelectorAll("[data-review-request]").forEach(btn=>btn.onclick=()=>{state.reviewRequestId=btn.dataset.reviewRequest;state.reviewDecision=btn.dataset.decision;renderApp()});
  const reviewCancel=$("reviewCancel");if(reviewCancel)reviewCancel.onclick=()=>{state.reviewRequestId=null;state.reviewDecision=null;renderApp()};
@@ -325,13 +326,16 @@ function productName(slug){return PRODUCT_MODULES.find(x=>x.slug===slug)?.name||
 function productCatalogView(){
  const signed=!!state.user;
  let top='<div class="product-hero"><div class="eyebrow">EL UNIVERSO DE SOLUCIONES HUXCASTI</div><h2>Un producto distinto para cada necesidad</h2><p>Explora nuestros futuros sistemas independientes. Cada proyecto tendrá su propia funcionalidad, identidad y condiciones. No son módulos de Just Be You.</p><div class="notice" style="margin-bottom:0"><strong>Catálogo en preparación.</strong> Ninguno de los cuatro productos especializados está disponible para contratar hoy. Puedes solicitar información; no hay cobros ni acceso automático.</div></div>';
- if(state.productInterestsError&&signed)top+='<div class="message error" role="alert">'+esc(state.productInterestsError)+'</div>';
+ if(state.master){top+='<div class="notice"><strong>Vista de propietario.</strong> Puedes revisar el interés recibido por cada producto desde tu panel maestro. No necesitas solicitar información.</div>'}
+ if(state.productInterestsError&&signed&&!state.master)top+='<div class="message error" role="alert">'+esc(state.productInterestsError)+'</div>';
  const cards=PRODUCT_MODULES.map(p=>{
   const interested=state.productInterests.some(i=>i.product_slug===p.slug&&i.status==='new');
   // La consulta de intereses es opcional; nunca bloquea el catálogo.
   // El servidor impide duplicados incluso si aún no cargó el historial.
   const action=interested?'Interés registrado':signed?'Solicitar información':'Entrar para consultar';
-  const button='<button type="button" class="btn '+(interested?'alt':'')+'" data-product-interest="'+p.slug+'"'+(interested||state.productRequestBusy?' disabled':'')+'>'+action+'</button>';
+  const button=state.master
+   ?'<button type="button" class="btn alt" data-admin-product="'+p.slug+'">Ver consultas de este producto</button>'
+   :'<button type="button" class="btn '+(interested?'alt':'')+'" data-product-interest="'+p.slug+'"'+(interested||state.productRequestBusy?' disabled':'')+'>'+action+'</button>';
   return '<article class="product-card"><div class="product-card-head"><span class="product-icon" aria-hidden="true">'+esc(p.icon)+'</span><span class="product-state">En desarrollo</span></div><div><h3>'+esc(p.name)+'</h3><p style="color:#44c4ff;margin-top:5px;font-weight:650">'+esc(p.subtitle)+'</p></div><p>'+esc(p.description)+'</p><div>'+p.features.map(f=>'<span class="product-feature">• '+esc(f)+'</span>').join('')+'</div><p class="product-info">'+esc(p.note)+'</p><div class="row">'+button+'</div></article>';
  }).join('');
  return top+'<div class="product-grid">'+cards+'</div><div class="card"><h3>¿Cómo funcionará cuando estén disponibles?</h3><p>Podrás solicitar el producto que necesites y, cuando esté listo, revisaremos el acceso, las pruebas y la suscripción de ese sistema por separado. Tu acceso actual a la plataforma no implica tener contratados estos productos.</p>'+(signed?'':'<button class="btn" id="catalogBackLogin" type="button">Entrar o crear cuenta</button>')+'</div>';
@@ -342,6 +346,7 @@ function showPublicCatalog(){
 function attachCatalogHandlers(){
  const back=$("catalogBackLogin");if(back)back.onclick=()=>{state.mode='login';renderAuth()};
  document.querySelectorAll('[data-product-interest]').forEach(b=>b.onclick=()=>{if(!state.user){state.mode='login';renderAuth();return}void requestProductInfo(b.dataset.productInterest)});
+ document.querySelectorAll('[data-admin-product]').forEach(b=>b.onclick=()=>{if(!state.master)return;state.adminProductFilter=b.dataset.adminProduct;state.section='masterProductInterests';renderApp();if(!state.platformInterestsLoaded&&!state.platformInterestsLoading)void loadPlatformInterests()});
 }
 async function loadProductInterests(){
  if(!state.user)return;
@@ -400,10 +405,13 @@ async function requestProductInfo(slug){
 }
 function masterProductInterestsView(){
  if(!state.master)return '<div class="card">Acceso no autorizado.</div>';
- const list=state.platformInterests;
- return '<div class="card"><div class="eyebrow">CONSULTAS DE CLIENTES</div><h2>Interés en productos</h2><p>Aquí verás qué empresas preguntan por Expedientes, Reservas, Tickets y Ventas. Es una lista de interés, no de ventas ni suscripciones.</p><div class="topline"><span class="tag">'+list.length+' consultas</span><button type="button" class="btn alt slim" id="productInquiriesRefresh">Actualizar</button></div>'
+ const options=[['all','Todos los productos'],...PRODUCT_MODULES.map(p=>[p.slug,p.name])];
+ const list=state.platformInterests.filter(x=>state.adminProductFilter==='all'||x.product_slug===state.adminProductFilter);
+ return '<div class="card"><div class="eyebrow">CONSULTAS DE CLIENTES</div><h2>Interés en productos</h2><p>Aquí verás qué empresas preguntan por Expedientes, Reservas, Tickets y Ventas. Es una lista de interés, no de ventas ni suscripciones.</p>'
+ +'<label for="adminProductFilter">Filtrar producto</label><select id="adminProductFilter">'+options.map(([key,label])=>'<option value="'+esc(key)+'"'+(state.adminProductFilter===key?' selected':'')+'>'+esc(label)+'</option>').join('')+'</select>'
+ +'<div class="topline" style="margin-top:16px"><span class="tag">'+list.length+' consultas</span><button type="button" class="btn alt slim" id="productInquiriesRefresh">Actualizar</button></div>'
  +(state.platformInterestsError?'<div class="message error">'+esc(state.platformInterestsError)+'</div>':'')
- +(!state.platformInterestsLoaded?'<div class="empty">Cargando consultas…</div>':list.length?list.map(x=>'<div class="item" style="cursor:default"><strong>'+esc(productName(x.product_slug))+'</strong><span>'+esc(x.business_name||'Sin negocio')+' · '+esc(x.requester_email)+'</span><span>Registrada: '+esc(masterDate(x.requested_at))+' · '+(x.inquiry_status==='new'?'Interés nuevo':esc(x.inquiry_status))+'</span></div>').join(''):'<div class="empty">Todavía no hay consultas sobre productos.</div>')
+ +(!state.platformInterestsLoaded?'<div class="empty">Cargando consultas…</div>':list.length?list.map(x=>'<div class="item" style="cursor:default"><strong>'+esc(productName(x.product_slug))+'</strong><span>'+esc(x.business_name||'Sin negocio')+' · '+esc(x.requester_email)+'</span><span>Registrada: '+esc(masterDate(x.requested_at))+' · '+(x.inquiry_status==='new'?'Interés nuevo':esc(x.inquiry_status))+'</span></div>').join(''):'<div class="empty">Todavía no hay consultas sobre este producto.</div>')
  +'<p class="small muted">Ningún producto especializado se activa ni factura automáticamente.</p></div>';
 }
 async function loadPlatformInterests(){
