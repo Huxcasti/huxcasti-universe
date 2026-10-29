@@ -9,7 +9,10 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 .wrap{max-width:1060px;margin:auto;padding:24px 16px 80px}.head{display:flex;align-items:center;gap:14px;min-height:70px;margin-bottom:16px}.brand{width:54px;height:56px;object-fit:contain;filter:drop-shadow(0 0 7px #42c8fa55)}.brandcopy strong{display:block;font-weight:900;letter-spacing:.20em;font-size:16px}.brandcopy small{font-size:10px;letter-spacing:.18em;color:var(--muted)}.headend{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .eyebrow{font-size:10px;font-weight:800;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin:12px 0 8px}
 h1{font-size:clamp(25px,5vw,38px);margin:6px 0 10px;line-height:1.14}h2{font-size:19px;margin:0 0 13px}h3{font-size:16px;margin:0 0 8px}p{color:var(--muted);line-height:1.55}.muted{color:var(--muted)}.small{font-size:12px}.card{border:1px solid var(--line);background:linear-gradient(155deg,#15243b,#0d192c);border-radius:19px;padding:20px;margin:14px 0;box-shadow:0 14px 35px #0002}
-.auth{max-width:490px;margin:35px auto}.auth .btn.primary-submit{display:flex;width:100%;min-height:52px;margin-top:20px;position:relative;z-index:1;background:linear-gradient(120deg,#0899f5,#5fe2ff);color:#00182b;font-size:16px;font-weight:900;box-shadow:0 5px 22px #0088ff33}.auth .btn.primary-submit:active{transform:scale(.99)}.auth #authFeedback{margin-top:12px}.notice{border:1px solid #316480;background:#0e344d;border-radius:12px;color:#d8f4ff;font-size:13px;line-height:1.5;padding:12px 14px;margin:12px 0}.warn{border-color:#725448;background:#332822;color:#f0dacc}
+.auth{max-width:490px;margin:35px auto}.auth #email,.auth #password{min-height:50px;height:50px;border:2px solid #3b526c;font-size:16px;background:#08182a}
+.auth #submitAuth{display:block;box-sizing:border-box;-webkit-appearance:none;appearance:none;width:100%;min-height:56px;height:56px;margin-top:19px;padding:0 12px;border:0;border-radius:12px;background:#20b4f1;color:#041b30;font:800 16px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;text-align:center;cursor:pointer;touch-action:manipulation}
+.auth #confirmSignup{margin-top:18px;padding:15px;background:#0a2d42;border:1px solid #44c4ff;border-radius:13px}
+.auth #confirmSignup[hidden]{display:none!important}.auth .btn.primary-submit:active{transform:scale(.99)}.auth #authFeedback{margin-top:12px}.notice{border:1px solid #316480;background:#0e344d;border-radius:12px;color:#d8f4ff;font-size:13px;line-height:1.5;padding:12px 14px;margin:12px 0}.warn{border-color:#725448;background:#332822;color:#f0dacc}
 label{display:block;font-size:12px;color:#cbdcf0;font-weight:700;margin:15px 0 7px}input,textarea,select{display:block;width:100%;border:1px solid #3b526c;color:var(--text);background:#08182a;border-radius:12px;padding:13px;outline:none;min-height:45px}textarea{min-height:120px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px #44c4ff22}
 .btn{touch-action:manipulation;display:inline-flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(120deg,#0785dc,#42baf1);color:#041625;border:0;border-radius:12px;padding:13px 18px;font-size:14px;font-weight:850;min-height:44px}.btn.alt{background:#172d47;color:#ccecff;border:1px solid #386082}.btn.ghost{background:none;border:1px solid #385372;color:var(--blue)}.btn.slim{padding:9px 13px;min-height:37px;font-size:12px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row .btn{flex:1}.actions{margin-top:18px}.selectRow{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}.selectRow select{max-width:350px}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:18px 0}.stat{border:1px solid var(--line);background:#142840;border-radius:14px;padding:15px}.stat b{font-size:27px;display:block;color:var(--green)}.stat span{font-size:11px;color:var(--muted)}
@@ -40,11 +43,11 @@ function setMain(html){$("main").innerHTML=html;renderHead()}
 function renderHead(){$("headend").innerHTML=state.user?'<span class="tag">'+esc(state.user.email)+'</span><button class="btn alt slim" id="logout">Salir</button>':'';if(state.user)$("logout").onclick=async()=>{await supabase.auth.signOut();clear();renderAuth()}}
 function clear(){state.user=null;state.session=null;state.businesses=[];state.activeId=null;state.clients=[];state.notes=[];state.clientId=null;state.master=false;state.role=""}
 function field(id,label,type="text",req=true){return '<label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+type+'" '+(req?'required':'')+' autocomplete="'+(id==='password'?'current-password':'on')+'>'}
-function registerHandlers(){const auth=$("authForm");if(auth){auth.onsubmit=handleAuth;const submit=$("submitAuth");if(submit)submit.onclick=handleAuth;}const switcher=$("switchMode");if(switcher)switcher.onclick=()=>{state.mode=state.mode==="login"?"signup":"login";renderAuth()};const forgot=$("forgot");if(forgot)forgot.onclick=resetMail;const change=$("resetForm");if(change)change.onsubmit=changePassword;}
+function registerHandlers(){const auth=$("authForm");if(auth)auth.onsubmit=handleAuth;const switcher=$("switchMode");if(switcher)switcher.onclick=()=>{state.mode=state.mode==="login"?"signup":"login";renderAuth()};const forgot=$("forgot");if(forgot)forgot.onclick=resetMail;const change=$("resetForm");if(change)change.onsubmit=changePassword;}
 function renderAuth(){
  state.reset=false;
  const signup=state.mode==="signup";
- setMain('<section class="card auth"><div class="eyebrow">ACCESO PRIVADO</div><h1>'+(signup?'Crear cuenta de negocio':'Entrar a Huxcasti Business')+'</h1><p>'+(signup?'Registra tu cuenta con tu correo. Cada negocio tendrá su propio espacio privado.':'Inicia sesión para consultar únicamente los negocios a los que perteneces.')+'</p><form id="authForm" novalidate>'+field('email','Correo electrónico','email')+field('password','Contraseña (mínimo 8 caracteres)','password')+'<button type="button" id="submitAuth" class="btn primary-submit">'+(signup?'Crear cuenta':'Entrar a mi cuenta')+'</button><div id="authFeedback" aria-live="polite"></div></form><div class="row actions"><button type="button" class="btn alt slim" id="switchMode">'+(signup?'Ya tengo cuenta':'Crear cuenta nueva')+'</button><button type="button" class="btn ghost slim" id="forgot">Olvidé mi contraseña</button></div><p class="small muted">La cuenta necesita correo verificado. Sin iniciar sesión no se pueden ver clientes ni expedientes.</p><div class="notice warn">Etapa de pruebas: por ahora registra solamente datos ficticios o contactos de prueba, nunca expedientes médicos ni información sensible.</div></section>');
+ setMain('<section class="card auth"><div class="eyebrow">ACCESO PRIVADO</div><h1>'+(signup?'Crear cuenta de negocio':'Entrar a Huxcasti Business')+'</h1><p>'+(signup?'Registra tu cuenta con tu correo. Cada negocio tendrá su propio espacio privado.':'Inicia sesión para consultar únicamente los negocios a los que perteneces.')+'</p><form id="authForm" novalidate>'+field('email','Correo electrónico','email')+field('password','Contraseña (mínimo 8 caracteres)','password')+'<input type="submit" id="submitAuth" value="'+(signup?'Crear cuenta':'Entrar a mi cuenta')+'"><div id="confirmSignup" hidden></div><div id="authFeedback" aria-live="polite"></div></form><div class="row actions"><button type="button" class="btn alt slim" id="switchMode">'+(signup?'Ya tengo cuenta':'Crear cuenta nueva')+'</button><button type="button" class="btn ghost slim" id="forgot">Olvidé mi contraseña</button></div><p class="small muted">La cuenta necesita correo verificado. Sin iniciar sesión no se pueden ver clientes ni expedientes.</p><p class="small muted">Usa tu correo para recibir el enlace de confirmación. No introduzcas expedientes médicos ni información sensible hasta completar las pruebas de seguridad.</p></section>');
  registerHandlers()
 }
 
@@ -66,30 +69,45 @@ function renderConfirmation(email){
  };
 }
 
+let signupPending=false;
+function confirmSignup(email,password){
+ const block=$("confirmSignup");if(!block)return;
+ block.hidden=false;
+ block.innerHTML='<p style="margin-top:0"><strong>¿Enviar enlace de confirmación?</strong></p><p>Confirma que el correo es <strong>'+esc(email)+'</strong>. Al pulsar OK, solicitaremos el enlace a Supabase.</p><div class="row"><button type="button" class="btn alt" id="cancelSignup">Cancelar</button><button type="button" class="btn" id="okSignup">OK, enviar enlace</button></div>';
+ $("cancelSignup").onclick=()=>{block.hidden=true;block.innerHTML="";};
+ $("okSignup").onclick=async ()=>{
+  if(signupPending)return;signupPending=true;locked(true);
+  try{
+    const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+    if(error)throw error;
+    if(data?.session)await bootstrap(data.session);
+    else if(data?.user)renderConfirmation(email);
+    else throw new Error("Supabase no confirmó el registro. Inténtalo después.");
+  }catch(err){
+    block.hidden=true;block.innerHTML="";
+    const message=err?.message||"No se pudo enviar la solicitud.";
+    flash(message,true);
+  }finally{signupPending=false;locked(false)}
+ };
+}
 async function handleAuth(e){
  e.preventDefault();
- if(state.loading)return;
+ if(state.loading||signupPending)return;
  const email=$("email")?.value.trim()||"",password=$("password")?.value||"";
- if(!email){flash("Escribe tu correo electrónico para crear la cuenta.",true);$("email")?.focus();return}
- if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){flash("Revisa que el correo tenga un formato válido, por ejemplo nombre@correo.com.",true);$("email")?.focus();return}
- if(!password){flash("Escribe una contraseña antes de continuar.",true);$("password")?.focus();return}
+ if(!email){flash("Escribe tu correo electrónico.",true);$("email")?.focus();return}
+ if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){flash("Escribe un correo válido.",true);$("email")?.focus();return}
  if(password.length<8){flash("La contraseña debe tener al menos 8 caracteres.",true);$("password")?.focus();return}
  flash("");
+ if(state.mode==="signup"){confirmSignup(email,password);return;}
  locked(true);
  try{
-  if(state.mode==="signup"){
-   const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
-   if(error)throw error;
-   if(data.session)await bootstrap(data.session);
-   else if(data.user){renderConfirmation(email);}
-   else{throw new Error("No recibimos una confirmación del registro. Inténtalo nuevamente.")}
-  }else{
    const {data,error}=await supabase.auth.signInWithPassword({email,password});
    if(error)throw error;
    await bootstrap(data.session);
-  }
- }catch(e){flash(e.message||"No se pudo completar el acceso.",true)}finally{locked(false)}
+ }catch(err){flash(err?.message||"No se pudo iniciar sesión.",true)}
+ finally{locked(false)}
 }
+
 async function resetMail(){
  const email=$("email")?.value?.trim()||"";
  if(!email){flash("Escribe primero tu correo electrónico.",true);return}
