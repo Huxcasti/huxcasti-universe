@@ -36,12 +36,12 @@ const supabase=createClient(URL,PUB,{auth:{autoRefreshToken:true,persistSession:
 window.__businessLoaded=true;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]));
-const state={user:null,session:null,mode:"login",loading:false,reset:false,businesses:[],activeId:null,clients:[],notes:[],clientId:null,section:"dashboard",role:"",master:false,overview:null,masterBusinesses:[],masterLoaded:false,masterLoading:false,masterError:'',masterSearch:'',masterStatus:'all',masterPage:0,masterTotal:0,selectedBusiness:null,masterRequest:0};
+const state={user:null,session:null,mode:"login",loading:false,reset:false,businesses:[],activeId:null,clients:[],notes:[],clientId:null,section:"dashboard",role:"",master:false,overview:null,masterBusinesses:[],masterLoaded:false,masterLoading:false,masterError:'',masterSearch:'',masterStatus:'all',masterPage:0,masterTotal:0,selectedBusiness:null,masterRequest:0,myRequests:[],myRequestsLoaded:false,myRequestsError:'',accessRequests:[],accessRequestsLoaded:false,accessRequestsLoading:false,accessRequestsError:'',reviewRequestId:null,reviewDecision:null};
 function flash(msg,error=false){const local=$("authFeedback");if(local)local.innerHTML=msg?'<div class="message '+(error?'error':'')+'" role="alert">'+esc(msg)+'</div>':'';$("flash").innerHTML=msg?'<div class="message '+(error?'error':'')+'">'+esc(msg)+'</div>':'';if(msg)setTimeout(()=>{$("flash").innerHTML=""},9500)}
 function locked(v){state.loading=v;document.querySelectorAll("button").forEach(x=>x.disabled=v)}
 function setMain(html){$("main").innerHTML=html;renderHead()}
 function renderHead(){$("headend").innerHTML=state.user?'<span class="tag">'+esc(state.user.email)+'</span><button class="btn alt slim" id="logout">Salir</button>':'';if(state.user)$("logout").onclick=async()=>{await supabase.auth.signOut();clear();renderAuth()}}
-function clear(){state.user=null;state.session=null;state.businesses=[];state.activeId=null;state.clients=[];state.notes=[];state.clientId=null;state.master=false;state.role="";state.overview=null;state.masterBusinesses=[];state.masterLoaded=false;state.masterRequest++}
+function clear(){state.user=null;state.session=null;state.businesses=[];state.activeId=null;state.clients=[];state.notes=[];state.clientId=null;state.master=false;state.role="";state.overview=null;state.masterBusinesses=[];state.masterLoaded=false;state.masterRequest++;state.myRequests=[];state.myRequestsLoaded=false;state.myRequestsError='';state.accessRequests=[];state.accessRequestsLoaded=false;state.reviewRequestId=null;state.reviewDecision=null;}
 function field(id,label,type="text",req=true){return '<label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+type+'" '+(req?'required':'')+' autocomplete="'+(id==='password'?'current-password':'on')+'>'}
 function registerHandlers(){const auth=$("authForm");if(auth)auth.onsubmit=handleAuth;const action=$("authAction");if(action)action.onclick=()=>{const status=$("authStatus");if(status)status.textContent="Procesando solicitud…";void handleAuth({preventDefault(){}});};const switcher=$("switchMode");if(switcher)switcher.onclick=()=>{state.mode=state.mode==="login"?"signup":"login";renderAuth()};const forgot=$("forgot");if(forgot)forgot.onclick=resetMail;const change=$("resetForm");if(change)change.onsubmit=changePassword;}
 function renderAuth(){
@@ -158,7 +158,8 @@ async function bootstrap(session){
   else{state.clients=[];state.notes=[]}
   state.section=state.master?"master":(state.activeId?"dashboard":"onboard");
   renderApp();
-  if(state.master){void loadOverview();void loadMasterDirectory()}
+  void loadMyRequests();
+  if(state.master){void loadOverview();void loadMasterDirectory();void loadAccessRequests()}
  }catch(e){setMain('<div class="card"><h2>No se pudo cargar tu cuenta</h2><p>'+esc(e.message||'Inténtalo otra vez')+'</p><button id="retry" class="btn">Reintentar</button></div>');$("retry").onclick=()=>bootstrap(session)}
 }
 function active(){return state.businesses.find(x=>x.id===state.activeId)}
@@ -182,21 +183,23 @@ function renderApp(){
  let nav='<nav class="nav">';
  if(b){nav+=navButton('dashboard','Inicio')+navButton('clients','Clientes');if(editable())nav+=navButton('addClient','Añadir cliente')}
  nav+=navButton('onboard','Registrar negocio');
- if(state.master)nav+=navButton('master','Panel maestro')+navButton('masterBusinesses','Gestión de negocios');
+ if(state.master)nav+=navButton('master','Panel maestro')+navButton('masterRequests','Solicitudes de acceso')+navButton('masterBusinesses','Gestión de negocios');
  nav+='</nav>';
  let content="";
- if(state.section==="onboard"||(!b&&!["master","masterBusinesses","masterBusinessDetail"].includes(state.section)))content=onboardView();
+ if(state.section==="onboard"||(!b&&!["master","masterRequests","masterBusinesses","masterBusinessDetail"].includes(state.section)))content=onboardView();
  else if(state.section==="dashboard")content=dashboardView();
  else if(state.section==="clients")content=clientsView();
  else if(state.section==="addClient")content=addClientView();
  else if(state.section==="client")content=clientView();
  else if(state.section==="master")content=masterView();
+ else if(state.section==="masterRequests")content=masterRequestsView();
  else if(state.section==="masterBusinesses")content=masterDirectoryView();
  else if(state.section==="masterBusinessDetail")content=masterDetailView();
  setMain(select+nav+content);
- document.querySelectorAll("[data-go]").forEach(x=>x.onclick=()=>{state.section=x.dataset.go;renderApp();if(state.section==="masterBusinesses"&&!state.masterLoaded&&!state.masterLoading)void loadMasterDirectory()});
+ document.querySelectorAll("[data-go]").forEach(x=>x.onclick=()=>{state.section=x.dataset.go;renderApp();if(state.section==="masterBusinesses"&&!state.masterLoaded&&!state.masterLoading)void loadMasterDirectory();if(state.section==="masterRequests"&&!state.accessRequestsLoaded&&!state.accessRequestsLoading)void loadAccessRequests()});
  const chooser=$("businessSelect");if(chooser)chooser.onchange=async()=>{state.activeId=chooser.value;state.clientId=null;state.section="dashboard";setMain('<div class="loader">Cargando clientes…</div>');try{await loadClients();renderApp()}catch(e){flash(e.message,true)}};
- const onboard=$("onboardForm");if(onboard)onboard.onsubmit=createBusiness;const onboardAction=$("onboardAction");if(onboardAction)onboardAction.onclick=()=>createBusiness({preventDefault(){}});
+ const onboard=$("onboardForm");if(onboard)onboard.onsubmit=requestBusinessAccess;const onboardAction=$("onboardAction");if(onboardAction)onboardAction.onclick=()=>requestBusinessAccess({preventDefault(){}});
+ const myRefresh=$("myRequestsRefresh");if(myRefresh)myRefresh.onclick=()=>void loadMyRequests();
  const add=$("addClientForm");if(add)add.onsubmit=saveClient;
  const search=$("searchClient");if(search)search.oninput=()=>renderClientRows(search.value);
  document.querySelectorAll("[data-client]").forEach(x=>x.onclick=()=>openClient(x.dataset.client));
@@ -204,6 +207,10 @@ function renderApp(){
  const back=$("backClients");if(back)back.onclick=()=>{state.section="clients";renderApp()};
  const refresh=$("refresh");if(refresh)refresh.onclick=async()=>{await loadClients();renderApp();flash("Datos actualizados.")};
  const overview=$("loadOverview");if(overview)overview.onclick=loadOverview;
+ const requestsReload=$("accessRequestsRefresh");if(requestsReload)requestsReload.onclick=()=>void loadAccessRequests();
+ document.querySelectorAll("[data-review-request]").forEach(btn=>btn.onclick=()=>{state.reviewRequestId=btn.dataset.reviewRequest;state.reviewDecision=btn.dataset.decision;renderApp()});
+ const reviewCancel=$("reviewCancel");if(reviewCancel)reviewCancel.onclick=()=>{state.reviewRequestId=null;state.reviewDecision=null;renderApp()};
+ const reviewConfirm=$("reviewConfirm");if(reviewConfirm)reviewConfirm.onclick=()=>void reviewAccessRequest();
  const masterSearchBox=$("masterSearch");if(masterSearchBox)masterSearchBox.oninput=()=>{state.masterSearch=masterSearchBox.value;state.masterPage=0;clearTimeout(masterTimer);masterTimer=setTimeout(()=>void loadMasterDirectory(),380)};
  const statusFilter=$("masterStatus");if(statusFilter)statusFilter.onchange=()=>{state.masterStatus=statusFilter.value;state.masterPage=0;void loadMasterDirectory()};
  const reload=$("masterReload");if(reload)reload.onclick=()=>void loadMasterDirectory();
@@ -212,12 +219,45 @@ function renderApp(){
  document.querySelectorAll("[data-master-id]").forEach(x=>x.onclick=()=>{state.selectedBusiness=x.dataset.masterId;state.section="masterBusinessDetail";renderApp()});
  const masterBackButton=$("masterBack");if(masterBackButton)masterBackButton.onclick=()=>{state.section="masterBusinesses";renderApp()};
 }
-function onboardView(){return '<article class="card"><h2>Registrar un negocio nuevo</h2><p>Este nombre será el que aparezca en su panel. Los clientes quedarán separados de los demás negocios.</p><div class="notice">Si esperas entrar al panel maestro como dueño de Huxcasti, no necesitas registrar un negocio aquí: tu cuenta debe recibir autorización de administrador maestro.</div><form id="onboardForm">'+field('bname','Nombre comercial')+field('sector','Industria o actividad')+'</form><button type="button" id="onboardAction" style="display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;width:100%;min-height:56px;margin-top:20px;border:0;border-radius:12px;background:#20b4f1;color:#041b30;font:800 16px/1.2 -apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:15px;cursor:pointer;">Crear espacio privado</button><div id="onboardStatus" role="status" aria-live="polite" style="padding-top:10px;color:#b6dbef;font-size:13px;"></div><p class="small muted">Alta en prueba técnica de 14 días; no hay cobros ni tarjetas activos.</p></article>'}
-async function createBusiness(e){
- e.preventDefault();if(state.loading)return;const name=$("bname").value.trim(),sector=$("sector").value.trim();const status=$("onboardStatus");
- if(name.length<2){if(status)status.textContent="Escribe el nombre del negocio.";return}
- locked(true);if(status)status.textContent="Creando espacio privado…";
- try{const {error}=await supabase.rpc("create_business",{p_name:name,p_sector:sector||'Otro'});if(error)throw error;await bootstrap(state.session);flash("Espacio creado correctamente.")}catch(e){if(status)status.textContent="No se pudo crear: "+e.message;flash(e.message,true)}finally{locked(false)}
+
+function onboardView(){
+ const pending=state.myRequests.find(x=>x.status==='pending');
+ const rejected=state.myRequests.find(x=>x.status==='rejected');
+ let html='<article class="card"><div class="eyebrow">ACCESO A HUXCASTI BUSINESS</div><h2>Solicitar acceso para tu negocio</h2><p>Por seguridad, el administrador debe aprobar cada empresa antes de comenzar. Los <strong>14 días gratuitos</strong> empiezan al aprobarse, no al solicitar acceso.</p>';
+ if(state.myRequestsError)html+='<div class="message error">'+esc(state.myRequestsError)+'</div>';
+ if(!state.myRequestsLoaded)html+='<div class="notice">Consultando tus solicitudes anteriores…</div><button type="button" class="btn alt" id="myRequestsRefresh">Actualizar</button>';
+ else if(pending)html+='<div class="notice"><strong>Solicitud pendiente de revisión</strong><p>'+esc(pending.business_name)+' · '+esc(pending.sector)+' · '+esc(masterDate(pending.created_at))+'</p></div><p>No se habilitará el panel del negocio hasta que el administrador apruebe esta solicitud.</p><button type="button" class="btn alt" id="myRequestsRefresh">Consultar estado</button>';
+ else{
+  if(rejected)html+='<div class="notice warn">La solicitud anterior de '+esc(rejected.business_name)+' fue rechazada. Si necesitas, puedes enviar otra.</div>';
+  if(state.master)html+='<div class="notice">Tu cuenta ya administra la plataforma. Esta solicitud es solo para registrar una empresa propia.</div>';
+  html+='<form id="onboardForm">'+field('bname','Nombre comercial')+field('sector','Industria o actividad')+'</form><button type="button" id="onboardAction" style="display:block!important;visibility:visible!important;opacity:1!important;width:100%;min-height:56px;margin-top:18px;border:0;border-radius:12px;background:#20b4f1;color:#041b30;font:800 16px -apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:15px;cursor:pointer;">Enviar solicitud de acceso</button><div id="onboardStatus" role="status" aria-live="polite" style="padding-top:10px;color:#b6dbef;font-size:13px"></div><p class="small muted">Enviar una solicitud es gratis. Aún no se han activado las suscripciones mensuales.</p>';
+ }
+ return html+'</article>';
+}
+async function loadMyRequests(){
+ if(!state.user)return;
+ const id=state.user.id;
+ try{
+  const {data,error}=await supabase.from('business_access_requests').select('id,business_name,sector,status,created_at,reviewed_at,business_id').eq('user_id',id).order('created_at',{ascending:false}).limit(10);
+  if(error)throw error;
+  if(state.user?.id!==id)return;
+  state.myRequests=data||[];state.myRequestsError='';state.myRequestsLoaded=true;
+ }catch(e){state.myRequestsError='Error al consultar tus solicitudes: '+(e?.message||'Error desconocido');state.myRequestsLoaded=true;}
+ if(state.section==='onboard')renderApp();
+}
+async function requestBusinessAccess(e){
+ e.preventDefault();if(state.loading||!state.myRequestsLoaded)return;
+ const name=$("bname")?.value?.trim()||'',sector=$("sector")?.value?.trim()||'';
+ const feedback=$("onboardStatus");
+ if(name.length<2||name.length>100){if(feedback)feedback.textContent='Escribe un nombre comercial válido.';return}
+ if(sector.length<2||sector.length>100){if(feedback)feedback.textContent='Escribe una industria válida.';return}
+ locked(true);if(feedback)feedback.textContent='Enviando solicitud…';
+ try{
+  const {error}=await supabase.rpc('request_business_access',{p_name:name,p_sector:sector});
+  if(error)throw error;
+  await loadMyRequests();flash('Solicitud enviada. Espera la aprobación del administrador.');
+ }catch(e){if(feedback)feedback.textContent='No se pudo enviar: '+(e?.message||'Error desconocido');flash(e?.message||'Error al enviar solicitud.',true)}
+ finally{locked(false)}
 }
 function dashboardView(){
  const b=active();return '<div class="stats"><div class="stat"><b>'+state.clients.length+'</b><span>Clientes (primeros 300)</span></div><div class="stat"><b>'+esc(b.plan)+'</b><span>Plan técnico</span></div><div class="stat"><b>'+esc(b.status)+'</b><span>Estado</span></div></div><div class="card"><h2>Panel del negocio</h2><p>Consulta clientes y añade notas de seguimiento. Los cambios se guardan en la base de datos de Supabase, no solo en tu teléfono.</p><div class="row"><button class="btn" data-go="clients">Ver clientes</button>'+(editable()?'<button class="btn alt" data-go="addClient">Registrar cliente</button>':'')+'</div></div><div class="notice warn">La plataforma está en pruebas. No guardes expedientes de salud, datos médicos ni documentos sensibles hasta completar las pruebas y la política de privacidad.</div>'
@@ -257,9 +297,53 @@ function masterDate(v){const d=new Date(v);return v&&!Number.isNaN(d.getTime())?
 function masterView(){
  if(!state.master)return '<div class="card">Acceso no autorizado.</div>';
  const v=state.overview;
- return '<div class="card"><div class="eyebrow">ADMINISTRACIÓN PRIVADA</div><h2>Panel maestro de Huxcasti</h2><p>Control general de negocios y estadísticas reales. Cada empresa mantiene sus clientes en un espacio privado.</p><div class="row"><button class="btn" data-go="masterBusinesses">Gestionar negocios</button><button class="btn alt" id="loadOverview">Actualizar estadísticas</button></div></div>'
+ return '<div class="card"><div class="eyebrow">ADMINISTRACIÓN PRIVADA</div><h2>Panel maestro de Huxcasti</h2><p>Control general de negocios y estadísticas reales. Cada empresa mantiene sus clientes en un espacio privado.</p><div class="row"><button class="btn" data-go="masterRequests">Revisar solicitudes</button><button class="btn alt" data-go="masterBusinesses">Gestionar negocios</button><button class="btn alt" id="loadOverview">Actualizar estadísticas</button></div></div>'
  +(v?'<div class="stats"><div class="stat"><b>'+Number(v.total_businesses||0)+'</b><span>Negocios registrados</span></div><div class="stat"><b>'+Number(v.active_businesses||0)+'</b><span>Activos</span></div><div class="stat"><b>'+Number(v.trial_businesses||0)+'</b><span>Pruebas vigentes</span></div><div class="stat"><b>'+Number(v.total_clients||0)+'</b><span>Clientes totales</span></div></div>':'<div class="notice">Consultando estadísticas de Supabase…</div>')
  +'<div class="card"><h3>Suscripciones y pagos</h3><p>Todavía no existe pasarela de pago, facturación ni verificación de suscripciones. Los planes mostrados son configuraciones del negocio y no representan cobros recibidos.</p></div>';
+}
+
+function masterRequestsView(){
+ if(!state.master)return '<div class="card">Acceso no autorizado.</div>';
+ const pending=state.accessRequests.filter(x=>x.request_status==='pending');
+ const reviewed=state.accessRequests.filter(x=>x.request_status!=='pending');
+ const row=r=>{
+  let t='<div class="item" style="cursor:default"><div class="topline"><strong>'+esc(r.business_name)+'</strong><span class="tag '+(r.request_status==='approved'?'green':'')+'">'+(r.request_status==='pending'?'Pendiente':r.request_status==='approved'?'Aprobada':'Rechazada')+'</span></div><span>'+esc(r.sector)+' · '+esc(r.requester_email)+' · '+esc(masterDate(r.requested_at))+'</span>';
+  if(r.request_status==='pending'){
+   if(state.reviewRequestId===r.request_id){
+    t+='<div class="notice warn"><strong>¿'+(state.reviewDecision==='approve'?'Aprobar el negocio y empezar los 14 días gratuitos':'Rechazar la solicitud')+'?</strong><div class="row" style="margin-top:12px"><button type="button" class="btn" id="reviewConfirm">Confirmar</button><button type="button" class="btn alt" id="reviewCancel">Cancelar</button></div></div>';
+   }else{
+    t+='<div class="row" style="margin-top:12px"><button type="button" class="btn" data-review-request="'+esc(r.request_id)+'" data-decision="approve">Aprobar</button><button type="button" class="btn alt" data-review-request="'+esc(r.request_id)+'" data-decision="reject">Rechazar</button></div>';
+   }
+  }
+  return t+'</div>';
+ };
+ return '<div class="card"><div class="eyebrow">CONTROL DE ACCESO</div><h2>Solicitudes de negocios</h2><p>Revisa quién solicita usar Huxcasti Business. Una aprobación crea el espacio y comienza su prueba de 14 días. Un rechazo no crea ninguna empresa.</p><div class="topline"><span class="tag">'+pending.length+' pendientes</span><button type="button" id="accessRequestsRefresh" class="btn alt slim">Actualizar</button></div>'
+ +(state.accessRequestsError?'<div class="message error">'+esc(state.accessRequestsError)+'</div>':'')
+ +(!state.accessRequestsLoaded?'<div class="empty">Cargando solicitudes…</div>':'<h3 style="margin-top:20px">Por aprobar</h3>'+(pending.length?pending.map(row).join(''):'<div class="empty">No hay solicitudes pendientes.</div>')+'<h3 style="margin-top:24px">Historial</h3>'+(reviewed.length?reviewed.map(row).join(''):'<div class="empty">Todavía no hay solicitudes atendidas.</div>'))
+ +'<p class="small muted">Las suscripciones y los cobros todavía no están activos.</p></div>';
+}
+async function loadAccessRequests(){
+ if(!state.master||state.accessRequestsLoading)return;
+ state.accessRequestsLoading=true;state.accessRequestsError='';
+ try{
+  const {data,error}=await supabase.rpc('list_business_access_requests');
+  if(error)throw error;
+  state.accessRequests=Array.isArray(data)?data:[];state.accessRequestsLoaded=true;
+ }catch(e){state.accessRequestsError='No se pudo cargar: '+(e?.message||'Error desconocido');state.accessRequestsLoaded=true;}
+ finally{state.accessRequestsLoading=false;if(['masterRequests','master'].includes(state.section))renderApp();}
+}
+async function reviewAccessRequest(){
+ if(!state.master||!state.reviewRequestId||!['approve','reject'].includes(state.reviewDecision)||state.loading)return;
+ const requestId=state.reviewRequestId,approved=state.reviewDecision==='approve';
+ locked(true);
+ try{
+  const {error}=await supabase.rpc('review_business_access_request',{p_request_id:requestId,p_approve:approved});
+  if(error)throw error;
+  state.reviewRequestId=null;state.reviewDecision=null;
+  await loadAccessRequests();await loadOverview();await loadMasterDirectory();
+  renderApp();flash(approved?'Negocio aprobado: comenzó su prueba de 14 días.':'Solicitud rechazada; no se creó negocio.');
+ }catch(e){flash('No se pudo resolver la solicitud: '+(e?.message||'Error desconocido'),true)}
+ finally{locked(false)}
 }
 function masterDirectoryView(){
  if(!state.master)return '<div class="card">Acceso no autorizado.</div>';
