@@ -328,9 +328,10 @@ function productCatalogView(){
  if(state.productInterestsError&&signed)top+='<div class="message error" role="alert">'+esc(state.productInterestsError)+'</div>';
  const cards=PRODUCT_MODULES.map(p=>{
   const interested=state.productInterests.some(i=>i.product_slug===p.slug&&i.status==='new');
-  const waiting=signed&& !state.productInterestsLoaded;
-  const action=interested?'Interés registrado':waiting?'Cargando tu cuenta…':signed?'Solicitar información':'Entrar para consultar';
-  const button='<button type="button" class="btn '+(interested?'alt':'')+'" data-product-interest="'+p.slug+'"'+(interested||waiting?' disabled':'')+'>'+action+'</button>';
+  // La consulta de intereses es opcional; nunca bloquea el catálogo.
+  // El servidor impide duplicados incluso si aún no cargó el historial.
+  const action=interested?'Interés registrado':signed?'Solicitar información':'Entrar para consultar';
+  const button='<button type="button" class="btn '+(interested?'alt':'')+'" data-product-interest="'+p.slug+'"'+(interested||state.productRequestBusy?' disabled':'')+'>'+action+'</button>';
   return '<article class="product-card"><div class="product-card-head"><span class="product-icon" aria-hidden="true">'+esc(p.icon)+'</span><span class="product-state">En desarrollo</span></div><div><h3>'+esc(p.name)+'</h3><p style="color:#44c4ff;margin-top:5px;font-weight:650">'+esc(p.subtitle)+'</p></div><p>'+esc(p.description)+'</p><div>'+p.features.map(f=>'<span class="product-feature">• '+esc(f)+'</span>').join('')+'</div><p class="product-info">'+esc(p.note)+'</p><div class="row">'+button+'</div></article>';
  }).join('');
  return top+'<div class="product-grid">'+cards+'</div><div class="card"><h3>¿Cómo funcionará cuando estén disponibles?</h3><p>Podrás solicitar el producto que necesites y, cuando esté listo, revisaremos el acceso, las pruebas y la suscripción de ese sistema por separado. Tu acceso actual a la plataforma no implica tener contratados estos productos.</p>'+(signed?'':'<button class="btn" id="catalogBackLogin" type="button">Entrar o crear cuenta</button>')+'</div>';
@@ -346,12 +347,26 @@ async function loadProductInterests(){
  if(!state.user)return;
  const uid=state.user.id;
  try{
-  const {data,error}=await supabase.from('product_inquiries').select('product_slug,status,created_at').eq('user_id',uid).order('created_at',{ascending:false}).limit(40);
-  if(error)throw error;
+  const query=supabase.from('product_inquiries')
+   .select('product_slug,status,created_at')
+   .eq('user_id',uid).order('created_at',{ascending:false}).limit(40);
+  const {data,error}=await Promise.race([
+   query,
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('La consulta de historial tardó demasiado. Puedes solicitar información de todos modos.')),12000))
+  ]);
   if(state.user?.id!==uid)return;
-  state.productInterests=data||[];state.productInterestsLoaded=true;state.productInterestsError='';
- }catch(e){state.productInterestsError='No pudimos consultar tus productos: '+(e?.message||'Error desconocido');state.productInterestsLoaded=true;}
- if(state.section==='catalog')renderApp();
+  if(error)throw error;
+  state.productInterests=data||[];
+  state.productInterestsError='';
+ }catch(e){
+  if(state.user?.id!==uid)return;
+  state.productInterestsError='No se pudo actualizar tu historial: '+(e?.message||'Error desconocido');
+ }finally{
+  if(state.user?.id===uid){
+   state.productInterestsLoaded=true;
+   if(state.section==='catalog')renderApp();
+  }
+ }
 }
 async function requestProductInfo(slug){
  if(state.productRequestBusy||!state.user||!PRODUCT_MODULES.some(p=>p.slug===slug))return;
@@ -361,14 +376,27 @@ async function requestProductInfo(slug){
  const buttons=[...document.querySelectorAll('[data-product-interest]')];
  buttons.forEach(x=>x.disabled=true);
  const tapped=buttons.find(x=>x.dataset.productInterest===slug);
- if(tapped)tapped.textContent='Registrando interés…';
+ if(tapped)tapped.textContent='Enviando solicitud…';
  try{
-  const {error}=await supabase.rpc('request_product_information',{p_product_slug:slug,p_business_id:active()?.id||null});
+  const {error}=await Promise.race([
+    supabase.rpc('request_product_information',{p_product_slug:slug,p_business_id:active()?.id||null}),
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('No recibimos respuesta del servidor. Inténtalo nuevamente; no se duplicarán las solicitudes.')),20000))
+  ]);
   if(error)throw error;
-  await loadProductInterests();
-  flash('Recibimos tu interés en '+selected.name+'. Te contactaremos cuando tengamos información de disponibilidad.');
- }catch(e){flash('No se pudo registrar tu interés: '+(e?.message||'Error desconocido'),true)}
- finally{state.productRequestBusy=false;if(state.section==='catalog')renderApp()}
+  // Mostrar el éxito inmediatamente, sin esperar otra consulta a Supabase.
+  if(!state.productInterests.some(x=>x.product_slug===slug&&x.status==='new')){
+   state.productInterests.push({product_slug:slug,status:'new',created_at:new Date().toISOString()});
+  }
+  state.productInterestsLoaded=true;
+  state.productInterestsError='';
+  if(state.section==='catalog')renderApp();
+  flash('Interés registrado en '+selected.name+'. Te contactaremos cuando haya novedades.');
+ }catch(e){
+  flash('No se pudo confirmar la solicitud: '+(e?.message||'Error desconocido'),true);
+ }finally{
+  state.productRequestBusy=false;
+  if(state.section==='catalog')renderApp();
+ }
 }
 function masterProductInterestsView(){
  if(!state.master)return '<div class="card">Acceso no autorizado.</div>';
