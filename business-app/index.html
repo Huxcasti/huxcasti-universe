@@ -177,7 +177,7 @@ async function loadNotes(id){
 }
 function navButton(key,label){return '<button data-go="'+key+'" class="'+(state.section===key?'active':'')+'">'+label+'</button>'}
 function renderApp(){
- const b=state.master&&["master","masterBusinesses","masterBusinessDetail"].includes(state.section)?null:active();
+ const b=state.master&&["master","masterRequests","masterBusinesses","masterBusinessDetail"].includes(state.section)?null:active();
  let title=b?'Administración de '+esc(b.name):'Huxcasti Business';
  const select=b?'<div class="selectRow"><div><div class="eyebrow">TU ESPACIO DE TRABAJO</div><h1>'+title+'</h1><div class="row"><span class="tag">'+esc(b.sector)+'</span><span class="tag green">'+esc(b.role)+'</span><span class="tag">'+esc(b.status)+'</span></div></div>'+(state.businesses.length>1?'<select id="businessSelect" aria-label="Cambiar negocio">'+state.businesses.map(x=>'<option value="'+esc(x.id)+'" '+(x.id===state.activeId?'selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select>':'')+'</div>':'<div class="eyebrow">HUXCASTI BUSINESS</div><h1>'+(state.master?'Centro de control Huxcasti':'Tu espacio empresarial')+'</h1>';
  let nav='<nav class="nav">';
@@ -200,6 +200,7 @@ function renderApp(){
  const chooser=$("businessSelect");if(chooser)chooser.onchange=async()=>{state.activeId=chooser.value;state.clientId=null;state.section="dashboard";setMain('<div class="loader">Cargando clientes…</div>');try{await loadClients();renderApp()}catch(e){flash(e.message,true)}};
  const onboard=$("onboardForm");if(onboard)onboard.onsubmit=requestBusinessAccess;const onboardAction=$("onboardAction");if(onboardAction)onboardAction.onclick=()=>requestBusinessAccess({preventDefault(){}});
  const myRefresh=$("myRequestsRefresh");if(myRefresh)myRefresh.onclick=()=>void loadMyRequests();
+ const reenter=$("reloadBusinessAccess");if(reenter)reenter.onclick=()=>void bootstrap(state.session);
  const add=$("addClientForm");if(add)add.onsubmit=saveClient;
  const search=$("searchClient");if(search)search.oninput=()=>renderClientRows(search.value);
  document.querySelectorAll("[data-client]").forEach(x=>x.onclick=()=>openClient(x.dataset.client));
@@ -223,9 +224,11 @@ function renderApp(){
 function onboardView(){
  const pending=state.myRequests.find(x=>x.status==='pending');
  const rejected=state.myRequests.find(x=>x.status==='rejected');
+ const approved=state.myRequests.find(x=>x.status==='approved'&&!state.businesses.some(b=>b.id===x.business_id));
  let html='<article class="card"><div class="eyebrow">ACCESO A HUXCASTI BUSINESS</div><h2>Solicitar acceso para tu negocio</h2><p>Por seguridad, el administrador debe aprobar cada empresa antes de comenzar. Los <strong>14 días gratuitos</strong> empiezan al aprobarse, no al solicitar acceso.</p>';
  if(state.myRequestsError)html+='<div class="message error">'+esc(state.myRequestsError)+'</div>';
  if(!state.myRequestsLoaded)html+='<div class="notice">Consultando tus solicitudes anteriores…</div><button type="button" class="btn alt" id="myRequestsRefresh">Actualizar</button>';
+ else if(approved)html+='<div class="notice"><strong>¡Tu negocio fue aprobado!</strong><p>'+esc(approved.business_name)+' ya tiene un espacio privado y su prueba gratuita comenzó el día de la aprobación.</p></div><button type="button" class="btn" id="reloadBusinessAccess">Entrar a mi negocio</button>';
  else if(pending)html+='<div class="notice"><strong>Solicitud pendiente de revisión</strong><p>'+esc(pending.business_name)+' · '+esc(pending.sector)+' · '+esc(masterDate(pending.created_at))+'</p></div><p>No se habilitará el panel del negocio hasta que el administrador apruebe esta solicitud.</p><button type="button" class="btn alt" id="myRequestsRefresh">Consultar estado</button>';
  else{
   if(rejected)html+='<div class="notice warn">La solicitud anterior de '+esc(rejected.business_name)+' fue rechazada. Si necesitas, puedes enviar otra.</div>';
