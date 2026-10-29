@@ -4,9 +4,9 @@
 <title>Huxcasti Business · Acceso</title>
 <style>
 :root{color-scheme:dark;--bg:#070e1c;--panel:#101d31;--card:#14243b;--line:#29415b;--text:#eff8ff;--muted:#a5bacf;--blue:#44c4ff;--green:#69ebbc;--red:#ff9ba5}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#15517466,transparent 50%),var(--bg);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);min-height:100svh}
+*{box-sizing:border-box}html,body{width:100%;max-width:100%;overflow-x:hidden}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#15517466,transparent 50%),var(--bg);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);min-height:100svh}
 button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}a{color:var(--blue)}
-.wrap{max-width:1060px;margin:auto;padding:24px 16px 80px}.head{display:flex;align-items:center;gap:14px;min-height:70px;margin-bottom:16px}.brand{width:54px;height:56px;object-fit:contain;filter:drop-shadow(0 0 7px #42c8fa55)}.brandcopy strong{display:block;font-weight:900;letter-spacing:.20em;font-size:16px}.brandcopy small{font-size:10px;letter-spacing:.18em;color:var(--muted)}.headend{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.wrap{width:100%;max-width:1060px;margin:auto;padding:24px 16px 80px;overflow-wrap:anywhere}.head{display:flex;align-items:center;gap:14px;min-height:70px;margin-bottom:16px}.brand{width:54px;height:56px;object-fit:contain;filter:drop-shadow(0 0 7px #42c8fa55)}.brandcopy strong{display:block;font-weight:900;letter-spacing:.20em;font-size:16px}.brandcopy small{font-size:10px;letter-spacing:.18em;color:var(--muted)}.headend{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .eyebrow{font-size:10px;font-weight:800;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin:12px 0 8px}
 h1{font-size:clamp(25px,5vw,38px);margin:6px 0 10px;line-height:1.14}h2{font-size:19px;margin:0 0 13px}h3{font-size:16px;margin:0 0 8px}p{color:var(--muted);line-height:1.55}.muted{color:var(--muted)}.small{font-size:12px}.card{border:1px solid var(--line);background:linear-gradient(155deg,#15243b,#0d192c);border-radius:19px;padding:20px;margin:14px 0;box-shadow:0 14px 35px #0002}
 .auth{max-width:490px;margin:35px auto}.auth #email,.auth #password{min-height:50px;height:50px;border:2px solid #3b526c;font-size:16px;background:#08182a}
@@ -193,7 +193,7 @@ function renderApp(){
  setMain(select+nav+content);
  document.querySelectorAll("[data-go]").forEach(x=>x.onclick=()=>{state.section=x.dataset.go;renderApp()});
  const chooser=$("businessSelect");if(chooser)chooser.onchange=async()=>{state.activeId=chooser.value;state.clientId=null;state.section="dashboard";setMain('<div class="loader">Cargando clientes…</div>');try{await loadClients();renderApp()}catch(e){flash(e.message,true)}};
- const onboard=$("onboardForm");if(onboard)onboard.onsubmit=createBusiness;
+ const onboard=$("onboardForm");if(onboard)onboard.onsubmit=createBusiness;const onboardAction=$("onboardAction");if(onboardAction)onboardAction.onclick=()=>createBusiness({preventDefault(){}});
  const add=$("addClientForm");if(add)add.onsubmit=saveClient;
  const search=$("searchClient");if(search)search.oninput=()=>renderClientRows(search.value);
  document.querySelectorAll("[data-client]").forEach(x=>x.onclick=()=>openClient(x.dataset.client));
@@ -202,12 +202,12 @@ function renderApp(){
  const refresh=$("refresh");if(refresh)refresh.onclick=async()=>{await loadClients();renderApp();flash("Datos actualizados.")};
  const overview=$("loadOverview");if(overview)overview.onclick=loadOverview;
 }
-function onboardView(){return '<article class="card"><h2>Registrar un negocio nuevo</h2><p>Este nombre será el que aparezca en su panel. Los clientes quedarán separados de los demás negocios.</p><form id="onboardForm">'+field('bname','Nombre comercial')+field('sector','Industria o actividad')+'<button class="btn actions" type="submit">Crear espacio privado</button></form><p class="small muted">Alta en prueba técnica de 14 días; no hay cobros ni tarjetas activos.</p></article>'}
+function onboardView(){return '<article class="card"><h2>Registrar un negocio nuevo</h2><p>Este nombre será el que aparezca en su panel. Los clientes quedarán separados de los demás negocios.</p><div class="notice">Si esperas entrar al panel maestro como dueño de Huxcasti, no necesitas registrar un negocio aquí: tu cuenta debe recibir autorización de administrador maestro.</div><form id="onboardForm">'+field('bname','Nombre comercial')+field('sector','Industria o actividad')+'</form><button type="button" id="onboardAction" style="display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;width:100%;min-height:56px;margin-top:20px;border:0;border-radius:12px;background:#20b4f1;color:#041b30;font:800 16px/1.2 -apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:15px;cursor:pointer;">Crear espacio privado</button><div id="onboardStatus" role="status" aria-live="polite" style="padding-top:10px;color:#b6dbef;font-size:13px;"></div><p class="small muted">Alta en prueba técnica de 14 días; no hay cobros ni tarjetas activos.</p></article>'}
 async function createBusiness(e){
- e.preventDefault();const name=$("bname").value.trim(),sector=$("sector").value.trim();
- if(name.length<2){flash("Escribe el nombre del negocio.",true);return}
- locked(true);
- try{const {error}=await supabase.rpc("create_business",{p_name:name,p_sector:sector||'Otro'});if(error)throw error;await bootstrap(state.session);flash("Espacio creado correctamente.")}catch(e){flash(e.message,true)}finally{locked(false)}
+ e.preventDefault();if(state.loading)return;const name=$("bname").value.trim(),sector=$("sector").value.trim();const status=$("onboardStatus");
+ if(name.length<2){if(status)status.textContent="Escribe el nombre del negocio.";return}
+ locked(true);if(status)status.textContent="Creando espacio privado…";
+ try{const {error}=await supabase.rpc("create_business",{p_name:name,p_sector:sector||'Otro'});if(error)throw error;await bootstrap(state.session);flash("Espacio creado correctamente.")}catch(e){if(status)status.textContent="No se pudo crear: "+e.message;flash(e.message,true)}finally{locked(false)}
 }
 function dashboardView(){
  const b=active();return '<div class="stats"><div class="stat"><b>'+state.clients.length+'</b><span>Clientes (primeros 300)</span></div><div class="stat"><b>'+esc(b.plan)+'</b><span>Plan técnico</span></div><div class="stat"><b>'+esc(b.status)+'</b><span>Estado</span></div></div><div class="card"><h2>Panel del negocio</h2><p>Consulta clientes y añade notas de seguimiento. Los cambios se guardan en la base de datos de Supabase, no solo en tu teléfono.</p><div class="row"><button class="btn" data-go="clients">Ver clientes</button>'+(editable()?'<button class="btn alt" data-go="addClient">Registrar cliente</button>':'')+'</div></div><div class="notice warn">La plataforma está en pruebas. No guardes expedientes de salud, datos médicos ni documentos sensibles hasta completar las pruebas y la política de privacidad.</div>'
