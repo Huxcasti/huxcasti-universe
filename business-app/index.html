@@ -198,7 +198,7 @@ function renderApp(){
  let title=b?'Administración de '+esc(b.name):'Huxcasti Business';
  const select=b?'<div class="selectRow"><div><div class="eyebrow">TU ESPACIO DE TRABAJO</div><h1>'+title+'</h1><div class="row"><span class="tag">'+esc(b.sector)+'</span><span class="tag green">'+esc(b.role)+'</span><span class="tag">'+esc(b.status)+'</span></div></div>'+(state.businesses.length>1?'<select id="businessSelect" aria-label="Cambiar negocio">'+state.businesses.map(x=>'<option value="'+esc(x.id)+'" '+(x.id===state.activeId?'selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select>':'')+'</div>':'<div class="eyebrow">HUXCASTI BUSINESS</div><h1>'+(state.master?'Centro de control Huxcasti':'Tu espacio empresarial')+'</h1>';
  let nav='<nav class="nav">';
- if(b){nav+=navButton('dashboard','Inicio')+navButton('clients','Clientes');if(editable())nav+=navButton('addClient','Añadir cliente')}
+ if(active()){nav+=navButton('dashboard','Inicio')+navButton('clients','Clientes');if(editable())nav+=navButton('addClient','Añadir cliente')}
  nav+=navButton('catalog','Catálogo de productos')+navButton('onboard','Registrar negocio');
  if(state.master)nav+=navButton('master','Panel maestro')+navButton('masterRequests','Solicitudes de acceso')+navButton('masterBusinesses','Gestión de negocios')+navButton('masterProductInterests','Interés en productos');
  nav+='</nav>';
