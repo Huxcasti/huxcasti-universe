@@ -204,13 +204,13 @@ function renderApp(){
  const back=$("backClients");if(back)back.onclick=()=>{state.section="clients";renderApp()};
  const refresh=$("refresh");if(refresh)refresh.onclick=async()=>{await loadClients();renderApp();flash("Datos actualizados.")};
  const overview=$("loadOverview");if(overview)overview.onclick=loadOverview;
- const search=$("masterSearch");if(search)search.oninput=()=>{state.masterSearch=search.value;state.masterPage=0;clearTimeout(masterTimer);masterTimer=setTimeout(()=>void loadMasterDirectory(),380)};
+ const masterSearchBox=$("masterSearch");if(masterSearchBox)masterSearchBox.oninput=()=>{state.masterSearch=masterSearchBox.value;state.masterPage=0;clearTimeout(masterTimer);masterTimer=setTimeout(()=>void loadMasterDirectory(),380)};
  const statusFilter=$("masterStatus");if(statusFilter)statusFilter.onchange=()=>{state.masterStatus=statusFilter.value;state.masterPage=0;void loadMasterDirectory()};
  const reload=$("masterReload");if(reload)reload.onclick=()=>void loadMasterDirectory();
  const prev=$("masterPrev");if(prev)prev.onclick=()=>{state.masterPage--;void loadMasterDirectory()};
  const next=$("masterNext");if(next)next.onclick=()=>{state.masterPage++;void loadMasterDirectory()};
  document.querySelectorAll("[data-master-id]").forEach(x=>x.onclick=()=>{state.selectedBusiness=x.dataset.masterId;state.section="masterBusinessDetail";renderApp()});
- const back=$("masterBack");if(back)back.onclick=()=>{state.section="masterBusinesses";renderApp()};
+ const masterBackButton=$("masterBack");if(masterBackButton)masterBackButton.onclick=()=>{state.section="masterBusinesses";renderApp()};
 }
 function onboardView(){return '<article class="card"><h2>Registrar un negocio nuevo</h2><p>Este nombre será el que aparezca en su panel. Los clientes quedarán separados de los demás negocios.</p><div class="notice">Si esperas entrar al panel maestro como dueño de Huxcasti, no necesitas registrar un negocio aquí: tu cuenta debe recibir autorización de administrador maestro.</div><form id="onboardForm">'+field('bname','Nombre comercial')+field('sector','Industria o actividad')+'</form><button type="button" id="onboardAction" style="display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;width:100%;min-height:56px;margin-top:20px;border:0;border-radius:12px;background:#20b4f1;color:#041b30;font:800 16px/1.2 -apple-system,BlinkMacSystemFont,Arial,sans-serif;padding:15px;cursor:pointer;">Crear espacio privado</button><div id="onboardStatus" role="status" aria-live="polite" style="padding-top:10px;color:#b6dbef;font-size:13px;"></div><p class="small muted">Alta en prueba técnica de 14 días; no hay cobros ni tarjetas activos.</p></article>'}
 async function createBusiness(e){
