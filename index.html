@@ -570,6 +570,10 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 @media(prefers-reduced-motion:reduce){#fallback .hx-hero-brand-mark{animation:none}}
 
 
+/* Professional hero image: preserve the complete composition at every screen size. */
+#fallback .hx-hero-visual.hx-professional-visual{height:auto;aspect-ratio:3/2;background:#07121e;border:1px solid #81d5e538;box-shadow:0 22px 65px #0006}
+#fallback .hx-professional-image{display:block;width:100%;height:100%;object-fit:contain}
+
 /* Hero: product-first presentation. These are illustrative UI mockups, not customer data. */
 #fallback .hx-product-showcase{position:relative;isolation:isolate;background:radial-gradient(ellipse at 48% 48%,#1a78914a,transparent 68%),linear-gradient(145deg,#0f2b3b,#071724 75%);border:1px solid #84d9eb55;box-shadow:0 22px 65px #0006;overflow:hidden}
 #fallback .hx-product-eyebrow{position:absolute;top:8%;left:7%;z-index:2;font-size:8px;font-weight:800;letter-spacing:.16em;color:#a4dce4}
@@ -1635,59 +1639,13 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       </div>
       <div class="hx-hero-values"><span>Diseño a tu medida</span><span>Sistemas prácticos</span><span>Atención cercana</span></div>
     </div>
-    <div class="hx-hero-visual hx-product-showcase" aria-label="Vista ilustrativa de un sistema de reservas en computadora y teléfono">
-      <div class="hx-visual-grid"></div><div class="hx-visual-glow"></div>
-      <span class="hx-product-eyebrow">VISTA CONCEPTUAL · SISTEMAS A TU MEDIDA</span>
-      <div class="hx-device-laptop" aria-hidden="true">
-        <div class="hx-laptop-screen">
-          <div class="hx-browser-bar"><span class="hx-browser-dots"><i></i><i></i><i></i></span><span>huxcasti / demo de boletería</span></div>
-          <div class="hx-cinema-app">
-            <aside class="hx-cinema-nav">
-              <div class="hx-cinema-brand">H<span>•</span></div>
-              <div class="hx-cinema-navitem active"><i>▦</i><span>Boletos</span></div>
-              <div class="hx-cinema-navitem"><i>▤</i><span>Funciones</span></div>
-              <div class="hx-cinema-navitem"><i>⌗</i><span>Acceso QR</span></div>
-              <div class="hx-cinema-navitem"><i>◫</i><span>Reportes</span></div>
-            </aside>
-            <div class="hx-cinema-content">
-              <div class="hx-cinema-head"><div><small>DEMO · VENTA DE BOLETOS</small><b>Selecciona tus asientos</b></div><span class="hx-cinema-head-status">● En línea</span></div>
-              <div class="hx-cinema-main">
-                <section class="hx-cinema-seating">
-                  <div class="hx-cinema-film"><span class="hx-cinema-film-art">✦</span><div><b>Función de muestra</b><small>Sala 01 &nbsp;·&nbsp; 7:30 PM</small></div></div>
-                  <div class="hx-cinema-screenbar">PANTALLA</div>
-                  <div class="hx-cinema-seats">
-                    <span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="free"></span>
-                    <span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span>
-                    <span class="free"></span><span class="free"></span><span class="free"></span><span class="chosen"></span><span class="chosen"></span><span class="free"></span><span class="free"></span>
-                    <span class="free"></span><span class="free"></span><span class="busy"></span><span class="free"></span><span class="free"></span><span class="free"></span><span class="free"></span>
-                  </div>
-                  <div class="hx-cinema-legend"><span><i class="free"></i> Disponible</span><span><i class="chosen"></i> Seleccionado</span><span><i class="busy"></i> Ocupado</span></div>
-                </section>
-                <aside class="hx-cinema-order">
-                  <strong>Tu selección</strong>
-                  <span class="hx-cinema-order-label">BOLETOS</span>
-                  <div class="hx-cinema-order-item"><span>Adulto</span><b>× 2</b></div>
-                  <span class="hx-cinema-order-label">ASIENTOS</span>
-                  <div class="hx-cinema-order-seats"><span>D4</span><span>D5</span></div>
-                  <div class="hx-cinema-qr"><span class="hx-cinema-qr-icon">▦</span><span>Acceso<br>con QR</span></div>
-                  <div class="hx-cinema-action">Continuar ↗</div>
-                </aside>
-              </div>
-            </div>
-          </div>
-        </div><div class="hx-laptop-base"></div>
-      </div>
-      <div class="hx-device-phone" aria-hidden="true">
-        <div class="hx-phone-notch"></div><div class="hx-phone-inner">
-          <strong class="hx-phone-brand">HUXCASTI<span>.</span></strong>
-          <div class="hx-phone-banner"><small>RESERVAS ONLINE</small><b>Tu próxima<br>experiencia.</b></div>
-          <strong class="hx-phone-prompt">Selecciona una fecha</strong>
-          <div class="hx-phone-dates"><small>L</small><small>M</small><small>J</small><small>V</small><span>18</span><span>19</span><span class="chosen">20</span><span>21</span></div>
-          <span class="hx-phone-fakebutton">Consultar disponibilidad ↗</span>
-          <small class="hx-phone-foot">● &nbsp; Reserva en línea</small>
-        </div><span class="hx-phone-home"></span>
-      </div>
-      <div class="hx-visual-caption">DISEÑO WEB &nbsp; / &nbsp; SISTEMAS DIGITALES</div>
+    <div class="hx-hero-visual hx-professional-visual">
+      <img class="hx-professional-image"
+        src="/assets/huxcasti-web-reservas-768.webp"
+        srcset="/assets/huxcasti-web-reservas-768.webp 768w, /assets/huxcasti-web-reservas-1536.webp 1536w"
+        sizes="(max-width: 700px) calc(100vw - 40px), (max-width: 1180px) 44vw, 510px"
+        width="1536" height="1024" fetchpriority="high" decoding="async"
+        alt="Diseño conceptual de una página web de Huxcasti en computadora y un sistema de reservas en celular.">
     </div>
   </section>
   <section id="servicios" class="hx-services" aria-labelledby="hx-services-title">
