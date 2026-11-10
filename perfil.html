@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#06111c">
+  <meta name="description" content="Portafolio profesional de Huxcasti: proyectos de desarrollo web, sistemas digitales y experiencia práctica con HTML, CSS, JavaScript, Node.js y Supabase.">
+  <title>Perfil profesional | Huxcasti — Desarrollo web junior</title>
+  <style>
+    :root{color-scheme:dark;--bg:#06101b;--panel:#0c2130;--edge:rgba(122,218,235,.18);--text:#f0fbff;--muted:#b3cdd8;--cyan:#55e4ee}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(ellipse 950px 600px at 75% -4%,#134052,transparent 75%),radial-gradient(ellipse 700px 580px at 3% 48%,#102c45,transparent 75%),var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit} a:focus-visible{outline:2px solid var(--cyan);outline-offset:4px} .container{width:min(1120px,calc(100% - 40px));margin:auto}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:23px 0;border-bottom:1px solid var(--edge)}.logo{text-decoration:none;font-weight:900;letter-spacing:-.055em;font-size:23px}.logo span,.accent{color:var(--cyan)}.back{font-size:13px;color:#b5d4e1;text-decoration:none;border:1px solid var(--edge);padding:9px 15px;border-radius:999px;white-space:nowrap}
+    .hero{padding:86px 0 58px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(270px,.6fr);gap:48px;align-items:center}.kicker{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--cyan);text-transform:uppercase}.hero h1{font-size:clamp(43px,6.5vw,79px);line-height:1.04;letter-spacing:-.06em;margin:19px 0 22px;font-weight:850}.hero p{font-size:17px;color:var(--muted);max-width:650px;line-height:1.7}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:31px}.action{padding:13px 20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--edge);border-radius:12px;text-decoration:none;font-size:14px;font-weight:750;background:#11283a}.action.primary{background:var(--cyan);color:#05222b;border-color:transparent}.action:hover{filter:brightness(1.09)}
+    .profile-card{background:linear-gradient(150deg,rgba(16,55,72,.92),rgba(8,26,42,.92));border:1px solid var(--edge);border-radius:24px;padding:28px;box-shadow:0 25px 65px #0005}.profile-card .over{display:block;color:#7ee9ee;letter-spacing:.2em;font-size:10px;font-weight:800;text-transform:uppercase}.profile-card h2{font-size:24px;line-height:1.18;letter-spacing:-.04em;margin:16px 0 22px}.profile-card ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}.profile-card li{display:flex;gap:10px;font-size:13px;color:#c7dde6;line-height:1.5}.profile-card li::before{content:"✓";color:var(--cyan);font-weight:900}
+    section.content{padding:34px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}.section-head h2{font-size:clamp(26px,3.6vw,40px);letter-spacing:-.055em;line-height:1.1;margin:7px 0}.section-head p{max-width:430px;font-size:14px;color:var(--muted);margin:0}
+    .projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.project{display:flex;flex-direction:column;min-width:0;background:linear-gradient(160deg,rgba(14,42,60,.97),rgba(7,23,37,.97));border:1px solid var(--edge);border-radius:20px;padding:26px;position:relative;overflow:hidden}.project::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--tone,var(--cyan))}.project small{color:#8ec3d1;font-size:11px;text-transform:uppercase;letter-spacing:.13em;font-weight:800}.project h3{font-size:25px;line-height:1.12;letter-spacing:-.045em;margin:15px 0 12px}.project p{font-size:14px;color:#c3d9e4;line-height:1.65;margin:0 0 15px}.project .detail{font-size:12px;color:#96b7c8;margin-top:auto;padding-top:8px}.project .detail strong{color:#d7f5fb}.project a{display:inline-block;margin-top:22px;color:#73edf3;font-size:13px;font-weight:800;text-decoration:none}.project a:hover{text-decoration:underline}
+    .skills-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{border:1px solid var(--edge);background:rgba(10,32,49,.76);border-radius:20px;padding:28px}.panel h3{font-size:19px;letter-spacing:-.03em;margin:0 0 12px}.panel p{font-size:14px;color:var(--muted);margin:0;line-height:1.7}.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}.tag{border:1px solid #40798b;background:#123245;color:#d4edf5;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:650}
+    .cta{margin:55px 0 45px;background:linear-gradient(115deg,#153e51,#0a243b);border:1px solid #37677a;border-radius:24px;padding:40px;display:flex;justify-content:space-between;gap:24px;align-items:center}.cta h2{font-size:clamp(25px,4vw,35px);line-height:1.1;letter-spacing:-.04em;margin:9px 0}.cta p{font-size:14px;color:var(--muted);margin:0;max-width:550px}.footer{border-top:1px solid var(--edge);padding:25px 0 42px;color:#829faf;font-size:12px;display:flex;justify-content:space-between;gap:15px}.footer a{color:#aee9f2}
+    @media(max-width:850px){.hero{grid-template-columns:1fr;padding:56px 0 36px;gap:22px}.projects{grid-template-columns:1fr}.skills-wrap{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:10px}.cta{align-items:start;flex-direction:column}}
+    @media(max-width:500px){.container{width:min(100% - 30px,1120px)}.top{padding:17px 0}.logo{font-size:20px}.back{font-size:11px;padding:8px 11px}.hero h1{font-size:42px}.hero p{font-size:15px}.profile-card,.panel,.project{padding:22px}.cta{padding:25px}.footer{display:block}.footer a{display:inline-block;margin-top:6px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="top">
+      <a class="logo" href="./" aria-label="Regresar a Huxcasti">HUXCASTI<span>.</span></a>
+      <a class="back" href="./">← Volver al universo</a>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="kicker">Portafolio profesional · Puerto Rico</div>
+          <h1 id="hero-title">Desarrollo web con <span class="accent">proyectos reales.</span></h1>
+          <p>Perfil orientado a oportunidades de <strong>desarrollador web junior</strong> y <strong>frontend junior</strong> en modalidad remota. En Huxcasti he participado en la planificación, creación, pruebas y publicación de experiencias web y herramientas digitales para distintos negocios.</p>
+          <div class="actions">
+            <a class="action primary" href="#proyectos">Ver proyectos ↘</a>
+            <a class="action" href="#contacto">Contacto profesional ↗</a>
+          </div>
+        </div>
+        <aside class="profile-card" aria-label="Resumen profesional">
+          <span class="over">En pocas palabras</span>
+          <h2>Del problema a una solución digital.</h2>
+          <ul>
+            <li>Desarrollo y adaptación de interfaces para móviles y computadoras.</li>
+            <li>Formularios, paneles administrativos, reservaciones y flujos de usuarios.</li>
+            <li>Integraciones prácticas con servicios de base de datos y despliegue web.</li>
+            <li>Aprendizaje continuo y trabajo con herramientas de inteligencia artificial.</li>
+          </ul>
+        </aside>
+      </section>
+      <section class="content" id="proyectos" aria-labelledby="projects-title">
+        <div class="section-head">
+          <div><div class="kicker">Proyectos seleccionados</div><h2 id="projects-title">Trabajo que puedes explorar.</h2></div>
+          <p>Las demostraciones muestran funcionalidades o información ficticia; no exponen expedientes ni credenciales de clientes.</p>
+        </div>
+        <div class="projects">
+          <article class="project" style="--tone:#b995f7">
+            <small>01 · Sistema de gestión</small>
+            <h3>Just Be You</h3>
+            <p>Experiencia digital para expedientes de clientas, formularios, historial de sesiones y herramientas administrativas. Incluye adaptación móvil y atención a la validación de datos.</p>
+            <div class="detail"><strong>Trabajo:</strong> flujos de usuarios, interfaz, pruebas, ajustes y publicación.<br><strong>Tecnologías utilizadas:</strong> HTML, CSS, JavaScript, Node.js y Supabase.</div>
+            <a href="demo-just-be-you.html">Abrir demo con datos ficticios ↗</a>
+          </article>
+          <article class="project" style="--tone:#6fe1a6">
+            <small>02 · Reservaciones y eventos</small>
+            <h3>Hacienda El Flambo</h3>
+            <p>Proyecto de reservaciones con selección de fechas, registro de invitados y funciones de administración, pensado para simplificar la organización de visitas y eventos.</p>
+            <div class="detail"><strong>Trabajo:</strong> experiencia de reserva, estructura del sistema y revisión de uso en móviles.<br><strong>Tecnologías utilizadas:</strong> HTML, CSS, JavaScript y Supabase.</div>
+            <a href="https://huxcasti.github.io/hacienda-el-flambo/" target="_blank" rel="noopener noreferrer">Ver proyecto ↗</a>
+          </article>
+          <article class="project" style="--tone:#ffab84">
+            <small>03 · Prototipo de boletería</small>
+            <h3>Cine Manuel Nieves</h3>
+            <p>Prototipo de venta y gestión de boletos con selección de asientos, códigos QR y flujos de acceso para personal y administración.</p>
+            <div class="detail"><strong>Trabajo:</strong> diseño de procesos de compra y validación, pruebas e integraciones.<br><strong>Tecnologías utilizadas:</strong> HTML, CSS, JavaScript, Node.js y Supabase.</div>
+            <a href="https://cine-manuel-nieves.netlify.app/" target="_blank" rel="noopener noreferrer">Explorar prototipo ↗</a>
+          </article>
+        </div>
+      </section>
+      <section class="content" aria-labelledby="skills-title">
+        <div class="section-head"><div><div class="kicker">Cómo trabajo</div><h2 id="skills-title">Herramientas y enfoque.</h2></div></div>
+        <div class="skills-wrap">
+          <div class="panel">
+            <h3>Tecnologías utilizadas en proyectos</h3>
+            <p>Experiencia práctica trabajando con estas herramientas. Continúo fortaleciendo los fundamentos de programación y la capacidad de explicar, mantener y modificar el código.</p>
+            <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Node.js</span><span class="tag">Supabase</span><span class="tag">Git / GitHub</span><span class="tag">GitHub Pages</span><span class="tag">Render</span><span class="tag">Diseño adaptable</span></div>
+          </div>
+          <div class="panel">
+            <h3>Mi forma de aportar</h3>
+            <p>Escucho el problema, organizo los requisitos, propongo flujos sencillos y pruebo cada función desde la perspectiva de quien va a usarla. Utilizo herramientas de IA como apoyo durante el desarrollo, siempre revisando y aprendiendo del resultado.</p>
+          </div>
+        </div>
+      </section>
+      <section class="cta" id="contacto" aria-labelledby="contacto-title">
+        <div><div class="kicker">Oportunidades profesionales</div><h2 id="contacto-title">Interesado en un puesto remoto junior.</h2><p>Disponible para conversar sobre oportunidades de desarrollo web, interfaces y mantenimiento de aplicaciones desde Puerto Rico.</p></div>
+        <a class="action primary" target="_blank" rel="noopener noreferrer" href="https://wa.me/17875490777?text=Hola%2C%20vi%20tu%20portafolio%20profesional%20en%20Huxcasti%20y%20quisiera%20conversar%20sobre%20una%20oportunidad%20de%20desarrollo%20web.">Contactar por WhatsApp ↗</a>
+      </section>
+    </main>
+    <footer class="footer"><span>Huxcasti · Portafolio profesional de desarrollo web · Puerto Rico</span><a href="./">Regresar a huxcasti.com</a></footer>
+  </div>
+</body>
+</html>
