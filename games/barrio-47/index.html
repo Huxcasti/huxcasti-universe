@@ -390,7 +390,7 @@ button{font:inherit;cursor:pointer}
    const flashMat=mat("G2 muzzle glow","#fff2bf","#ffa126");
    muzzleFlash.material=flashMat;muzzleFlash.isPickable=false;muzzleFlash.setEnabled(false);
    weapon=mount;
-   oldWeapon.dispose(false,true);
+   oldWeapon.dispose(false,false); // Preserve shared scene materials used by other world objects.
    get("ammo").textContent="G2 COMBAT / ∞";
    if(running)tip("G2 COMBAT · ARMA EQUIPADA");
    console.info("Barrio 47: G2 Combat 3D pistol loaded",meshes.length,"meshes");
