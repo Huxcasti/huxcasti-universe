@@ -374,8 +374,9 @@ button{font:inherit;cursor:pointer}
  function tree(x,z){
   cyl("tree-trunk",x,1.0,z,.33,2,mats.wood);
   for(const [dx,dy,dz,size] of [[0,3.2,0,2.3],[.4,3.6,.1,1.7],[-.7,3.0,.4,1.3]]){
-   const foliage=B.MeshBuilder.CreateSphere("tree-top",{diameter:size,segments:6},scene);
-   foliage.position.set(x+dx,dy,z+dz);foliage.material=mats.grass2;foliage.isPickable=false;
+   const leaf=B.MeshBuilder.CreateSphere("tree-top",{diameter:size,segments:8},scene);
+   leaf.position.set(x+dx,dy,z+dz);leaf.material=dx<0?mats.leafLight:mats.grass2;leaf.isPickable=false;
+   foliage.push({mesh:leaf,x:leaf.position.x,z:leaf.position.z,phase:x*.17+z*.11+dx*1.7});
   }
  }
  function target(x,z,index){
@@ -386,7 +387,7 @@ button{font:inherit;cursor:pointer}
   ring.parent=root;ring.position.y=2.0;ring.material=mats.lime;ring.isPickable=false;
   const pillar=cyl("target-pedestal",x,.65,z,.24,1.3,mats.metal);
   pillar.isPickable=false;
-  targets.push({root,orb,x,z,index,active:true});
+  targets.push({root,orb,ring,x,z,index,active:true});
  }
  function buildScene(){
   scene=new B.Scene(engine);
@@ -408,7 +409,7 @@ button{font:inherit;cursor:pointer}
    fence:mat("fence",colors.fence),teal:mat("teal",colors.teal),lime:mat("lime",colors.lime,"#6d8d35"),
    metal:mat("metal",colors.metal),bus:mat("bus",colors.bus),brick:mat("brick",colors.brick),
    roof:mat("roof","#20394c"),rubber:mat("rubber","#131c27"),lamp:mat("lamp","#f5f9df","#4c5330"),
-   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("tactical red armor","#973c45"),enemyDark:mat("charcoal armor","#202e3a"),enemyFace:mat("helmet visor","#dd8370","#4c241f"),enemyFabric:mat("tactical fabric","#586c65"),enemyPlate:mat("armor plate","#364653"),enemyBoot:mat("combat boot","#161c25"),enemySkin:mat("skin","#bc947b"),enemyTrim:mat("team insignia","#d8c77c"),enemyMuzzle:mat("bot flash","#ffcd79","#ff672a"),botShadow:mat("enemy shadow","#15251f")
+   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("tactical red armor","#973c45"),enemyDark:mat("charcoal armor","#202e3a"),enemyFace:mat("helmet visor","#dd8370","#4c241f"),enemyFabric:mat("tactical fabric","#586c65"),enemyPlate:mat("armor plate","#364653"),enemyBoot:mat("combat boot","#161c25"),enemySkin:mat("skin","#bc947b"),enemyTrim:mat("team insignia","#d8c77c"),enemyMuzzle:mat("bot flash","#ffcd79","#ff672a"),botShadow:mat("enemy shadow","#15251f"),warning:mat("drone warning light","#f9b75c","#e18f28"),leafLight:mat("leaf highlights","#54896a")
   };
   plane("main grass",0,-.06,0,96,77,mats.grass);
   plane("road",0,.011,0,94,15.8,mats.asphalt);
@@ -436,6 +437,7 @@ button{font:inherit;cursor:pointer}
   }
   // Simple training range where shooting can be practiced.
   [[-36,-5],[-12,11],[8,-12],[31,13],[-6,28],[35,-27],[-37,28],[16,-19]].forEach((t,i)=>target(t[0],t[1],i));
+  makeAmbientDetails();
   // Unreachable distant silhouettes create depth without costly texture assets.
   for(let i=0;i<22;i++){
    const x=-75+i*7.4;
@@ -448,6 +450,58 @@ button{font:inherit;cursor:pointer}
   makeWeapon();
   loadG2Pistol();
   for(let i=0;i<3;i++)createBot(i);
+ }
+ function makeAmbientDetails(){
+  // Moving roadside details without extra downloads or physics overhead.
+  for(const [x,z] of [[-33,-13],[32,15],[-5,14],[14,-12]]){
+   cyl("lamp-post",x,2.35,z,.16,4.7,mats.metal);
+   box("lamp-arm",x+.48,4.60,z,.99,.11,.12,mats.metal,false);
+   const bulb=box("lamp-bulb",x+.86,4.49,z,.40,.12,.28,mats.lamp,false);
+   ambientMotion.push({kind:"bulb",mesh:bulb,phase:x*.22});
+  }
+  for(const [x,z,accent] of [[-40,12,mats.teal],[39,-10,mats.yellow]]){
+   cyl("flagpole",x,2.7,z,.10,5.3,mats.metal);
+   const flag=B.MeshBuilder.CreatePlane("training-flag",{width:1.25,height:.70},scene);
+   flag.position.set(x+.69,4.67,z);flag.material=accent;flag.isPickable=false;
+   flag.rotation.y=Math.PI/2;
+   ambientMotion.push({kind:"flag",mesh:flag,phase:z*.2});
+  }
+  const drone=new B.TransformNode("training-drone",scene);
+  drone.position.set(0,8,-8);
+  const body=B.MeshBuilder.CreateSphere("drone-body",{diameter:.85,segments:10},scene);
+  body.parent=drone;body.material=mats.metal;body.isPickable=false;
+  const lens=B.MeshBuilder.CreateSphere("drone-lens",{diameter:.24,segments:8},scene);
+  lens.parent=drone;lens.position.set(0,-.24,.36);lens.material=mats.warning;lens.isPickable=false;
+  for(const x of [-.72,.72]){
+   const arm=B.MeshBuilder.CreateBox("drone-arm",{width:.9,height:.08,depth:.10},scene);
+   arm.parent=drone;arm.position.x=x;arm.material=mats.trim;arm.isPickable=false;
+   const rotor=B.MeshBuilder.CreateTorus("drone-propeller",{diameter:.58,thickness:.055,tessellation:12},scene);
+   rotor.parent=drone;rotor.position.set(x*1.5,.12,0);rotor.material=mats.metal;rotor.isPickable=false;
+   ambientMotion.push({kind:"rotor",mesh:rotor,phase:x});
+  }
+  ambientMotion.push({kind:"drone",mesh:drone,phase:0});
+ }
+ function updateWorldMotion(){
+  for(const f of foliage){
+   f.mesh.position.x=f.x+Math.sin(elapsed*1.35+f.phase)*.085;
+   f.mesh.position.z=f.z+Math.sin(elapsed*.94+f.phase*.6)*.055;
+  }
+  for(const t of targets){
+   if(!t.active)continue;
+   t.orb.position.y=2+Math.sin(elapsed*2.2+t.index*.74)*.13;
+   t.ring.position.y=t.orb.position.y;
+   t.ring.rotation.z=elapsed*.45+t.index;
+  }
+  for(const p of ambientMotion){
+   if(p.kind==="drone"){
+    p.mesh.position.x=Math.sin(elapsed*.24)*22;
+    p.mesh.position.z=-8+Math.cos(elapsed*.21)*4;
+    p.mesh.position.y=7.9+Math.sin(elapsed*1.3)*.32;
+    p.mesh.rotation.y=elapsed*.30;
+   }else if(p.kind==="rotor")p.mesh.rotation.y=elapsed*12+p.phase;
+   else if(p.kind==="flag")p.mesh.rotation.z=Math.sin(elapsed*3+p.phase)*.10;
+   else if(p.kind==="bulb")p.mesh.scaling.y=.95+Math.sin(elapsed*2+p.phase)*.05;
+  }
  }
  function makeWeapon(){
   weapon=new B.TransformNode("weapon",scene);weapon.parent=camera;
@@ -743,6 +797,7 @@ button{font:inherit;cursor:pointer}
   }
   if(fireCooldown>0)fireCooldown-=dt;
   updateBots(dt);
+  updateWorldMotion();
   if(Math.floor(elapsed*8)!==Math.floor((elapsed-dt)*8))drawRadar();
  }
  function tip(text){
