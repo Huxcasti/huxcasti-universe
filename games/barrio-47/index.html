@@ -87,6 +87,24 @@ button{font:inherit;cursor:pointer}
 #minimap{width:104px;height:83px}
 .mark{padding:6px 9px}.score-card{padding:6px 9px}
 }
+
+/* ALFA 02: combate contra bots, vida y reaparición */
+.bot-card{min-width:71px;gap:6px}.bot-card span{font-size:9px}
+#healthPanel{position:absolute;top:calc(max(13px,env(safe-area-inset-top)) + 58px);right:max(13px,env(safe-area-inset-right));width:155px;padding:9px 11px;border:1px solid #9ce3f063;border-radius:11px;background:#071827d9;backdrop-filter:blur(8px);font-size:10px;font-weight:700;letter-spacing:.12em}
+#healthPanel span{display:flex;justify-content:space-between;align-items:center}
+#healthPanel strong{font-size:13px;letter-spacing:0}
+#healthTrack{margin-top:7px;height:7px;background:#ffffff25;border-radius:30px;overflow:hidden}
+#healthFill{height:100%;width:100%;border-radius:30px;background:linear-gradient(90deg,#44d9a0,#a8ffb5);transition:width .16s ease,background .16s ease}
+#damageFlash{position:fixed;inset:0;z-index:8;background:radial-gradient(ellipse,transparent 36%,#ec263e97);opacity:0;pointer-events:none;transition:opacity .16s ease}
+#damageFlash.active{opacity:1}
+#deathScreen[hidden]{display:none!important}
+#deathScreen{position:fixed;inset:0;z-index:45;display:grid;place-items:center;padding:24px;background:#081422e8;backdrop-filter:blur(10px)}
+.death-card{width:min(430px,100%);padding:33px;text-align:center;border:1px solid #ff778577;border-radius:23px;background:#13283aea}
+.death-card h2{font-size:clamp(37px,10vw,62px);line-height:1;margin:0 0 15px;color:#ff8e91;letter-spacing:-.05em}
+.death-card p{font-size:14px;line-height:1.6;color:#d7e5ef}
+#respawn{width:100%;padding:17px;border:0;border-radius:12px;background:#41deef;color:#042638;font-weight:900;font-size:15px;margin-top:12px}
+@media(max-width:720px){.bot-card{padding:7px;min-width:56px}.bot-card span{font-size:8px}.bot-card strong{font-size:15px}#healthPanel{top:calc(max(13px,env(safe-area-inset-top)) + 51px);width:127px;padding:7px 9px}}
+@media(max-height:430px){#healthPanel{top:calc(max(10px,env(safe-area-inset-top)) + 47px);width:132px}}
 </style>
 </head>
 <body>
@@ -95,10 +113,11 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE ENTRENAMIENTO · ALFA 01</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 02</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
-   <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
+   <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
+  <div id="healthPanel" aria-label="Puntos de vida"><span>VIDA <strong><b id="healthValue">100</b>/100</strong></span><div id="healthTrack"><div id="healthFill"></div></div></div>
   <div id="centerTip" role="status"></div>
   <div id="reticle"><i></i></div>
   <div id="hit"></div>
@@ -108,11 +127,13 @@ button{font:inherit;cursor:pointer}
   <button id="fire" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
   <span id="ammo">CARGANDO G2 COMBAT...</span>
 </div>
+<div id="damageFlash" aria-hidden="true"></div>
+<div id="deathScreen" hidden><div class="death-card"><h2>TE ELIMINARON</h2><p>Conseguiste <strong id="deathKills">0</strong> bajas. Los enemigos patrullan el barrio y disparan cuando te tienen a la vista.</p><button id="respawn">VOLVER A APARECER</button></div></div>
 <div id="menu">
  <div class="menu-card">
   <div class="eyebrow">Huxcasti Games · Primer prototipo jugable</div>
   <h1>BARRIO <span>47</span></h1>
-  <p>Un mapa 3D original de combate de práctica: casas enfrentadas, un autobús en la calle, patios, garajes y blancos flotantes. Explora en primera persona desde tu iPhone.</p>
+  <p>Un barrio 3D original con casas, autobús, patios y garajes. Ahora hay tres enemigos que te buscan y disparan. Sobrevive, elimina enemigos y practica tu puntería desde el iPhone.</p>
   <div class="pills"><span>🎮 FPS táctil</span><span>📱 iPhone</span><span>🏘️ Mapa original 3D</span><span>🎯 Blancos de práctica</span></div>
   <button id="play">ENTRAR AL MAPA</button>
   <div class="guide">
@@ -134,8 +155,8 @@ button{font:inherit;cursor:pointer}
  function fail(message){get("loading").hidden=true;get("fatal").style.display="block";get("fatalMsg").textContent=message;}
  if(!window.BABYLON){fail("No se cargó Babylon.js. Comprueba tu conexión.");return;}
  const B=window.BABYLON;
- let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0;
- const canvas=get("world"), colliders=[],targets=[],keys=new Set();
+ let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0,playerHealth=100,kills=0,dead=false,damageFlashTimer=0;
+ const canvas=get("world"), colliders=[],targets=[],bots=[],keys=new Set();
  const WORLD={minX:-45,maxX:45,minZ:-36,maxZ:36};
  let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0;
  const colors={
@@ -297,7 +318,7 @@ button{font:inherit;cursor:pointer}
    fence:mat("fence",colors.fence),teal:mat("teal",colors.teal),lime:mat("lime",colors.lime,"#6d8d35"),
    metal:mat("metal",colors.metal),bus:mat("bus",colors.bus),brick:mat("brick",colors.brick),
    roof:mat("roof","#20394c"),rubber:mat("rubber","#131c27"),lamp:mat("lamp","#f5f9df","#4c5330"),
-   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20")
+   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("enemy armor","#a93849"),enemyDark:mat("enemy armor details","#252e3d"),enemyFace:mat("enemy visor","#ff8974","#7a3024")
   };
   plane("main grass",0,-.06,0,96,77,mats.grass);
   plane("road",0,.011,0,94,15.8,mats.asphalt);
@@ -336,6 +357,7 @@ button{font:inherit;cursor:pointer}
   scene.activeCamera=camera;
   makeWeapon();
   loadG2Pistol();
+  for(let i=0;i<3;i++)createBot(i);
  }
  function makeWeapon(){
   weapon=new B.TransformNode("weapon",scene);weapon.parent=camera;
@@ -400,6 +422,103 @@ button{font:inherit;cursor:pointer}
    if(running)tip("ARMA PROVISIONAL · MODELO G2 NO DISPONIBLE");
   }
  }
+ // Local enemies for solo play, with simple movement and shooting.
+ const botSpawnPoints=[[-24,11],[-7,-11],[20,9],[-34,23],[8,-23],[36,-12],[-14,12],[33,16]];
+ function botPiece(bot,name,x,y,z,w,h,d,material,canShoot){
+  const mesh=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
+  mesh.parent=bot.root;mesh.position.set(x,y,z);mesh.material=material;mesh.isPickable=!!canShoot;
+  if(canShoot)mesh.metadata={botIndex:bot.index};
+  return mesh;
+ }
+ function createBot(index){
+  const bot={index,root:new B.TransformNode("enemy-"+index,scene),hp:3,alive:false,respawnIn:0,shotIn:2.5+index,side:index%2===0?1:-1};
+  botPiece(bot,"enemy-torso",0,1.18,0,.70,.83,.35,mats.enemy,true);
+  botPiece(bot,"enemy-vest",0,1.18,.195,.56,.57,.05,mats.enemyDark,false);
+  const head=B.MeshBuilder.CreateSphere("enemy-head",{diameter:.44,segments:8},scene);
+  head.parent=bot.root;head.position.y=1.78;head.material=mats.enemyDark;head.isPickable=true;head.metadata={botIndex:index};
+  botPiece(bot,"enemy-visor",0,1.80,.215,.34,.16,.04,mats.enemyFace,false);
+  for(const x of [-.45,.45]){
+   botPiece(bot,"enemy-arm",x,1.18,.02,.18,.65,.23,mats.enemyDark,false);
+   botPiece(bot,"enemy-leg",x*.55,.49,0,.22,.87,.27,mats.enemyDark,false);
+  }
+  botPiece(bot,"enemy-training-blaster",.30,1.08,.39,.14,.14,.62,mats.enemyDark,false);
+  bots.push(bot);spawnBot(bot,true);
+ }
+ function spawnBot(bot,firstTime){
+  const player=camera.position;
+  let pos=firstTime?botSpawnPoints[bot.index]:null;
+  if(!pos||collision(pos[0],pos[1])){
+   const valid=botSpawnPoints.filter(p=>!collision(p[0],p[1])&&Math.hypot(p[0]-player.x,p[1]-player.z)>13&&bots.every(other=>other===bot||!other.alive||Math.hypot(other.root.position.x-p[0],other.root.position.z-p[1])>5));
+   pos=valid.length?valid[Math.floor(Math.random()*valid.length)]:botSpawnPoints[bot.index];
+  }
+  bot.root.position.set(pos[0],0,pos[1]);bot.root.rotation.y=0;
+  bot.hp=3;bot.alive=true;bot.respawnIn=0;bot.shotIn=2+Math.random()*1.5;bot.root.setEnabled(true);
+ }
+ function canEnemySeePlayer(bot){
+  const from=v(bot.root.position.x,1.54,bot.root.position.z),to=camera.position.clone();
+  const direction=to.subtract(from),distance=direction.length();
+  if(distance<.01)return true;
+  const ray=new B.Ray(from,direction.scale(1/distance),Math.max(.1,distance-.35));
+  const obstruction=scene.pickWithRay(ray,mesh=>mesh.isPickable===true&&!Number.isInteger(mesh.metadata?.botIndex)&&!mesh.metadata?.target);
+  return !obstruction||!obstruction.hit;
+ }
+ function enemyShot(bot){
+  const start=v(bot.root.position.x,1.39,bot.root.position.z),end=camera.position.clone();
+  const streak=B.MeshBuilder.CreateLines("enemy-laser",{points:[start,end]},scene);
+  streak.color=color("#ff645b");streak.isPickable=false;
+  setTimeout(()=>{if(!streak.isDisposed())streak.dispose()},120);
+  const speed=Math.hypot(joy.x,joy.y);
+  const accuracy=Math.max(.40,.75-speed*.12-(vertical>.25?.18:0));
+  if(Math.random()<accuracy)damagePlayer(12);
+ }
+ function damagePlayer(points){
+  if(dead||!running)return;
+  playerHealth=Math.max(0,playerHealth-points);
+  get("healthValue").textContent=String(playerHealth);
+  get("healthFill").style.width=playerHealth+"%";
+  get("healthFill").style.background=playerHealth<=30?"#ff5d6a":"linear-gradient(90deg,#44d9a0,#a8ffb5)";
+  get("damageFlash").classList.add("active");
+  clearTimeout(damageFlashTimer);damageFlashTimer=setTimeout(()=>get("damageFlash").classList.remove("active"),155);
+  if(playerHealth<=0){
+   dead=true;running=false;runHeld=false;joy.x=joy.y=0;keys.clear();
+   clearInterval(firingTimer);firingTimer=0;get("fire").classList.remove("pressed");
+   get("deathKills").textContent=String(kills);
+   get("hud").hidden=true;get("deathScreen").hidden=false;
+  }
+ }
+ function respawnPlayer(){
+  camera.position.set(-36,1.78,0);camera.rotation.set(0,Math.PI/2,0);
+  vertical=0;jumpV=0;recoil=0;runHeld=false;joy.x=joy.y=0;keys.clear();
+  get("knob").style.transform="translate(0,0)";
+  playerHealth=100;dead=false;get("healthValue").textContent="100";
+  get("healthFill").style.width="100%";get("healthFill").style.background="linear-gradient(90deg,#44d9a0,#a8ffb5)";
+  get("damageFlash").classList.remove("active");
+  for(const bot of bots)spawnBot(bot,true);
+  get("deathScreen").hidden=true;get("hud").hidden=false;running=true;engine.resize();drawRadar();tip("¡DE NUEVO EN COMBATE!");
+ }
+ function updateBots(dt){
+  for(const bot of bots){
+   if(!bot.alive){bot.respawnIn-=dt;if(bot.respawnIn<=0)spawnBot(bot,false);continue}
+   const here=bot.root.position,dx=camera.position.x-here.x,dz=camera.position.z-here.z,dist=Math.hypot(dx,dz);
+   if(dist>.001)bot.root.rotation.y=Math.atan2(dx,dz);
+   if(dist>4.3&&dist<46){
+    const rate=(1.8+bot.index*.13)*dt,ux=dx/dist,uz=dz/dist;
+    const nx=here.x+ux*rate,nz=here.z+uz*rate;
+    if(!collision(nx,nz)){here.x=nx;here.z=nz}
+    else if(!collision(nx,here.z))here.x=nx;
+    else if(!collision(here.x,nz))here.z=nz;
+    else{
+     const sx=here.x-bot.side*uz*rate,sz=here.z+bot.side*ux*rate;
+     if(!collision(sx,sz)){here.x=sx;here.z=sz}else bot.side*=-1;
+    }
+   }
+   bot.shotIn-=dt;
+   if(dist<24&&dist>2.2&&bot.shotIn<=0){
+    bot.shotIn=1.5+Math.random()*1.35;
+    if(canEnemySeePlayer(bot))enemyShot(bot);
+   }
+  }
+ }
  function collision(x,z){
   if(x<WORLD.minX+.7||x>WORLD.maxX-.7||z<WORLD.minZ+.7||z>WORLD.maxZ-.7)return true;
   const radius=.42;
@@ -438,6 +557,7 @@ button{font:inherit;cursor:pointer}
    weapon.position.y=restY+Math.sin(elapsed*10)*.018*moveAmount;
   }
   if(fireCooldown>0)fireCooldown-=dt;
+  updateBots(dt);
   if(Math.floor(elapsed*8)!==Math.floor((elapsed-dt)*8))drawRadar();
  }
  function tip(text){
@@ -454,6 +574,17 @@ button{font:inherit;cursor:pointer}
   if(muzzleFlash){muzzleFlash.setEnabled(true);setTimeout(()=>{if(muzzleFlash&&!muzzleFlash.isDisposed())muzzleFlash.setEnabled(false)},55);}
   const ray=camera.getForwardRay(100);
   const hit=scene.pickWithRay(ray,mesh=>mesh.isPickable===true);
+  if(hit&&hit.hit&&hit.pickedMesh&&hit.pickedMesh.metadata&&Number.isInteger(hit.pickedMesh.metadata.botIndex)){
+   const bot=bots[hit.pickedMesh.metadata.botIndex];
+   if(bot&&bot.alive){
+    bot.hp--;onHitFlash();
+    if(bot.hp<=0){
+     bot.alive=false;bot.root.setEnabled(false);bot.respawnIn=6.5;
+     kills++;get("kills").textContent=String(kills).padStart(2,"0");tip("+1 BAJA · ENEMIGO ELIMINADO");
+    }else tip("IMPACTO · ENEMIGO HERIDO");
+   }
+   return;
+  }
   if(hit&&hit.hit&&hit.pickedMesh&&hit.pickedMesh.metadata&&hit.pickedMesh.metadata.target){
    const ix=hit.pickedMesh.metadata.index,t=targets[ix];
    if(t&&t.active){
@@ -481,6 +612,10 @@ button{font:inherit;cursor:pointer}
    if(!t.active)continue;
    ctx.fillStyle="#baf16e";ctx.beginPath();ctx.arc(px(t.x),pz(t.z),2.1,0,Math.PI*2);ctx.fill();
   }
+  for(const bot of bots){
+   if(!bot.alive)continue;
+   ctx.fillStyle="#ff6478";ctx.beginPath();ctx.arc(px(bot.root.position.x),pz(bot.root.position.z),3.2,0,Math.PI*2);ctx.fill();
+  }
   if(camera){
    const x=px(camera.position.x),y=pz(camera.position.z),a=camera.rotation.y;
    ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI-a);
@@ -494,6 +629,7 @@ button{font:inherit;cursor:pointer}
   const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
   get("play").addEventListener("click",start);
   get("pause").addEventListener("click",pause);
+  get("respawn").addEventListener("click",respawnPlayer);
   const joyEl=get("joy"),knob=get("knob");
   let joyId=null;
   function setJoy(e){
@@ -540,6 +676,7 @@ button{font:inherit;cursor:pointer}
    keys.add(e.code);
    if(e.code==="Space"&&!e.repeat)jump();
    if(e.code==="Escape"&&running)pause();
+   if(e.code==="KeyR"&&dead)respawnPlayer();
   });
   window.addEventListener("keyup",e=>keys.delete(e.code));
   window.addEventListener("blur",()=>{keys.clear();runHeld=false;stopFire()});
