@@ -105,6 +105,86 @@ button{font:inherit;cursor:pointer}
 #respawn{width:100%;padding:17px;border:0;border-radius:12px;background:#41deef;color:#042638;font-weight:900;font-size:15px;margin-top:12px}
 @media(max-width:720px){.bot-card{padding:7px;min-width:56px}.bot-card span{font-size:8px}.bot-card strong{font-size:15px}#healthPanel{top:calc(max(13px,env(safe-area-inset-top)) + 51px);width:127px;padding:7px 9px}}
 @media(max-height:430px){#healthPanel{top:calc(max(10px,env(safe-area-inset-top)) + 47px);width:132px}}
+
+/* ALFA 02.1 · Disposición estable y sin superposiciones en pantalla horizontal */
+#combatControls{
+ position:absolute;
+ right:calc(26px + env(safe-area-inset-right));
+ bottom:calc(40px + env(safe-area-inset-bottom));
+ display:grid;
+ grid-template-columns:76px 92px;
+ grid-template-rows:52px 52px;
+ column-gap:23px;
+ row-gap:15px;
+ align-items:stretch;
+ pointer-events:none;
+ touch-action:none;
+ isolation:isolate;
+}
+#combatControls #fire,
+#combatControls #jump,
+#combatControls #sprint{
+ position:static;
+ inset:auto;
+ margin:0;
+ transform:none;
+ width:100%;
+ height:100%;
+ min-width:0;
+ min-height:0;
+ touch-action:none;
+ -webkit-touch-callout:none;
+ -webkit-user-select:none;
+ user-select:none;
+ -webkit-tap-highlight-color:transparent;
+ pointer-events:auto;
+}
+#combatControls #sprint{grid-column:1;grid-row:1;border-radius:15px;font-size:11px}
+#combatControls #jump{grid-column:1;grid-row:2;border-radius:15px;font-size:11px}
+#combatControls #fire{
+ grid-column:2;
+ grid-row:1 / span 2;
+ width:92px;
+ height:92px;
+ align-self:center;
+ justify-self:center;
+ border-radius:50%;
+ font-size:11px;
+ z-index:2;
+}
+#ammo{
+ right:calc(30px + env(safe-area-inset-right));
+ bottom:calc(13px + env(safe-area-inset-bottom));
+ white-space:nowrap;
+ pointer-events:none;
+}
+#hud,#world,#lookzone,#joy,#combatControls{overscroll-behavior:none;touch-action:none;-webkit-touch-callout:none}
+@media(max-height:430px) and (orientation:landscape){
+ #combatControls{
+  grid-template-columns:73px 85px;
+  grid-template-rows:46px 46px;
+  column-gap:24px;
+  row-gap:14px;
+  right:calc(27px + env(safe-area-inset-right));
+  bottom:calc(34px + env(safe-area-inset-bottom));
+ }
+ #combatControls #fire{width:85px;height:85px;font-size:10px}
+ #combatControls #sprint,#combatControls #jump{font-size:10px}
+ #ammo{bottom:calc(9px + env(safe-area-inset-bottom));right:calc(28px + env(safe-area-inset-right))}
+}
+@media(max-width:720px) and (orientation:portrait){
+ #combatControls{
+  grid-template-columns:57px 77px;
+  grid-template-rows:46px 46px;
+  column-gap:16px;
+  row-gap:12px;
+  right:calc(14px + env(safe-area-inset-right));
+  bottom:calc(44px + env(safe-area-inset-bottom));
+ }
+ #combatControls #fire{width:77px;height:77px;font-size:9px}
+ #combatControls #sprint,#combatControls #jump{font-size:9px}
+ #ammo{right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
@@ -122,9 +202,11 @@ button{font:inherit;cursor:pointer}
   <div id="reticle"><i></i></div>
   <div id="hit"></div>
   <div id="joy" aria-label="Joystick de movimiento"><div id="knob"></div></div>
-  <button id="sprint" aria-label="Correr">CORRER</button>
-  <button id="jump" aria-label="Saltar">SALTAR</button>
-  <button id="fire" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
+  <div id="combatControls" aria-label="Controles de combate">
+   <button id="sprint" type="button" aria-label="Correr">CORRER</button>
+   <button id="jump" type="button" aria-label="Saltar">SALTAR</button>
+   <button id="fire" type="button" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
+  </div>
   <span id="ammo">CARGANDO G2 COMBAT...</span>
 </div>
 <div id="damageFlash" aria-hidden="true"></div>
@@ -624,6 +706,25 @@ button{font:inherit;cursor:pointer}
   }
  }
  function ui(){
+  // iOS: las pulsaciones repetidas y los gestos táctiles no deben ampliar Safari.
+  // Evitar el gesto por defecto solo dentro de los controles del juego.
+  const gameTouchTargets=[get("fire"),get("jump"),get("sprint"),get("joy"),get("lookzone")];
+  for(const el of gameTouchTargets){
+   for(const eventName of ["touchstart","touchmove","touchend","touchcancel"]){
+    el.addEventListener(eventName,e=>{if(running&&e.cancelable)e.preventDefault()},{passive:false});
+   }
+   el.addEventListener("dblclick",e=>e.preventDefault());
+   el.addEventListener("contextmenu",e=>e.preventDefault());
+  }
+  // Safari incluye gestos de zoom (doble toque/pellizco) pese a user-scalable=no.
+  for(const eventName of ["gesturestart","gesturechange","gestureend"]){
+   document.addEventListener(eventName,e=>{
+    if(running&&e.cancelable)e.preventDefault();
+   },{passive:false});
+  }
+  document.addEventListener("dblclick",e=>{
+   if(running&&e.cancelable)e.preventDefault();
+  },{passive:false});
   get("loading").hidden=true;
   const start=()=>{get("menu").hidden=true;get("hud").hidden=false;running=true;engine.resize();drawRadar();tip("TOCA Y DESLIZA PARA EXPLORAR");};
   const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
