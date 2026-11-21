@@ -475,7 +475,7 @@ button{font:inherit;cursor:pointer}
    mount.parent=camera;
    mount.position.set(.43,-.58,1.05);
    mount.scaling.setAll(3.7);
-   mount.metadata={restZ:1.05,restY:-.58};
+   mount.metadata={restX:.43,restZ:1.05,restY:-.58};
    const steel=mat("G2 carbon steel","#515d67"),
          black=mat("G2 matte black","#181d24"),
          grip=mat("G2 polymer grip","#252a2d"),
@@ -629,7 +629,7 @@ button{font:inherit;cursor:pointer}
  }
  function respawnPlayer(){
   camera.position.set(-36,1.78,0);camera.rotation.set(0,Math.PI/2,0);
-  vertical=0;jumpV=0;recoil=0;runHeld=false;joy.x=joy.y=0;keys.clear();
+  vertical=0;jumpV=0;recoil=0;landingJolt=0;motionBlend=0;lookSwayX=lookSwayY=0;runHeld=false;joy.x=joy.y=0;keys.clear();
   get("knob").style.transform="translate(0,0)";
   playerHealth=100;dead=false;get("healthValue").textContent="100";
   get("healthFill").style.width="100%";get("healthFill").style.background="linear-gradient(90deg,#44d9a0,#a8ffb5)";
@@ -717,16 +717,29 @@ button{font:inherit;cursor:pointer}
   if(!collision(camera.position.x,camera.position.z+mz))camera.position.z+=mz;
   if(jumpV!==0||vertical>0){
    vertical+=jumpV*dt;jumpV-=18.3*dt;
-   if(vertical<=0){vertical=0;jumpV=0}
+   if(vertical<=0){landingJolt=jumpV<0?-.10:landingJolt;vertical=0;jumpV=0}
   }
-  const moveAmount=Math.min(1,Math.hypot(mx,mz)*8);
-  const bob=Math.sin(elapsed*12)*(moveAmount>.05?.027*moveAmount:0);
-  camera.position.y=1.78+vertical+bob;
-  if(weapon) {
-   recoil=Math.max(0,recoil-5*dt);
-   const restZ=weapon.metadata?.restZ??0,restY=weapon.metadata?.restY??0;
-   weapon.position.z=restZ-recoil*.20;
-   weapon.position.y=restY+Math.sin(elapsed*10)*.018*moveAmount;
+  const movement=Math.min(1,Math.hypot(left,front)/norm);
+  motionBlend+=(movement-motionBlend)*Math.min(1,dt*8);
+  const step=elapsed*(sprint?15.5:11);
+  const bob=Math.sin(step)*.042*motionBlend;
+  const sideSway=Math.cos(step*.5)*.025*motionBlend;
+  landingJolt+=(0-landingJolt)*Math.min(1,dt*12);
+  camera.position.y=1.78+vertical+bob+landingJolt;
+  camera.rotation.z+=((-left/norm)*.028*motionBlend-camera.rotation.z)*Math.min(1,dt*8);
+  const desiredFov=sprint&&movement>.25?1.255:1.19;
+  camera.fov+=(desiredFov-camera.fov)*Math.min(1,dt*4.5);
+  lookSwayX+=(0-lookSwayX)*Math.min(1,dt*8);
+  lookSwayY+=(0-lookSwayY)*Math.min(1,dt*8);
+  if(weapon){
+   recoil=Math.max(0,recoil-4.9*dt);
+   const restX=weapon.metadata?.restX??0,restZ=weapon.metadata?.restZ??0,restY=weapon.metadata?.restY??0;
+   weapon.position.x=restX-lookSwayX*.18+sideSway*.9;
+   weapon.position.z=restZ-recoil*.23+Math.cos(step)*.017*motionBlend;
+   weapon.position.y=restY+Math.abs(Math.sin(step))*.03*motionBlend+landingJolt*.65-lookSwayY*.12;
+   weapon.rotation.x=-recoil*.18-lookSwayY*.20;
+   weapon.rotation.z=-Math.sin(step*.5)*.018*motionBlend-lookSwayX*.15;
+   weapon.rotation.y=-lookSwayX*.14;
   }
   if(fireCooldown>0)fireCooldown-=dt;
   updateBots(dt);
@@ -841,6 +854,8 @@ button{font:inherit;cursor:pointer}
    const dx=e.clientX-lastLook.x,dy=e.clientY-lastLook.y;
    camera.rotation.y+=dx*.0047;
    camera.rotation.x=Math.max(-1.13,Math.min(1.13,camera.rotation.x+dy*.0036));
+   lookSwayX=Math.max(-.22,Math.min(.22,lookSwayX+dx*.0035));
+   lookSwayY=Math.max(-.20,Math.min(.20,lookSwayY+dy*.003));
    lastLook={x:e.clientX,y:e.clientY};
   });
   function stopLook(e){if(e.pointerId===lookingId){lookingId=null;lastLook=null}}
@@ -876,6 +891,8 @@ button{font:inherit;cursor:pointer}
    if(document.pointerLockElement!==canvas||!running)return;
    camera.rotation.y+=e.movementX*.0022;
    camera.rotation.x=Math.max(-1.13,Math.min(1.13,camera.rotation.x+e.movementY*.0022));
+   lookSwayX=Math.max(-.22,Math.min(.22,lookSwayX+e.movementX*.002));
+   lookSwayY=Math.max(-.20,Math.min(.20,lookSwayY+e.movementY*.002));
   });
   canvas.addEventListener("mousedown",e=>{if(e.button===0&&running)shoot()});
   drawRadar();
