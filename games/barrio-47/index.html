@@ -588,7 +588,7 @@ button{font:inherit;cursor:pointer}
    pos=valid.length?valid[Math.floor(Math.random()*valid.length)]:botSpawnPoints[bot.index];
   }
   bot.root.position.set(pos[0],0,pos[1]);bot.root.rotation.y=0;
-  bot.hp=3;bot.alive=true;bot.respawnIn=0;bot.shotIn=2+Math.random()*1.5;bot.root.setEnabled(true);
+  bot.hp=3;bot.alive=true;bot.respawnIn=0;bot.shotIn=2+Math.random()*1.5;bot.flipIn=2+Math.random()*3;bot.moveBlend=0;bot.hitReact=0;bot.attackPulse=0;bot.root.setEnabled(true);
  }
  function canEnemySeePlayer(bot){
   const from=v(bot.root.position.x,1.54,bot.root.position.z),to=camera.position.clone();
@@ -605,6 +605,11 @@ button{font:inherit;cursor:pointer}
   setTimeout(()=>{if(!streak.isDisposed())streak.dispose()},120);
   const speed=Math.hypot(joy.x,joy.y);
   const accuracy=Math.max(.40,.75-speed*.12-(vertical>.25?.18:0));
+  if(bot.muzzle){
+   bot.muzzle.setEnabled(true);
+   setTimeout(()=>{if(bot.muzzle&&!bot.muzzle.isDisposed())bot.muzzle.setEnabled(false)},90);
+  }
+  bot.attackPulse=.35;
   if(Math.random()<accuracy)damagePlayer(12);
  }
  function damagePlayer(points){
@@ -634,20 +639,51 @@ button{font:inherit;cursor:pointer}
  }
  function updateBots(dt){
   for(const bot of bots){
-   if(!bot.alive){bot.respawnIn-=dt;if(bot.respawnIn<=0)spawnBot(bot,false);continue}
-   const here=bot.root.position,dx=camera.position.x-here.x,dz=camera.position.z-here.z,dist=Math.hypot(dx,dz);
-   if(dist>.001)bot.root.rotation.y=Math.atan2(dx,dz);
-   if(dist>4.3&&dist<46){
-    const rate=(1.8+bot.index*.13)*dt,ux=dx/dist,uz=dz/dist;
-    const nx=here.x+ux*rate,nz=here.z+uz*rate;
-    if(!collision(nx,nz)){here.x=nx;here.z=nz}
-    else if(!collision(nx,here.z))here.x=nx;
-    else if(!collision(here.x,nz))here.z=nz;
-    else{
-     const sx=here.x-bot.side*uz*rate,sz=here.z+bot.side*ux*rate;
-     if(!collision(sx,sz)){here.x=sx;here.z=sz}else bot.side*=-1;
-    }
+   if(!bot.alive){
+    bot.respawnIn-=dt;
+    if(bot.respawnIn<=0)spawnBot(bot,false);
+    continue;
    }
+   const here=bot.root.position;
+   const dx=camera.position.x-here.x,dz=camera.position.z-here.z;
+   const dist=Math.hypot(dx,dz),inv=dist>.01?1/dist:0;
+   const ux=dx*inv,uz=dz*inv;
+   const desiredAngle=Math.atan2(dx,dz);
+   const angleDelta=Math.atan2(Math.sin(desiredAngle-bot.root.rotation.y),Math.cos(desiredAngle-bot.root.rotation.y));
+   bot.root.rotation.y+=angleDelta*Math.min(1,dt*6);
+   bot.flipIn-=dt;
+   if(bot.flipIn<=0){bot.side*=-1;bot.flipIn=2+Math.random()*3.5}
+   const lastX=here.x,lastZ=here.z;
+   if(dist<45&&dist>.5){
+    // Pursue from afar, strafe near the player, and retreat to avoid stacking.
+    let forward=dist>10?1:(dist<4?-0.65:.05);
+    const side=dist<22?bot.side*.9:.20*bot.side;
+    let movX=ux*forward-uz*side,movZ=uz*forward+ux*side;
+    const n=Math.max(1,Math.hypot(movX,movZ));movX/=n;movZ/=n;
+    const rate=(dist<13?2.25:1.9+bot.index*.14)*dt;
+    const nx=here.x+movX*rate,nz=here.z+movZ*rate;
+    const neighborClear=(x,z)=>bots.every(other=>other===bot||!other.alive||Math.hypot(other.root.position.x-x,other.root.position.z-z)>1.15);
+    if(!collision(nx,nz)&&neighborClear(nx,nz)){here.x=nx;here.z=nz}
+    else if(!collision(nx,here.z)&&neighborClear(nx,here.z))here.x=nx;
+    else if(!collision(here.x,nz)&&neighborClear(here.x,nz))here.z=nz;
+    else bot.side*=-1;
+   }
+   const motion=Math.hypot(here.x-lastX,here.z-lastZ)>dt*.3?1:0;
+   bot.moveBlend+=(motion-bot.moveBlend)*Math.min(1,dt*9);
+   bot.pace+=dt*(motion?10:2.0);
+   bot.hitReact=Math.max(0,bot.hitReact-dt*2.8);
+   bot.attackPulse=Math.max(0,bot.attackPulse-dt*2.2);
+   const stride=Math.sin(bot.pace),wobble=Math.abs(Math.cos(bot.pace));
+   bot.leftLeg.rotation.x=stride*.58*bot.moveBlend;
+   bot.rightLeg.rotation.x=-stride*.58*bot.moveBlend;
+   bot.leftArm.rotation.x=-.15-stride*.35*bot.moveBlend;
+   bot.rightArm.rotation.x=-.36+stride*.18*bot.moveBlend-bot.attackPulse*.5;
+   bot.torso.position.y=1.19+wobble*.055*bot.moveBlend+Math.sin(elapsed*1.9+bot.index)*.008;
+   bot.torso.rotation.z=-stride*.042*bot.moveBlend+bot.hitReact*(bot.side>0?.15:-.15);
+   bot.torso.rotation.x=bot.attackPulse*.11;
+   bot.head.rotation.y=Math.sin(elapsed*1.45+bot.index)*.055;
+   bot.head.rotation.x=Math.sin(elapsed*.87+bot.index)*.025;
+   bot.gun.rotation.x=-bot.attackPulse*.23;
    bot.shotIn-=dt;
    if(dist<24&&dist>2.2&&bot.shotIn<=0){
     bot.shotIn=1.5+Math.random()*1.35;
@@ -713,7 +749,7 @@ button{font:inherit;cursor:pointer}
   if(hit&&hit.hit&&hit.pickedMesh&&hit.pickedMesh.metadata&&Number.isInteger(hit.pickedMesh.metadata.botIndex)){
    const bot=bots[hit.pickedMesh.metadata.botIndex];
    if(bot&&bot.alive){
-    bot.hp--;onHitFlash();
+    bot.hp--;bot.hitReact=.35;onHitFlash();
     if(bot.hp<=0){
      bot.alive=false;bot.root.setEnabled(false);bot.respawnIn=6.5;
      kills++;get("kills").textContent=String(kills).padStart(2,"0");tip("+1 BAJA · ENEMIGO ELIMINADO");
