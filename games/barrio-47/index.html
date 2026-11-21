@@ -199,7 +199,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 02.2</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 03</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -246,12 +246,12 @@ button{font:inherit;cursor:pointer}
  if(!window.BABYLON){fail("No se cargó Babylon.js. Comprueba tu conexión.");return;}
  const B=window.BABYLON;
  let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0,playerHealth=100,kills=0,dead=false,damageFlashTimer=0;
- const canvas=get("world"), colliders=[],targets=[],bots=[],keys=new Set();
+ const canvas=get("world"), colliders=[],targets=[],bots=[],foliage=[],ambientMotion=[],keys=new Set();
  const WORLD={minX:-45,maxX:45,minZ:-36,maxZ:36};
- let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0;
+ let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0,lookSwayX=0,lookSwayY=0,landingJolt=0,motionBlend=0,qualityScale=.90,qualityTimer=0,slowFrames=0,fastFrames=0;
  const colors={
-  grass:"#567f65",asphalt:"#3b4b60",road:"#40536a",white:"#deedee",yellow:"#ffdb8e",
-  walk:"#aabac0",blue:"#4796b9",blueD:"#235b83",orange:"#df8259",orangeD:"#aa563c",
+  grass:"#4b8062",asphalt:"#33465a",road:"#35485c",white:"#edf2ea",yellow:"#eac674",
+  walk:"#8c9ba5",blue:"#367ca8",blueD:"#20466f",orange:"#cb7452",orangeD:"#9c4c37",
   cream:"#e7e1cb",trim:"#243e52",glass:"#294d65",fence:"#7b9c9a",
   teal:"#38cbc6",lime:"#d1f86c",metal:"#879fae",bus:"#e9d9b8",brick:"#c46b55"
  };
@@ -390,16 +390,16 @@ button{font:inherit;cursor:pointer}
  }
  function buildScene(){
   scene=new B.Scene(engine);
-  scene.clearColor=new B.Color4(.66,.80,.91,1);
-  scene.ambientColor=color("#718a98");
+  scene.clearColor=new B.Color4(.54,.71,.87,1);
+  scene.ambientColor=color("#607988");
   scene.fogMode=B.Scene.FOGMODE_LINEAR;
-  scene.fogStart=58;scene.fogEnd=138;scene.fogColor=color("#a2c4d5");
+  scene.fogStart=87;scene.fogEnd=175;scene.fogColor=color("#8fb6d4");
   const hemi=new B.HemisphericLight("sunfill",v(.1,1,.1),scene);
-  hemi.intensity=.85;hemi.groundColor=color("#6b8291");
+  hemi.intensity=.67;hemi.groundColor=color("#647f72");
   const sunlight=new B.DirectionalLight("sun",v(-.5,-1,-.3),scene);
-  sunlight.position=v(-30,55,-28);sunlight.intensity=1.18;
+  sunlight.position=v(-30,55,-28);sunlight.intensity=1.06;
   mats={
-   grass:mat("grass",colors.grass),grass2:mat("leaves","#3b7568"),
+   grass:mat("grass",colors.grass),grass2:mat("leaves","#34684f"),
    sand:mat("sand","#9d9875"),asphalt:mat("road",colors.road),
    yellow:mat("yellow",colors.yellow),white:mat("white",colors.white),
    walk:mat("walk",colors.walk),blue:mat("blue",colors.blue),blueD:mat("dark blue",colors.blueD),
@@ -800,13 +800,32 @@ button{font:inherit;cursor:pointer}
  }
  try{
   engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:false},true);
-  engine.setHardwareScalingLevel(Math.max(1,Math.min(2,window.devicePixelRatio/1.5)));
+  // Render near native CSS resolution on high-density iPhone screens.
+  qualityScale=window.devicePixelRatio>=2?.90:1;
+  engine.setHardwareScalingLevel(qualityScale);
   buildScene();
   ui();
   engine.runRenderLoop(()=>{
    const dt=engine.getDeltaTime()/1000;
    update(dt);
    scene.render();
+   if(running){
+    qualityTimer+=dt;
+    if(qualityTimer>2.3){
+     const fps=engine.getFps();
+     if(fps<36){slowFrames++;fastFrames=0}
+     else if(fps>55){fastFrames++;slowFrames=0}
+     else{slowFrames=0;fastFrames=0}
+     if(slowFrames>=2&&qualityScale<1.18){
+      qualityScale=Math.min(1.18,qualityScale+.09);
+      engine.setHardwareScalingLevel(qualityScale);slowFrames=0;
+     }else if(fastFrames>=3&&qualityScale>.82){
+      qualityScale=Math.max(.82,qualityScale-.04);
+      engine.setHardwareScalingLevel(qualityScale);fastFrames=0;
+     }
+     qualityTimer=0;
+    }
+   }
   });
   window.addEventListener("resize",()=>engine.resize());
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&running)get("pause").click();});
