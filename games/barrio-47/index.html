@@ -106,7 +106,7 @@ button{font:inherit;cursor:pointer}
   <button id="sprint" aria-label="Correr">CORRER</button>
   <button id="jump" aria-label="Saltar">SALTAR</button>
   <button id="fire" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
-  <span id="ammo">BLASTER / ∞</span>
+  <span id="ammo">CARGANDO G2 COMBAT...</span>
 </div>
 <div id="menu">
  <div class="menu-card">
@@ -118,7 +118,7 @@ button{font:inherit;cursor:pointer}
   <div class="guide">
    <div><b>◉ Dedo izquierdo</b>Joystick para caminar</div>
    <div><b>↗ Dedo derecho</b>Desliza para mirar</div>
-   <div><b>⌖ DISPARAR</b>Apunta a los drones brillantes</div>
+   <div><b>⌖ DISPARAR</b>Practica con la pistola G2 Combat</div>
    <div><b>⇧ SALTAR / CORRER</b>Muévete por el escenario</div>
   </div>
   <p class="menu-note">Mejor en horizontal. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Primera versión de prueba: no incluye multijugador ni enemigos que disparen.</p>
@@ -126,6 +126,7 @@ button{font:inherit;cursor:pointer}
 </div>
 <div id="fatal"><h2>No se pudo iniciar el motor 3D</h2><p id="fatalMsg"></p><p>Prueba abrir la página con Safari y conexión a internet. Este prototipo utiliza Babylon.js para mostrar gráficos 3D.</p></div>
 <script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 <script>
 (function(){
  "use strict";
@@ -133,7 +134,7 @@ button{font:inherit;cursor:pointer}
  function fail(message){get("loading").hidden=true;get("fatal").style.display="block";get("fatalMsg").textContent=message;}
  if(!window.BABYLON){fail("No se cargó Babylon.js. Comprueba tu conexión.");return;}
  const B=window.BABYLON;
- let engine,scene,camera,weapon, running=false,score=0,peekTimer=0, elapsed=0;
+ let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0;
  const canvas=get("world"), colliders=[],targets=[],keys=new Set();
  const WORLD={minX:-45,maxX:45,minZ:-36,maxZ:36};
  let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0;
@@ -334,6 +335,7 @@ button{font:inherit;cursor:pointer}
   camera.rotation.y=Math.PI/2;
   scene.activeCamera=camera;
   makeWeapon();
+  loadG2Pistol();
  }
  function makeWeapon(){
   weapon=new B.TransformNode("weapon",scene);weapon.parent=camera;
@@ -347,6 +349,56 @@ button{font:inherit;cursor:pointer}
   part("blaster glow",.40,-.235,1.31,.12,.025,.25,glow);
   part("blaster handle",.43,-.54,.91,.12,.33,.16,gunMetal);
   part("blaster sight",.40,-.21,1.04,.05,.10,.18,mats.lime);
+ }
+ async function loadG2Pistol(){
+  // The user's original Blender OBJ is bundled locally: no paid or third-party model URL.
+  // Keep the lightweight practice blaster visible until the real pistol finishes loading.
+  try{
+   if(!B.SceneLoader || !B.SceneLoader.ImportMeshAsync)throw new Error("3D file importer unavailable");
+   const result=await B.SceneLoader.ImportMeshAsync("","./assets/","G2-Combat.obj",scene);
+   const meshes=result.meshes.filter(mesh=>mesh instanceof B.Mesh && mesh.getTotalVertices()>0);
+   if(meshes.length<4)throw new Error("The pistol file contains no usable geometry");
+   const oldWeapon=weapon;
+   const mount=new B.TransformNode("G2 Combat - first person mount",scene);
+   mount.parent=camera;
+   mount.position.set(.43,-.58,1.05);
+   mount.scaling.setAll(3.7);
+   mount.metadata={restZ:1.05,restY:-.58};
+   const steel=mat("G2 carbon steel","#515d67"),
+         black=mat("G2 matte black","#181d24"),
+         grip=mat("G2 polymer grip","#252a2d"),
+         highlight=mat("G2 machined parts","#8b9396"),
+         brass=mat("G2 cartridges","#b79a50");
+   steel.specularColor=color("#9eabb5");
+   black.specularColor=color("#3d4247");
+   highlight.specularColor=color("#bac5d0");
+   brass.specularColor=color("#c9b574");
+   for(const mesh of meshes){
+    const name=mesh.name.toLowerCase();
+    mesh.parent=mount;
+    mesh.isPickable=false; // Shots must pass through the held weapon toward the targets.
+    mesh.material=/bullet/.test(name)?brass
+       :/slide|barrel/.test(name)?steel
+       :/trigger|safety|lock|hammer|release|loader/.test(name)?highlight
+       :/magazine/.test(name)?black:grip;
+    mesh.alwaysSelectAsActiveMesh=true;
+   }
+   // A tiny muzzle flash is shown for 55 ms after every training shot.
+   muzzleFlash=B.MeshBuilder.CreateSphere("G2 muzzle flash",{diameter:.034,segments:8},scene);
+   muzzleFlash.parent=mount;
+   muzzleFlash.position.set(0,.058,.115);
+   const flashMat=mat("G2 muzzle glow","#fff2bf","#ffa126");
+   muzzleFlash.material=flashMat;muzzleFlash.isPickable=false;muzzleFlash.setEnabled(false);
+   weapon=mount;
+   oldWeapon.dispose(false,true);
+   get("ammo").textContent="G2 COMBAT / ∞";
+   if(running)tip("G2 COMBAT · ARMA EQUIPADA");
+   console.info("Barrio 47: G2 Combat 3D pistol loaded",meshes.length,"meshes");
+  }catch(err){
+   get("ammo").textContent="BLASTER / ∞";
+   console.warn("Barrio 47: using fallback practice blaster",err);
+   if(running)tip("ARMA PROVISIONAL · MODELO G2 NO DISPONIBLE");
+  }
  }
  function collision(x,z){
   if(x<WORLD.minX+.7||x>WORLD.maxX-.7||z<WORLD.minZ+.7||z>WORLD.maxZ-.7)return true;
@@ -381,8 +433,9 @@ button{font:inherit;cursor:pointer}
   camera.position.y=1.78+vertical+bob;
   if(weapon) {
    recoil=Math.max(0,recoil-5*dt);
-   weapon.position.z=-recoil*.20;
-   weapon.position.y=Math.sin(elapsed*10)*.018*moveAmount;
+   const restZ=weapon.metadata?.restZ??0,restY=weapon.metadata?.restY??0;
+   weapon.position.z=restZ-recoil*.20;
+   weapon.position.y=restY+Math.sin(elapsed*10)*.018*moveAmount;
   }
   if(fireCooldown>0)fireCooldown-=dt;
   if(Math.floor(elapsed*8)!==Math.floor((elapsed-dt)*8))drawRadar();
@@ -398,6 +451,7 @@ button{font:inherit;cursor:pointer}
  function shoot(){
   if(!running||fireCooldown>0)return;
   fireCooldown=.17;recoil=.48;
+  if(muzzleFlash){muzzleFlash.setEnabled(true);setTimeout(()=>{if(muzzleFlash&&!muzzleFlash.isDisposed())muzzleFlash.setEnabled(false)},55);}
   const ray=camera.getForwardRay(100);
   const hit=scene.pickWithRay(ray,mesh=>mesh.isPickable===true);
   if(hit&&hit.hit&&hit.pickedMesh&&hit.pickedMesh.metadata&&hit.pickedMesh.metadata.target){
