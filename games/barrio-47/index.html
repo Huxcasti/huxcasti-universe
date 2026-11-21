@@ -155,7 +155,7 @@ button{font:inherit;cursor:pointer}
   const mesh=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
   mesh.position.set(x,y,z);mesh.material=material;
   mesh.isPickable=!!solid;
-  if(solid)colliders.push({x1:x-w/2,x2:x+w/2,z1:z-d/2,z2:z+d/2});
+  if(solid && y-h/2<1.90 && y+h/2>0.75)colliders.push({x1:x-w/2,x2:x+w/2,z1:z-d/2,z2:z+d/2});
   return mesh;
  }
  function plane(name,x,y,z,w,d,material){
@@ -429,7 +429,7 @@ button{font:inherit;cursor:pointer}
   }
   if(camera){
    const x=px(camera.position.x),y=pz(camera.position.z),a=camera.rotation.y;
-   ctx.save();ctx.translate(x,y);ctx.rotate(-a);
+   ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI-a);
    ctx.fillStyle="#5ae2ff";ctx.beginPath();ctx.moveTo(0,9);ctx.lineTo(-5,-5);ctx.lineTo(5,-5);ctx.closePath();ctx.fill();
    ctx.restore();
   }
