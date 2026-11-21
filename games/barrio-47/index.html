@@ -408,7 +408,7 @@ button{font:inherit;cursor:pointer}
    fence:mat("fence",colors.fence),teal:mat("teal",colors.teal),lime:mat("lime",colors.lime,"#6d8d35"),
    metal:mat("metal",colors.metal),bus:mat("bus",colors.bus),brick:mat("brick",colors.brick),
    roof:mat("roof","#20394c"),rubber:mat("rubber","#131c27"),lamp:mat("lamp","#f5f9df","#4c5330"),
-   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("enemy armor","#a93849"),enemyDark:mat("enemy armor details","#252e3d"),enemyFace:mat("enemy visor","#ff8974","#7a3024")
+   wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("tactical red armor","#973c45"),enemyDark:mat("charcoal armor","#202e3a"),enemyFace:mat("helmet visor","#dd8370","#4c241f"),enemyFabric:mat("tactical fabric","#586c65"),enemyPlate:mat("armor plate","#364653"),enemyBoot:mat("combat boot","#161c25"),enemySkin:mat("skin","#bc947b"),enemyTrim:mat("team insignia","#d8c77c"),enemyMuzzle:mat("bot flash","#ffcd79","#ff672a"),botShadow:mat("enemy shadow","#15251f")
   };
   plane("main grass",0,-.06,0,96,77,mats.grass);
   plane("road",0,.011,0,94,15.8,mats.asphalt);
@@ -514,24 +514,70 @@ button{font:inherit;cursor:pointer}
  }
  // Local enemies for solo play, with simple movement and shooting.
  const botSpawnPoints=[[-24,11],[-7,-11],[20,9],[-34,23],[8,-23],[36,-12],[-14,12],[33,16]];
- function botPiece(bot,name,x,y,z,w,h,d,material,canShoot){
+
+ // Procedural opponent meshes use joint pivots for convincing running animations.
+ function botPiece(bot,name,x,y,z,w,h,d,material,pickable,parent){
   const mesh=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);
-  mesh.parent=bot.root;mesh.position.set(x,y,z);mesh.material=material;mesh.isPickable=!!canShoot;
-  if(canShoot)mesh.metadata={botIndex:bot.index};
+  mesh.parent=parent||bot.root;mesh.position.set(x,y,z);mesh.material=material;
+  mesh.isPickable=!!pickable;
+  if(pickable)mesh.metadata={botIndex:bot.index};
   return mesh;
  }
+ function botNode(name,parent,x,y,z){
+  const node=new B.TransformNode(name,scene);
+  node.parent=parent;node.position.set(x,y,z);return node;
+ }
  function createBot(index){
-  const bot={index,root:new B.TransformNode("enemy-"+index,scene),hp:3,alive:false,respawnIn:0,shotIn:2.5+index,side:index%2===0?1:-1};
-  botPiece(bot,"enemy-torso",0,1.18,0,.70,.83,.35,mats.enemy,true);
-  botPiece(bot,"enemy-vest",0,1.18,.195,.56,.57,.05,mats.enemyDark,false);
-  const head=B.MeshBuilder.CreateSphere("enemy-head",{diameter:.44,segments:8},scene);
-  head.parent=bot.root;head.position.y=1.78;head.material=mats.enemyDark;head.isPickable=true;head.metadata={botIndex:index};
-  botPiece(bot,"enemy-visor",0,1.80,.215,.34,.16,.04,mats.enemyFace,false);
-  for(const x of [-.45,.45]){
-   botPiece(bot,"enemy-arm",x,1.18,.02,.18,.65,.23,mats.enemyDark,false);
-   botPiece(bot,"enemy-leg",x*.55,.49,0,.22,.87,.27,mats.enemyDark,false);
+  const bot={index,root:new B.TransformNode("opponent-"+index,scene),hp:3,alive:false,respawnIn:0,shotIn:2.5+index,side:index%2===0?1:-1,flipIn:3,pace:0,moveBlend:0,hitReact:0,attackPulse:0};
+  bot.torso=botNode("bot-body",bot.root,0,1.19,0);
+  const cloth=index===1?mats.enemyFabric:mats.enemy;
+  botPiece(bot,"body",0,0,0,.70,.82,.38,cloth,true,bot.torso);
+  botPiece(bot,"armor-vest",0,.01,.245,.60,.67,.12,mats.enemyPlate,true,bot.torso);
+  botPiece(bot,"waist-belt",0,-.39,.04,.77,.16,.45,mats.enemyDark,true,bot.torso);
+  botPiece(bot,"radio",-.34,.16,.27,.16,.27,.12,mats.enemyBoot,false,bot.torso);
+  for(const side of [-1,1]){
+   botPiece(bot,"magazine-pouch",side*.19,-.24,.32,.16,.20,.10,mats.enemyFabric,false,bot.torso);
+   botPiece(bot,"shoulder-armor",side*.40,.25,0,.27,.21,.43,mats.enemyPlate,true,bot.torso);
   }
-  botPiece(bot,"enemy-training-blaster",.30,1.08,.39,.14,.14,.62,mats.enemyDark,false);
+  bot.head=botNode("bot-head",bot.torso,0,.61,0);
+  const face=B.MeshBuilder.CreateSphere("soldier-face",{diameter:.39,segments:12},scene);
+  face.parent=bot.head;face.position.set(0,-.06,.02);face.material=mats.enemySkin;
+  face.isPickable=true;face.metadata={botIndex:index};
+  const helmet=B.MeshBuilder.CreateSphere("tactical-helmet",{diameter:.54,segments:12},scene);
+  helmet.parent=bot.head;helmet.position.set(0,.12,-.025);
+  helmet.scaling.set(1.05,.72,1.06);helmet.material=mats.enemyDark;
+  helmet.isPickable=true;helmet.metadata={botIndex:index};
+  botPiece(bot,"helmet-rim",0,.02,.20,.50,.105,.22,mats.enemyPlate,false,bot.head);
+  botPiece(bot,"visor",0,-.02,.225,.37,.135,.095,mats.enemyFace,false,bot.head);
+  botPiece(bot,"visor-reflection",-.08,-.004,.279,.10,.027,.014,mats.enemyTrim,false,bot.head);
+  botPiece(bot,"face-cover",0,-.19,.205,.35,.17,.10,mats.enemyFabric,true,bot.head);
+  bot.leftArm=botNode("left-shoulder",bot.torso,-.48,.23,0);
+  bot.rightArm=botNode("right-shoulder",bot.torso,.48,.23,0);
+  for(const arm of [bot.leftArm,bot.rightArm]){
+   botPiece(bot,"combat-sleeve",0,-.20,0,.235,.50,.25,cloth,true,arm);
+   botPiece(bot,"arm-pad",0,-.25,.15,.245,.26,.08,mats.enemyPlate,false,arm);
+   const glove=B.MeshBuilder.CreateSphere("combat-glove",{diameter:.22,segments:8},scene);
+   glove.parent=arm;glove.position.set(0,-.47,.015);glove.material=mats.enemyBoot;
+   glove.isPickable=true;glove.metadata={botIndex:index};
+  }
+  bot.leftLeg=botNode("left-hip",bot.root,-.20,.91,0);
+  bot.rightLeg=botNode("right-hip",bot.root,.20,.91,0);
+  for(const leg of [bot.leftLeg,bot.rightLeg]){
+   botPiece(bot,"combat-trousers",0,-.37,0,.26,.69,.34,mats.enemyFabric,true,leg);
+   botPiece(bot,"knee-guard",0,-.40,.195,.23,.25,.065,mats.enemyPlate,false,leg);
+   botPiece(bot,"combat-boots",0,-.76,.09,.28,.24,.48,mats.enemyBoot,true,leg);
+  }
+  bot.gun=botNode("enemy-rifle",bot.torso,.24,-.01,.27);
+  botPiece(bot,"rifle-stock",.05,-.10,.08,.15,.21,.45,mats.enemyDark,false,bot.gun);
+  botPiece(bot,"rifle-receiver",.05,-.07,.36,.19,.19,.43,mats.enemyPlate,false,bot.gun);
+  botPiece(bot,"rifle-barrel",.05,-.048,.78,.105,.105,.55,mats.enemyBoot,false,bot.gun);
+  botPiece(bot,"rifle-sight",.05,.085,.42,.065,.10,.13,mats.enemyTrim,false,bot.gun);
+  bot.muzzle=B.MeshBuilder.CreateSphere("bot-muzzle",{diameter:.26,segments:8},scene);
+  bot.muzzle.parent=bot.gun;bot.muzzle.position.set(.05,-.048,1.06);
+  bot.muzzle.material=mats.enemyMuzzle;bot.muzzle.isPickable=false;bot.muzzle.setEnabled(false);
+  const shadow=B.MeshBuilder.CreateGround("bot-contact-shadow",{width:.84,height:.56},scene);
+  shadow.parent=bot.root;shadow.position.y=.012;shadow.material=mats.botShadow;shadow.isPickable=false;
+  mats.botShadow.alpha=.27;mats.botShadow.disableLighting=true;
   bots.push(bot);spawnBot(bot,true);
  }
  function spawnBot(bot,firstTime){
