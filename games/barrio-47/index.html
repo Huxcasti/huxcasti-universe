@@ -46,7 +46,7 @@ button{font:inherit;cursor:pointer}
 #joy:before{width:1px;top:17px;bottom:17px;left:50%}
 #joy:after{height:1px;left:17px;right:17px;top:50%}
 #knob{position:absolute;left:50%;top:50%;width:57px;height:57px;margin-left:-28.5px;margin-top:-28.5px;border-radius:50%;background:linear-gradient(160deg,#a8e6ff99,#2990bf99);border:2px solid #c4f3ffbb;box-shadow:0 2px 16px #021321a0;pointer-events:none;transform:translate(0,0)}
-#fire,#jump,#sprint{position:absolute;pointer-events:auto;touch-action:none;border:1px solid #bdf7ff79;color:white;font-weight:850;letter-spacing:.05em;display:grid;place-items:center;backdrop-filter:blur(8px);box-shadow:0 5px 16px #08121f66}
+#fire,#jump,#sprint{position:static;pointer-events:auto;touch-action:none;border:1px solid #bdf7ff79;color:white;font-weight:850;letter-spacing:.05em;display:grid;place-items:center;backdrop-filter:blur(8px);box-shadow:0 5px 16px #08121f66}
 #fire{right:calc(24px + env(safe-area-inset-right));bottom:calc(36px + env(safe-area-inset-bottom));width:92px;height:92px;border-radius:50%;background:#f15f41c4;font-size:11px}
 #fire:active,#fire.pressed{background:#ff9f5f}
 #fire .cross{font-size:28px;line-height:1}
@@ -106,83 +106,89 @@ button{font:inherit;cursor:pointer}
 @media(max-width:720px){.bot-card{padding:7px;min-width:56px}.bot-card span{font-size:8px}.bot-card strong{font-size:15px}#healthPanel{top:calc(max(13px,env(safe-area-inset-top)) + 51px);width:127px;padding:7px 9px}}
 @media(max-height:430px){#healthPanel{top:calc(max(10px,env(safe-area-inset-top)) + 47px);width:132px}}
 
-/* ALFA 02.1 · Disposición estable y sin superposiciones en pantalla horizontal */
+/* ALFA 02.2 · Botones separados, distribuidos mediante flexbox */
 #combatControls{
  position:absolute;
  right:calc(26px + env(safe-area-inset-right));
- bottom:calc(40px + env(safe-area-inset-bottom));
- display:grid;
- grid-template-columns:76px 92px;
- grid-template-rows:52px 52px;
- column-gap:23px;
- row-gap:15px;
- align-items:stretch;
+ bottom:calc(41px + env(safe-area-inset-bottom));
+ display:flex;
+ flex-direction:row;
+ justify-content:flex-end;
+ align-items:center;
+ gap:28px;
+ width:max-content;
  pointer-events:none;
  touch-action:none;
  isolation:isolate;
 }
-#combatControls #fire,
-#combatControls #jump,
-#combatControls #sprint{
+#moveButtons{
+ display:flex;
+ flex-direction:column;
+ align-items:stretch;
+ justify-content:center;
+ flex:0 0 78px;
+ gap:16px;
+ pointer-events:none;
+ touch-action:none;
+}
+#combatControls #sprint,#combatControls #jump,#combatControls #fire{
  position:static;
  inset:auto;
  margin:0;
- transform:none;
- width:100%;
- height:100%;
+ padding:0;
  min-width:0;
  min-height:0;
+ pointer-events:auto;
  touch-action:none;
  -webkit-touch-callout:none;
  -webkit-user-select:none;
  user-select:none;
  -webkit-tap-highlight-color:transparent;
- pointer-events:auto;
+ flex-shrink:0;
 }
-#combatControls #sprint{grid-column:1;grid-row:1;border-radius:15px;font-size:11px}
-#combatControls #jump{grid-column:1;grid-row:2;border-radius:15px;font-size:11px}
+#combatControls #sprint{
+ width:78px;height:49px;border-radius:15px;
+ background:#115b57cc;font-size:11px;
+}
+#combatControls #jump{
+ width:78px;height:55px;border-radius:16px;
+ background:#0d3d60c9;font-size:11px;
+}
 #combatControls #fire{
- grid-column:2;
- grid-row:1 / span 2;
- width:92px;
- height:92px;
- align-self:center;
- justify-self:center;
- border-radius:50%;
- font-size:11px;
- z-index:2;
+ width:96px;height:96px;border-radius:50%;
+ background:#f15f41c4;font-size:11px;
 }
+#combatControls #fire:active,#combatControls #fire.pressed{background:#ff9f5f}
 #ammo{
- right:calc(30px + env(safe-area-inset-right));
- bottom:calc(13px + env(safe-area-inset-bottom));
- white-space:nowrap;
- pointer-events:none;
+ right:calc(29px + env(safe-area-inset-right));
+ bottom:calc(12px + env(safe-area-inset-bottom));
+ white-space:nowrap;pointer-events:none;
 }
-#hud,#world,#lookzone,#joy,#combatControls{overscroll-behavior:none;touch-action:none;-webkit-touch-callout:none}
+#hud,#world,#lookzone,#joy,#combatControls,#moveButtons{
+ overscroll-behavior:none;touch-action:none;-webkit-touch-callout:none;
+}
 @media(max-height:430px) and (orientation:landscape){
  #combatControls{
-  grid-template-columns:73px 85px;
-  grid-template-rows:46px 46px;
-  column-gap:24px;
-  row-gap:14px;
-  right:calc(27px + env(safe-area-inset-right));
-  bottom:calc(34px + env(safe-area-inset-bottom));
+  right:calc(25px + env(safe-area-inset-right));
+  bottom:calc(31px + env(safe-area-inset-bottom));
+  gap:26px;
  }
- #combatControls #fire{width:85px;height:85px;font-size:10px}
- #combatControls #sprint,#combatControls #jump{font-size:10px}
- #ammo{bottom:calc(9px + env(safe-area-inset-bottom));right:calc(28px + env(safe-area-inset-right))}
+ #moveButtons{flex-basis:73px;gap:13px}
+ #combatControls #sprint{width:73px;height:43px;font-size:10px}
+ #combatControls #jump{width:73px;height:49px;font-size:10px}
+ #combatControls #fire{width:86px;height:86px;font-size:10px}
+ #ammo{right:calc(27px + env(safe-area-inset-right));bottom:calc(9px + env(safe-area-inset-bottom))}
 }
 @media(max-width:720px) and (orientation:portrait){
  #combatControls{
-  grid-template-columns:57px 77px;
-  grid-template-rows:46px 46px;
-  column-gap:16px;
-  row-gap:12px;
   right:calc(14px + env(safe-area-inset-right));
-  bottom:calc(44px + env(safe-area-inset-bottom));
+  bottom:calc(43px + env(safe-area-inset-bottom));
+  gap:16px;
  }
- #combatControls #fire{width:77px;height:77px;font-size:9px}
- #combatControls #sprint,#combatControls #jump{font-size:9px}
+ #moveButtons{flex-basis:58px;gap:11px}
+ #combatControls #sprint{width:58px;height:43px;font-size:9px}
+ #combatControls #jump{width:58px;height:51px;font-size:10px}
+ #combatControls #fire{width:78px;height:78px;font-size:9px}
  #ammo{right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
 }
 </style>
@@ -193,7 +199,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 02</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 02.2</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -203,8 +209,10 @@ button{font:inherit;cursor:pointer}
   <div id="hit"></div>
   <div id="joy" aria-label="Joystick de movimiento"><div id="knob"></div></div>
   <div id="combatControls" aria-label="Controles de combate">
-   <button id="sprint" type="button" aria-label="Correr">CORRER</button>
-   <button id="jump" type="button" aria-label="Saltar">SALTAR</button>
+   <div id="moveButtons">
+    <button id="sprint" type="button" aria-label="Correr">CORRER</button>
+    <button id="jump" type="button" aria-label="Saltar">SALTAR</button>
+   </div>
    <button id="fire" type="button" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
   </div>
   <span id="ammo">CARGANDO G2 COMBAT...</span>
@@ -708,7 +716,7 @@ button{font:inherit;cursor:pointer}
  function ui(){
   // iOS: las pulsaciones repetidas y los gestos táctiles no deben ampliar Safari.
   // Evitar el gesto por defecto solo dentro de los controles del juego.
-  const gameTouchTargets=[get("fire"),get("jump"),get("sprint"),get("joy"),get("lookzone")];
+  const gameTouchTargets=[get("fire"),get("jump"),get("sprint"),get("joy"),get("lookzone"),get("combatControls"),get("moveButtons")];
   for(const el of gameTouchTargets){
    for(const eventName of ["touchstart","touchmove","touchend","touchcancel"]){
     el.addEventListener(eventName,e=>{if(running&&e.cancelable)e.preventDefault()},{passive:false});
