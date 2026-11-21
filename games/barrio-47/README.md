@@ -22,6 +22,7 @@ En computadora también funcionan las teclas WASD, Shift, espacio y mouse.
 - Radar 2D con posición del jugador.
 - Cámara en primera persona con joystick y apuntado táctiles.
 - Escena creada con geometría programática y Babylon.js; no se utilizan modelos 3D de pago.
+- Pistola G2 Combat original del usuario (`assets/G2-Combat.obj`), integrada en primera persona: piezas con materiales propios, disparo táctil y fogonazo. Si la descarga falla se mantiene el arma de prueba como respaldo.
 
 ## Lo que falta
 - Enemigos con IA que patrullen y disparen.
