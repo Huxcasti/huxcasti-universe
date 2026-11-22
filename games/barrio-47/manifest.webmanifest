@@ -1,0 +1,13 @@
+{
+  "name": "Barrio 47 — Huxcasti Games",
+  "short_name": "Barrio 47",
+  "description": "FPS táctil en primera persona optimizado para jugar en horizontal.",
+  "id": "/games/barrio-47/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "theme_color": "#091728",
+  "background_color": "#091728",
+  "lang": "es"
+}
