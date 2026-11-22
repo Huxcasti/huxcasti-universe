@@ -200,9 +200,26 @@ button{font:inherit;cursor:pointer}
  #combatControls #fire{width:78px;height:78px;font-size:9px}
  #ammo{right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
 }
+/* Rotate the ENTIRE game including its first menu in portrait on iPhone. */
+#gameViewport{position:fixed;inset:0;width:100vw;height:100vh;width:100dvw;height:100dvh;overflow:hidden;isolation:isolate;touch-action:none;transform-origin:top left}
+@media (orientation:portrait) and (pointer:coarse){
+ #gameViewport{inset:auto;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform:rotate(90deg) translateY(-100%)}
+ #rotationOverlay{display:none!important}
+ #joy{left:15px;bottom:19px;width:103px;height:103px}
+ #combatControls{right:17px;bottom:21px;gap:20px}
+ #moveButtons{flex-basis:68px;gap:12px}
+ #combatControls #sprint{width:68px;height:40px;font-size:10px}
+ #combatControls #jump{width:68px;height:49px;font-size:10px}
+ #combatControls #fire{width:83px;height:83px;font-size:10px}
+ #minimap{width:104px;height:83px}
+ .mark{padding:6px 9px}.score-card{padding:6px 9px}
+ #healthPanel{top:54px;width:126px}
+ #ammo{right:21px;bottom:7px}
+}
 </style>
 </head>
 <body>
+<div id="gameViewport">
 <canvas id="world" aria-label="Videojuego tridimensional de Barrio 47"></canvas>
 <div id="rotationOverlay" role="status" aria-live="polite">
  <div class="rotate-phone" aria-hidden="true"></div>
@@ -246,10 +263,11 @@ button{font:inherit;cursor:pointer}
    <div><b>⌖ DISPARAR</b>Practica con la pistola G2 Combat</div>
    <div><b>⇧ SALTAR / CORRER</b>Muévete por el escenario</div>
   </div>
-  <p class="menu-note">Solo en horizontal. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Versión alfa de prueba: combate contra bots sin multijugador.</p>
+  <p class="menu-note">Pantalla horizontal automática para menú y partida. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Versión alfa de prueba: combate contra bots sin multijugador.</p>
  </div>
 </div>
 <div id="fatal"><h2>No se pudo iniciar el motor 3D</h2><p id="fatalMsg"></p><p>Prueba abrir la página con Safari y conexión a internet. Este prototipo utiliza Babylon.js para mostrar gráficos 3D.</p></div>
+</div><!-- end landscape viewport -->
 <script src="https://cdn.babylonjs.com/babylon.js"></script>
 <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 <script>
@@ -966,34 +984,10 @@ button{font:inherit;cursor:pointer}
    ctx.restore();
   }
  }
- let returnToGameAfterRotate=false;
+ // Landscape layout works even before the first Play tap.
  const portraitGame=()=>window.matchMedia("(orientation: portrait) and (pointer: coarse)").matches;
- function syncOrientation(){
-  if(portraitGame()&&running){
-   returnToGameAfterRotate=true;running=false;runHeld=false;
-   keys.clear();joy.x=joy.y=0;velocityX=velocityZ=0;
-   clearInterval(firingTimer);firingTimer=0;
-   get("fire").classList.remove("pressed");
-   get("knob").style.transform="translate(0,0)";
-  }else if(!portraitGame()&&returnToGameAfterRotate&&!dead){
-   returnToGameAfterRotate=false;running=true;
-  }
-  engine.resize();
- }
- async function tryLandscapeLock(){
-  // Browser support varies: Safari iPhone normally requires physical rotation.
-  try{
-   if(document.documentElement.requestFullscreen&&!document.fullscreenElement){
-    await document.documentElement.requestFullscreen();
-   }
-   if(screen.orientation&&typeof screen.orientation.lock==="function"){
-    await screen.orientation.lock("landscape");
-   }
-  }catch(err){
-   console.info("Orientación: giro físico necesario",err&&err.name);
-  }
-  syncOrientation();
- }
+ function coordinatesForGame(e){return portraitGame()?{x:e.clientY,y:-e.clientX}:{x:e.clientX,y:e.clientY};}
+ function syncOrientation(){engine.resize();if(camera)drawRadar();}
  function ui(){
   // iOS: las pulsaciones repetidas y los gestos táctiles no deben ampliar Safari.
   // Evitar el gesto por defecto solo dentro de los controles del juego.
@@ -1016,9 +1010,8 @@ button{font:inherit;cursor:pointer}
   },{passive:false});
   get("loading").hidden=true;
   const start=()=>{
-   tryLandscapeLock();
    get("menu").hidden=true;get("hud").hidden=false;
-   running=!portraitGame();returnToGameAfterRotate=portraitGame();
+   running=true;
    engine.resize();drawRadar();tip("TOCA Y DESLIZA PARA EXPLORAR");
   };
   const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;velocityX=velocityZ=0;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
@@ -1029,7 +1022,8 @@ button{font:inherit;cursor:pointer}
   let joyId=null;
   function setJoy(e){
    const rect=joyEl.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-   let dx=e.clientX-cx,dy=e.clientY-cy;
+   const sx=e.clientX-cx,sy=e.clientY-cy;
+   let dx=portraitGame()?sy:sx,dy=portraitGame()?-sx:sy;
    const max=rect.width*.35,length=Math.hypot(dx,dy)||1,s=Math.min(1,max/length);
    dx*=s;dy*=s;joy.x=dx/max;joy.y=dy/max;
    knob.style.transform="translate("+dx+"px,"+dy+"px)";
@@ -1039,15 +1033,15 @@ button{font:inherit;cursor:pointer}
   function endJoy(e){if(e.pointerId!==joyId)return;joyId=null;joy.x=joy.y=0;knob.style.transform="translate(0,0)";}
   joyEl.addEventListener("pointerup",endJoy);joyEl.addEventListener("pointercancel",endJoy);
   const look=get("lookzone");
-  look.addEventListener("pointerdown",e=>{if(!running||lookingId!==null)return;lookingId=e.pointerId;lastLook={x:e.clientX,y:e.clientY};look.setPointerCapture(e.pointerId);e.preventDefault();});
+  look.addEventListener("pointerdown",e=>{if(!running||lookingId!==null)return;lookingId=e.pointerId;lastLook=coordinatesForGame(e);look.setPointerCapture(e.pointerId);e.preventDefault();});
   look.addEventListener("pointermove",e=>{
    if(e.pointerId!==lookingId||!lastLook||!running)return;
-   const dx=e.clientX-lastLook.x,dy=e.clientY-lastLook.y;
+   const cursor=coordinatesForGame(e),dx=cursor.x-lastLook.x,dy=cursor.y-lastLook.y;
    camera.rotation.y+=dx*.0047;
    camera.rotation.x=Math.max(-1.13,Math.min(1.13,camera.rotation.x+dy*.0036));
    lookSwayX=Math.max(-.22,Math.min(.22,lookSwayX+dx*.0035));
    lookSwayY=Math.max(-.20,Math.min(.20,lookSwayY+dy*.003));
-   lastLook={x:e.clientX,y:e.clientY};
+   lastLook=cursor;
   });
   function stopLook(e){if(e.pointerId===lookingId){lookingId=null;lastLook=null}}
   look.addEventListener("pointerup",stopLook);look.addEventListener("pointercancel",stopLook);
