@@ -612,7 +612,7 @@ button{font:inherit;cursor:pointer}
   node.parent=parent;node.position.set(x,y,z);return node;
  }
  function createBot(index){
-  const bot={index,root:new B.TransformNode("opponent-"+index,scene),hp:3,alive:false,respawnIn:0,shotIn:2.5+index,side:index%2===0?1:-1,flipIn:3,pace:0,moveBlend:0,hitReact:0,attackPulse:0};
+  const bot={index,root:new B.TransformNode("opponent-"+index,scene),hp:3,alive:false,respawnIn:0,shotIn:2.5+index,side:index%2===0?1:-1,flipIn:3,pace:0,moveBlend:0,hitReact:0,attackPulse:0,visionIn:0,canSee:false,alertIn:0,lastX:0,lastZ:0,aimTime:0,dodgeIn:0,stuckIn:0,patrolIndex:(index*2+3)%botSpawnPoints.length,lean:0};
   bot.torso=botNode("bot-body",bot.root,0,1.19,0);
   const cloth=index===1?mats.enemyFabric:mats.enemy;
   botPiece(bot,"body",0,0,0,.70,.82,.38,cloth,true,bot.torso);
@@ -672,7 +672,7 @@ button{font:inherit;cursor:pointer}
    pos=valid.length?valid[Math.floor(Math.random()*valid.length)]:botSpawnPoints[bot.index];
   }
   bot.root.position.set(pos[0],0,pos[1]);bot.root.rotation.y=0;
-  bot.hp=3;bot.alive=true;bot.respawnIn=0;bot.shotIn=2+Math.random()*1.5;bot.flipIn=2+Math.random()*3;bot.moveBlend=0;bot.hitReact=0;bot.attackPulse=0;bot.root.setEnabled(true);
+  bot.hp=3;bot.alive=true;bot.respawnIn=0;bot.shotIn=2+Math.random()*1.5;bot.flipIn=2+Math.random()*3;bot.moveBlend=0;bot.hitReact=0;bot.attackPulse=0;bot.visionIn=0;bot.canSee=false;bot.alertIn=0;bot.aimTime=0;bot.dodgeIn=0;bot.stuckIn=0;bot.lean=0;bot.lastX=pos[0];bot.lastZ=pos[1];bot.root.setEnabled(true);
  }
  function canEnemySeePlayer(bot){
   const from=v(bot.root.position.x,1.54,bot.root.position.z),to=camera.position.clone();
@@ -730,48 +730,99 @@ button{font:inherit;cursor:pointer}
    }
    const here=bot.root.position;
    const dx=camera.position.x-here.x,dz=camera.position.z-here.z;
-   const dist=Math.hypot(dx,dz),inv=dist>.01?1/dist:0;
+   const dist=Math.hypot(dx,dz),inv=dist>.001?1/dist:0;
    const ux=dx*inv,uz=dz*inv;
-   const desiredAngle=Math.atan2(dx,dz);
-   const angleDelta=Math.atan2(Math.sin(desiredAngle-bot.root.rotation.y),Math.cos(desiredAngle-bot.root.rotation.y));
-   bot.root.rotation.y+=angleDelta*Math.min(1,dt*6);
-   bot.flipIn-=dt;
-   if(bot.flipIn<=0){bot.side*=-1;bot.flipIn=2+Math.random()*3.5}
-   const lastX=here.x,lastZ=here.z;
-   if(dist<45&&dist>.5){
-    // Pursue from afar, strafe near the player, and retreat to avoid stacking.
-    let forward=dist>10?1:(dist<4?-0.65:.05);
-    const side=dist<22?bot.side*.9:.20*bot.side;
-    let movX=ux*forward-uz*side,movZ=uz*forward+ux*side;
-    const n=Math.max(1,Math.hypot(movX,movZ));movX/=n;movZ/=n;
-    const rate=(dist<13?2.25:1.9+bot.index*.14)*dt;
-    const nx=here.x+movX*rate,nz=here.z+movZ*rate;
-    const neighborClear=(x,z)=>bots.every(other=>other===bot||!other.alive||Math.hypot(other.root.position.x-x,other.root.position.z-z)>1.15);
-    if(!collision(nx,nz)&&neighborClear(nx,nz)){here.x=nx;here.z=nz}
-    else if(!collision(nx,here.z)&&neighborClear(nx,here.z))here.x=nx;
-    else if(!collision(here.x,nz)&&neighborClear(here.x,nz))here.z=nz;
-    else bot.side*=-1;
+   // Cache visibility to keep performance stable on mobile.
+   bot.visionIn-=dt;
+   if(bot.visionIn<=0){
+    bot.canSee=dist<34&&canEnemySeePlayer(bot);
+    bot.visionIn=.19+bot.index*.045;
    }
-   const motion=Math.hypot(here.x-lastX,here.z-lastZ)>dt*.3?1:0;
-   bot.moveBlend+=(motion-bot.moveBlend)*Math.min(1,dt*9);
-   bot.pace+=dt*(motion?10:2.0);
-   bot.hitReact=Math.max(0,bot.hitReact-dt*2.8);
-   bot.attackPulse=Math.max(0,bot.attackPulse-dt*2.2);
+   if(bot.canSee){
+    bot.lastX=camera.position.x;bot.lastZ=camera.position.z;
+    bot.alertIn=4.2;bot.aimTime=Math.min(2,bot.aimTime+dt);
+   }else{
+    bot.alertIn=Math.max(0,bot.alertIn-dt);
+    bot.aimTime=Math.max(0,bot.aimTime-dt*1.8);
+   }
+   bot.flipIn-=dt;
+   if(bot.flipIn<=0){bot.side*=-1;bot.flipIn=1.3+Math.random()*2.7;}
+   bot.dodgeIn=Math.max(0,bot.dodgeIn-dt);
+   const alerted=bot.canSee||bot.alertIn>0;
+   const waypoint=botSpawnPoints[bot.patrolIndex];
+   if(!alerted&&Math.hypot(waypoint[0]-here.x,waypoint[1]-here.z)<3.2){
+    bot.patrolIndex=(bot.patrolIndex+1+bot.index%2)%botSpawnPoints.length;
+   }
+   const goal=alerted?[bot.lastX,bot.lastZ]:botSpawnPoints[bot.patrolIndex];
+   const gdx=goal[0]-here.x,gdz=goal[1]-here.z,gd=Math.hypot(gdx,gdz);
+   let movX=0,movZ=0;
+   if(bot.canSee){
+    // Approach at a distance, strafe in combat, and retreat if too close.
+    const forward=dist>13?1:dist<5?-.95:dist<8?-.28:.13;
+    const sideways=(dist<25?(bot.dodgeIn>0?1.45:.86):.22)*bot.side;
+    movX=ux*forward-uz*sideways;
+    movZ=uz*forward+ux*sideways;
+   }else if(gd>1.1){
+    movX=gdx/gd;movZ=gdz/gd;
+   }else if(alerted){
+    movX=-uz*bot.side;movZ=ux*bot.side;
+   }
+   const directionSize=Math.hypot(movX,movZ);
+   if(directionSize>.03){movX/=directionSize;movZ/=directionSize;}
+   const pace=bot.canSee?(dist>12?3.0:2.45):(alerted?2.8:1.58);
+   const step=pace*dt,oldX=here.x,oldZ=here.z;
+   const free=(x,z)=>!collision(x,z)&&
+    Math.hypot(x-camera.position.x,z-camera.position.z)>.92&&
+    bots.every(other=>other===bot||!other.alive||Math.hypot(other.root.position.x-x,other.root.position.z-z)>1.05);
+   if(directionSize>.03){
+    // Steer around vehicles, cover, house walls and other opponents.
+    const base=Math.atan2(movZ,movX);
+    const steer=[0,.48*bot.side,-.48*bot.side,1.0*bot.side,-1.0*bot.side,1.65*bot.side,-1.65*bot.side];
+    let moved=false;
+    for(const turn of steer){
+     const a=base+turn,nx=here.x+Math.cos(a)*step,nz=here.z+Math.sin(a)*step;
+     if(free(nx,nz)){here.x=nx;here.z=nz;moved=true;break;}
+    }
+    if(!moved){
+     if(free(here.x+movX*step,here.z)){here.x+=movX*step;moved=true;}
+     else if(free(here.x,here.z+movZ*step)){here.z+=movZ*step;moved=true;}
+    }
+    if(moved)bot.stuckIn=0;
+    else {
+     bot.stuckIn+=dt;
+     if(bot.stuckIn>.55){
+      bot.side*=-1;bot.stuckIn=0;
+      if(!alerted)bot.patrolIndex=(bot.patrolIndex+2)%botSpawnPoints.length;
+     }
+    }
+   }
+   const traveled=Math.hypot(here.x-oldX,here.z-oldZ);
+   const motion=Math.min(1,traveled/Math.max(.01,step));
+   bot.moveBlend+=(motion-bot.moveBlend)*Math.min(1,dt*8);
+   bot.pace+=dt*(3+pace*3.4)*Math.max(.25,bot.moveBlend);
+   // Face the player while firing, otherwise face the patrol direction.
+   const desiredAngle=bot.canSee?Math.atan2(dx,dz):(traveled>.002?Math.atan2(here.x-oldX,here.z-oldZ):bot.root.rotation.y);
+   const angleDelta=Math.atan2(Math.sin(desiredAngle-bot.root.rotation.y),Math.cos(desiredAngle-bot.root.rotation.y));
+   bot.root.rotation.y+=angleDelta*Math.min(1,dt*(bot.canSee?7:4));
+   bot.hitReact=Math.max(0,bot.hitReact-dt*2.9);
+   bot.attackPulse=Math.max(0,bot.attackPulse-dt*2.4);
    const stride=Math.sin(bot.pace),wobble=Math.abs(Math.cos(bot.pace));
-   bot.leftLeg.rotation.x=stride*.58*bot.moveBlend;
-   bot.rightLeg.rotation.x=-stride*.58*bot.moveBlend;
-   bot.leftArm.rotation.x=-.15-stride*.35*bot.moveBlend;
-   bot.rightArm.rotation.x=-.36+stride*.18*bot.moveBlend-bot.attackPulse*.5;
-   bot.torso.position.y=1.19+wobble*.055*bot.moveBlend+Math.sin(elapsed*1.9+bot.index)*.008;
-   bot.torso.rotation.z=-stride*.042*bot.moveBlend+bot.hitReact*(bot.side>0?.15:-.15);
-   bot.torso.rotation.x=bot.attackPulse*.11;
-   bot.head.rotation.y=Math.sin(elapsed*1.45+bot.index)*.055;
-   bot.head.rotation.x=Math.sin(elapsed*.87+bot.index)*.025;
-   bot.gun.rotation.x=-bot.attackPulse*.23;
+   const targetLean=Math.max(-.13,Math.min(.13,(bot.canSee?bot.side*.065:-angleDelta*.10)*bot.moveBlend));
+   bot.lean+=(targetLean-bot.lean)*Math.min(1,dt*7);
+   bot.leftLeg.rotation.x=stride*.76*bot.moveBlend;
+   bot.rightLeg.rotation.x=-stride*.76*bot.moveBlend;
+   bot.leftArm.rotation.x=-.18-stride*.44*bot.moveBlend;
+   bot.rightArm.rotation.x=-.40+stride*.19*bot.moveBlend-bot.attackPulse*.56;
+   bot.torso.position.y=1.19+wobble*.078*bot.moveBlend+Math.sin(elapsed*1.9+bot.index)*.009-bot.dodgeIn*.09;
+   bot.torso.rotation.z=bot.lean-stride*.055*bot.moveBlend+bot.hitReact*(bot.side>0?.17:-.17);
+   bot.torso.rotation.x=bot.attackPulse*.14+bot.dodgeIn*.07;
+   bot.head.rotation.y=Math.sin(elapsed*1.45+bot.index)*.07;
+   bot.head.rotation.x=Math.sin(elapsed*.87+bot.index)*.028;
+   bot.gun.rotation.x=-bot.attackPulse*.28;
    bot.shotIn-=dt;
-   if(dist<24&&dist>2.2&&bot.shotIn<=0){
-    bot.shotIn=1.5+Math.random()*1.35;
-    if(canEnemySeePlayer(bot))enemyShot(bot);
+   if(bot.canSee&&bot.aimTime>.35&&dist<27&&dist>2&&bot.shotIn<=0){
+    bot.shotIn=1.3+Math.random()*1.2;
+    enemyShot(bot);
    }
   }
  }
@@ -854,11 +905,12 @@ button{font:inherit;cursor:pointer}
   if(hit&&hit.hit&&hit.pickedMesh&&hit.pickedMesh.metadata&&Number.isInteger(hit.pickedMesh.metadata.botIndex)){
    const bot=bots[hit.pickedMesh.metadata.botIndex];
    if(bot&&bot.alive){
-    bot.hp--;bot.hitReact=.35;onHitFlash();
+    const headshot=/soldier-face|tactical-helmet/.test(hit.pickedMesh.name);
+    bot.hp-=headshot?2:1;bot.hitReact=.42;bot.dodgeIn=.5;bot.side*=-1;onHitFlash();
     if(bot.hp<=0){
      bot.alive=false;bot.root.setEnabled(false);bot.respawnIn=6.5;
      kills++;get("kills").textContent=String(kills).padStart(2,"0");tip("+1 BAJA · ENEMIGO ELIMINADO");
-    }else tip("IMPACTO · ENEMIGO HERIDO");
+    }else tip(headshot?"TIRO A LA CABEZA · +DAÑO":"IMPACTO · ENEMIGO HERIDO");
    }
    return;
   }
