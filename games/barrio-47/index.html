@@ -257,7 +257,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 05</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 06</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="settingsGear" type="button" aria-label="Configurar botones">⚙</button><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -1122,14 +1122,14 @@ button{font:inherit;cursor:pointer}
    dx*=s;dy*=s;joy.x=dx/max;joy.y=dy/max;
    knob.style.transform="translate("+dx+"px,"+dy+"px)";
   }
-  joyEl.addEventListener("pointerdown",e=>{if(!running||joyId!==null)return;joyId=e.pointerId;joyEl.setPointerCapture(e.pointerId);setJoy(e);e.preventDefault();});
-  joyEl.addEventListener("pointermove",e=>{if(joyId===e.pointerId)setJoy(e);});
+  joyEl.addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||!running||joyId!==null)return;joyId=e.pointerId;joyEl.setPointerCapture(e.pointerId);setJoy(e);e.preventDefault();});
+  joyEl.addEventListener("pointermove",e=>{if(e.pointerType!=="touch"&&joyId===e.pointerId)setJoy(e);});
   function endJoy(e){if(e.pointerId!==joyId)return;joyId=null;joy.x=joy.y=0;knob.style.transform="translate(0,0)";}
   joyEl.addEventListener("pointerup",endJoy);joyEl.addEventListener("pointercancel",endJoy);
   const look=get("lookzone");
-  look.addEventListener("pointerdown",e=>{if(!running||lookingId!==null)return;lookingId=e.pointerId;lastLook=coordinatesForGame(e);look.setPointerCapture(e.pointerId);e.preventDefault();});
+  look.addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||!running||lookingId!==null)return;lookingId=e.pointerId;lastLook=coordinatesForGame(e);look.setPointerCapture(e.pointerId);e.preventDefault();});
   look.addEventListener("pointermove",e=>{
-   if(e.pointerId!==lookingId||!lastLook||!running)return;
+   if(e.pointerType==="touch"||e.pointerId!==lookingId||!lastLook||!running)return;
    const cursor=coordinatesForGame(e),dx=cursor.x-lastLook.x,dy=cursor.y-lastLook.y;
    camera.rotation.y+=dx*.0047;
    camera.rotation.x=Math.max(-1.13,Math.min(1.13,camera.rotation.x+dy*.0036));
@@ -1139,10 +1139,10 @@ button{font:inherit;cursor:pointer}
   });
   function stopLook(e){if(e.pointerId===lookingId){lookingId=null;lastLook=null}}
   look.addEventListener("pointerup",stopLook);look.addEventListener("pointercancel",stopLook);
-  get("jump").addEventListener("pointerdown",e=>{if(!running)return;jump();e.preventDefault()});
+  get("jump").addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||!running)return;jump();e.preventDefault()});
   const runButton=get("sprint"),sprintPointers=new Set();
   runButton.addEventListener("pointerdown",e=>{
-   if(!running)return;e.preventDefault();
+   if(e.pointerType==="touch"||!running)return;e.preventDefault();
    sprintPointers.add(e.pointerId);runHeld=true;
    try{runButton.setPointerCapture(e.pointerId)}catch(error){}
   });
@@ -1158,7 +1158,7 @@ button{font:inherit;cursor:pointer}
    clearInterval(firingTimer);firingTimer=0;fire.classList.remove("pressed");
   };
   fire.addEventListener("pointerdown",e=>{
-   if(!running)return;e.preventDefault();
+   if(e.pointerType==="touch"||!running)return;e.preventDefault();
    if(firePointers.has(e.pointerId))return;
    firePointers.add(e.pointerId);
    try{fire.setPointerCapture(e.pointerId)}catch(error){}
@@ -1168,6 +1168,129 @@ button{font:inherit;cursor:pointer}
    }
   });
   for(const event of ["pointerup","pointercancel","lostpointercapture"])fire.addEventListener(event,stopFire);
+
+  // iPhone/iPad: route every Touch.identifier to its own action.
+  // Pointer capture alone may be cancelled by Safari when a second finger joins.
+  // Native multi-touch keeps the movement stick working while firing or sprinting.
+  let movingFinger=null,aimFinger=null;
+  const shootingFingers=new Set(),sprintingFingers=new Set(),fireAimLast=new Map();
+  const touchKey=id=>"touch-"+id;
+  const gamePoint=t=>{
+   const view=get("gameViewport");
+   if(portraitGame())return {x:t.clientY,y:view.clientHeight-t.clientX};
+   const rect=view.getBoundingClientRect();
+   return {x:t.clientX-rect.left,y:t.clientY-rect.top};
+  };
+  function moveFromTouch(t){
+   if(!movingFinger||t.identifier!==movingFinger.id)return;
+   const p=gamePoint(t);
+   const dx=p.x-movingFinger.x,dy=p.y-movingFinger.y;
+   const max=Math.max(20,controlConfig.joy.size*.35);
+   const len=Math.hypot(dx,dy)||1,ratio=Math.min(1,max/len);
+   const x=dx*ratio,y=dy*ratio;
+   joy.x=x/max;joy.y=y/max;
+   knob.style.transform="translate("+x+"px,"+y+"px)";
+  }
+  function moveCameraBy(dx,dy){
+   camera.rotation.y+=dx*.0047;
+   camera.rotation.x=clamp(camera.rotation.x+dy*.0036,-1.13,1.13);
+   lookSwayX=clamp(lookSwayX+dx*.0035,-.22,.22);
+   lookSwayY=clamp(lookSwayY+dy*.003,-.20,.20);
+  }
+  function endNativeFinger(id){
+   if(movingFinger&&movingFinger.id===id){
+    movingFinger=null;joy.x=joy.y=0;
+    knob.style.transform="translate(0,0)";
+   }
+   if(aimFinger&&aimFinger.id===id)aimFinger=null;
+   const key=touchKey(id);
+   if(shootingFingers.delete(id))stopFire({pointerId:key});
+   if(sprintingFingers.delete(id))stopSprint({pointerId:key});
+   fireAimLast.delete(id);
+  }
+  function clearNativeTouches(){
+   movingFinger=null;aimFinger=null;
+   shootingFingers.clear();sprintingFingers.clear();fireAimLast.clear();
+   joy.x=joy.y=0;knob.style.transform="translate(0,0)";
+   for(const key of [...firePointers])if(typeof key==="string"&&key.startsWith("touch-"))firePointers.delete(key);
+   for(const key of [...sprintPointers])if(typeof key==="string"&&key.startsWith("touch-"))sprintPointers.delete(key);
+   stopFire();stopSprint();
+  }
+  document.addEventListener("touchstart",e=>{
+   if(!running)return;
+   let handled=false;
+   for(const t of e.changedTouches){
+    const elem=t.target instanceof Element?t.target:null;
+    if(!elem||!get("gameViewport").contains(elem))continue;
+    if(elem.closest("#editorPanel,#menu,#pause,#settingsGear,.hud-top,#healthPanel,#ammo,#deathScreen"))continue;
+    const p=gamePoint(t),id=t.identifier;
+    const isJoy=!!elem.closest("#joy"),isFire=!!elem.closest("#fire"),
+          isSprint=!!elem.closest("#sprint"),isJump=!!elem.closest("#jump");
+    const isLook=!!elem.closest("#lookzone,#world");
+    if(isFire){
+     shootingFingers.add(id);
+     const token=touchKey(id);
+     if(!firePointers.has(token)){
+      firePointers.add(token);
+      if(firePointers.size===1){
+       fire.classList.add("pressed");shoot();
+       clearInterval(firingTimer);firingTimer=setInterval(shoot,185);
+      }
+     }
+     fireAimLast.set(id,p);handled=true;
+    }else if(isSprint){
+     sprintingFingers.add(id);sprintPointers.add(touchKey(id));
+     runHeld=true;handled=true;
+    }else if(isJump){
+     jump();handled=true;
+    }else if((isJoy||p.x<layerSize().w*.36)&&!movingFinger){
+     // The left side acts as an extended joystick pickup area.
+     // Starting on the visible stick uses its actual center.
+     const anchor=isJoy?{x:parseFloat(joyEl.style.left)||p.x,
+                          y:parseFloat(joyEl.style.top)||p.y}:p;
+     movingFinger={id,x:anchor.x,y:anchor.y};
+     moveFromTouch(t);handled=true;
+    }else if((isLook||p.x>=layerSize().w*.36)&&!aimFinger){
+     aimFinger={id,p};handled=true;
+    }
+   }
+   if(handled&&e.cancelable)e.preventDefault();
+  },{capture:true,passive:false});
+  document.addEventListener("touchmove",e=>{
+   if(!running)return;
+   let handled=false;
+   for(const t of e.changedTouches){
+    const id=t.identifier,p=gamePoint(t);
+    if(movingFinger&&movingFinger.id===id){
+     moveFromTouch(t);handled=true;
+    }
+    if(aimFinger&&aimFinger.id===id){
+     moveCameraBy(p.x-aimFinger.p.x,p.y-aimFinger.p.y);
+     aimFinger.p=p;handled=true;
+    }
+    if(shootingFingers.has(id)){
+     // Holding FIRE does not lock the camera: sliding the fire finger can aim.
+     const prev=fireAimLast.get(id);
+     if(prev&&!aimFinger)moveCameraBy(p.x-prev.x,p.y-prev.y);
+     fireAimLast.set(id,p);handled=true;
+    }
+    if(sprintingFingers.has(id))handled=true;
+   }
+   if(handled&&e.cancelable)e.preventDefault();
+  },{capture:true,passive:false});
+  const endTouches=e=>{
+   let found=false;
+   for(const t of e.changedTouches){
+    if((movingFinger&&movingFinger.id===t.identifier)||
+       (aimFinger&&aimFinger.id===t.identifier)||
+       shootingFingers.has(t.identifier)||sprintingFingers.has(t.identifier)){
+     endNativeFinger(t.identifier);found=true;
+    }
+   }
+   if(found&&e.cancelable)e.preventDefault();
+  };
+  document.addEventListener("touchend",endTouches,{capture:true,passive:false});
+  document.addEventListener("touchcancel",endTouches,{capture:true,passive:false});
   window.addEventListener("keydown",e=>{
    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code))e.preventDefault();
    keys.add(e.code);
@@ -1176,7 +1299,7 @@ button{font:inherit;cursor:pointer}
    if(e.code==="KeyR"&&dead)respawnPlayer();
   });
   window.addEventListener("keyup",e=>keys.delete(e.code));
-  window.addEventListener("blur",()=>{keys.clear();runHeld=false;sprintPointers.clear();joyId=null;lookingId=null;lastLook=null;joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";velocityX=velocityZ=0;stopFire()});
+  window.addEventListener("blur",()=>{clearNativeTouches();keys.clear();runHeld=false;sprintPointers.clear();joyId=null;lookingId=null;lastLook=null;joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";velocityX=velocityZ=0;stopFire()});
   canvas.addEventListener("click",()=>{if(running&&matchMedia("(pointer:fine)").matches)canvas.requestPointerLock?.()});
   document.addEventListener("mousemove",e=>{
    if(document.pointerLockElement!==canvas||!running)return;
@@ -1201,7 +1324,7 @@ button{font:inherit;cursor:pointer}
   function resetInputs(){
    joyId=null;lookingId=null;lastLook=null;joy.x=joy.y=0;
    get("knob").style.transform="translate(0,0)";
-   keys.clear();velocityX=velocityZ=0;runHeld=false;sprintPointers.clear();stopFire();
+   keys.clear();velocityX=velocityZ=0;runHeld=false;sprintPointers.clear();clearNativeTouches();stopFire();
   }
   function openControlEditor(){
    if(editing||dead)return;
