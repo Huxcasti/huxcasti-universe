@@ -205,11 +205,13 @@ button{font:inherit;cursor:pointer}
 /* Customizable controls overlay */
 #controlLayer{position:absolute;inset:0;z-index:7;pointer-events:none;touch-action:none}
 #controlLayer #combatControls,#controlLayer #moveButtons{display:contents!important}
-#controlLayer #joy,#controlLayer #fire,#controlLayer #jump,#controlLayer #sprint{
+#controlLayer #joy,#controlLayer #fire,#controlLayer #jump,#controlLayer #sprint,#controlLayer #crouch{
  position:absolute!important;right:auto!important;bottom:auto!important;
  transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;z-index:8;flex:none!important;
  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none
 }
+#crouch{border:1px solid #9ad5ff8c;border-radius:14px;color:#fff;background:#34608bd9;font-weight:900;font-size:10px;letter-spacing:.04em;display:grid;place-items:center;box-shadow:0 4px 14px #06172888}
+#crouch.active{background:#b8eaaa;color:#092b30;border-color:#e1ffc2;box-shadow:0 0 16px #82e7a877}
 #settingsGear{pointer-events:auto;width:40px;height:41px;border:1px solid #ffffff40;border-radius:11px;background:#123047;color:#d3f9ff;font-size:20px}
 #menuControls{width:100%;min-height:44px;margin-top:10px;border:1px solid #6cd7e7;border-radius:12px;background:#12324a;color:#d7f8ff;font-size:13px;font-weight:900}
 #editorPanel[hidden]{display:none!important}
@@ -257,7 +259,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 07</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 08</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="settingsGear" type="button" aria-label="Configurar botones">⚙</button><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -270,6 +272,7 @@ button{font:inherit;cursor:pointer}
    <div id="moveButtons">
     <button id="sprint" class="control-editable" type="button" aria-label="Correr">CORRER</button>
     <button id="jump" class="control-editable" type="button" aria-label="Saltar">SALTAR</button>
+     <button id="crouch" class="control-editable" type="button" aria-label="Agacharse" aria-pressed="false">AGACHAR</button>
    </div>
    <button id="fire" class="control-editable" type="button" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
   </div>
@@ -290,7 +293,7 @@ button{font:inherit;cursor:pointer}
    <div><b>◉ Dedo izquierdo</b>Joystick para caminar</div>
    <div><b>↗ Dedo derecho</b>Desliza para mirar</div>
    <div><b>⌖ DISPARAR</b>Practica con la pistola G2 Combat</div>
-   <div><b>⇧ SALTAR / CORRER</b>Muévete por el escenario</div>
+   <div><b>⇧ SALTAR / CORRER / AGACHAR</b>Combina movimientos sin detenerte</div>
   </div>
   <p class="menu-note">Pantalla horizontal automática para menú y partida. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Versión alfa de prueba: combate contra bots sin multijugador.</p>
  </div>
@@ -299,7 +302,7 @@ button{font:inherit;cursor:pointer}
  <div class="editor-header"><strong>⚙ EDITAR CONTROLES</strong><small>Arrastra los botones para moverlos. Ajusta su tamaño y guarda.</small></div>
  <div class="editor-row">
   <label for="controlChoice">BOTÓN</label>
-  <select id="controlChoice"><option value="joy">Movimiento</option><option value="fire">Disparar</option><option value="jump">Saltar</option><option value="sprint">Correr</option></select>
+  <select id="controlChoice"><option value="joy">Movimiento</option><option value="fire">Disparar</option><option value="jump">Saltar</option><option value="sprint">Correr</option><option value="crouch">Agacharse</option></select>
   <label for="controlSize">TAMAÑO</label><input id="controlSize" type="range" min="48" max="182" step="2" value="100">
   <output id="controlSizeValue">100 px</output>
   <button id="controlReset" type="button">RESTAURAR</button>
@@ -321,7 +324,7 @@ button{font:inherit;cursor:pointer}
  let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0,playerHealth=100,kills=0,dead=false,damageFlashTimer=0;
  const canvas=get("world"), colliders=[],targets=[],bots=[],foliage=[],ambientMotion=[],keys=new Set();
  const WORLD={minX:-45,maxX:45,minZ:-36,maxZ:36};
- let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0,lookSwayX=0,lookSwayY=0,landingJolt=0,motionBlend=0,velocityX=0,velocityZ=0,qualityScale=.61,qualityTimer=0,slowFrames=0,fastFrames=0;
+ let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0,lookSwayX=0,lookSwayY=0,landingJolt=0,motionBlend=0,velocityX=0,velocityZ=0,crouched=false,crouchBlend=0,qualityScale=.61,qualityTimer=0,slowFrames=0,fastFrames=0;
  const colors={
   grass:"#4b8062",asphalt:"#33465a",road:"#35485c",white:"#edf2ea",yellow:"#eac674",
   walk:"#8c9ba5",blue:"#367ca8",blueD:"#20466f",orange:"#cb7452",orangeD:"#9c4c37",
@@ -778,7 +781,7 @@ button{font:inherit;cursor:pointer}
   get("damageFlash").classList.add("active");
   clearTimeout(damageFlashTimer);damageFlashTimer=setTimeout(()=>get("damageFlash").classList.remove("active"),155);
   if(playerHealth<=0){
-   dead=true;running=false;runHeld=false;joy.x=joy.y=0;keys.clear();
+   dead=true;running=false;runHeld=false;setCrouch(false);joy.x=joy.y=0;keys.clear();
    clearInterval(firingTimer);firingTimer=0;get("fire").classList.remove("pressed");
    get("deathKills").textContent=String(kills);
    get("hud").hidden=true;get("deathScreen").hidden=false;
@@ -786,7 +789,7 @@ button{font:inherit;cursor:pointer}
  }
  function respawnPlayer(){
   camera.position.set(-36,1.78,0);camera.rotation.set(0,Math.PI/2,0);
-  vertical=0;jumpV=0;recoil=0;landingJolt=0;motionBlend=0;velocityX=velocityZ=0;lookSwayX=lookSwayY=0;runHeld=false;joy.x=joy.y=0;keys.clear();
+  vertical=0;jumpV=0;recoil=0;landingJolt=0;motionBlend=0;velocityX=velocityZ=0;crouchBlend=0;setCrouch(false);lookSwayX=lookSwayY=0;runHeld=false;joy.x=joy.y=0;keys.clear();
   get("knob").style.transform="translate(0,0)";
   playerHealth=100;dead=false;get("healthValue").textContent="100";
   get("healthFill").style.width="100%";get("healthFill").style.background="linear-gradient(90deg,#44d9a0,#a8ffb5)";
@@ -916,8 +919,8 @@ button{font:inherit;cursor:pointer}
   elapsed+=dt;
   const left=(keys.has("KeyA")||keys.has("ArrowLeft")?-1:0)+(keys.has("KeyD")||keys.has("ArrowRight")?1:0)+joy.x;
   const front=(keys.has("KeyW")||keys.has("ArrowUp")?1:0)-(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-joy.y;
-  const norm=Math.max(1,Math.hypot(left,front)),sprint=(runHeld||keys.has("ShiftLeft")||keys.has("ShiftRight"));
-  const speed=sprint?8.15:5.35;
+  const norm=Math.max(1,Math.hypot(left,front)),sprint=!crouched&&(runHeld||keys.has("ShiftLeft")||keys.has("ShiftRight"));
+  const speed=crouched?2.65:sprint?8.15:5.35;
   const yaw=camera.rotation.y;
   const desiredX=(Math.sin(yaw)*front+Math.cos(yaw)*left)/norm*speed;
   const desiredZ=(Math.cos(yaw)*front-Math.sin(yaw)*left)/norm*speed;
@@ -936,13 +939,14 @@ button{font:inherit;cursor:pointer}
   const actualSpeed=Math.hypot(camera.position.x-beforeX,camera.position.z-beforeZ)/Math.max(dt,.001);
   const movement=Math.min(1,actualSpeed/Math.max(speed,.01));
   motionBlend+=(movement-motionBlend)*Math.min(1,dt*9);
-  const step=elapsed*(sprint?15.8:11.1);
-  const bob=Math.sin(step)*.048*motionBlend;
+  const step=elapsed*(crouched?7.5:sprint?15.8:11.1);
+  const bob=Math.sin(step)*(crouched?.017:.048)*motionBlend;
   const sideSway=Math.cos(step*.5)*.029*motionBlend;
   landingJolt+=(0-landingJolt)*Math.min(1,dt*12);
-  camera.position.y=1.78+vertical+bob+landingJolt;
+  crouchBlend+=((crouched?1:0)-crouchBlend)*Math.min(1,dt*11);
+  camera.position.y=1.78-crouchBlend*.67+vertical+bob+landingJolt;
   camera.rotation.z+=((-left/norm)*.037*motionBlend-camera.rotation.z)*Math.min(1,dt*8);
-  const desiredFov=sprint&&movement>.25?1.255:1.19;
+  const desiredFov=crouched?1.15:sprint&&movement>.25?1.255:1.19;
   camera.fov+=(desiredFov-camera.fov)*Math.min(1,dt*4.5);
   lookSwayX+=(0-lookSwayX)*Math.min(1,dt*8);
   lookSwayY+=(0-lookSwayY)*Math.min(1,dt*8);
@@ -997,8 +1001,18 @@ button{font:inherit;cursor:pointer}
    }
   }
  }
+ function setCrouch(on){
+  crouched=!!on;
+  const btn=get("crouch");
+  if(!btn)return;
+  btn.classList.toggle("active",crouched);
+  btn.setAttribute("aria-pressed",String(crouched));
+  btn.setAttribute("aria-label",crouched?"Levantarse":"Agacharse");
+  btn.textContent=crouched?"LEVANTAR":"AGACHAR";
+ }
+ function toggleCrouch(){if(running)setCrouch(!crouched);}
  function jump(){
-  if(running&&vertical<.05){jumpV=6.6;vertical=.015}
+  if(running&&vertical<.05){if(crouched)setCrouch(false);jumpV=6.6;vertical=.015}
  }
  function drawRadar(){
   const canvas=get("minimap"),ctx=canvas.getContext("2d");if(!ctx)return;
@@ -1031,7 +1045,7 @@ button{font:inherit;cursor:pointer}
  function syncOrientation(){engine.resize();applyControls();if(camera)drawRadar();}
 
  // Per-device normalized landscape HUD layout. Allows independent fingers on every control.
- const CONTROL_IDS=["joy","fire","jump","sprint"];
+ const CONTROL_IDS=["joy","fire","jump","sprint","crouch"];
  const CONTROL_KEY="barrio47.controls.v1";
  const clamp=(n,lo,hi)=>Math.min(hi,Math.max(lo,n));
  let controlConfig=null;
@@ -1039,16 +1053,17 @@ button{font:inherit;cursor:pointer}
   const el=get("controlLayer"),view=get("gameViewport");
   return {w:Math.max(310,el.clientWidth||view.clientWidth),h:Math.max(215,el.clientHeight||view.clientHeight)};
  }
- function dimensions(id,size){return {w:size,h:size*(id==="jump"?.75:id==="sprint"?.65:1)}}
+ function dimensions(id,size){return {w:size,h:size*((id==="jump"||id==="crouch")?.75:id==="sprint"?.65:1)}}
  function defaultControls(){
   const {w,h}=layerSize(),factor=h<340?.86:h<410?.94:1;
-  const j=Math.round(110*factor),f=Math.round(96*factor),u=Math.round(73*factor),sp=Math.round(71*factor);
+  const j=Math.round(110*factor),f=Math.round(96*factor),u=Math.round(73*factor),sp=Math.round(71*factor),c=Math.round(73*factor);
   const x=w-19-f-23-u/2,uh=dimensions("jump",u).h,sh=dimensions("sprint",sp).h;
   return {
    joy:{x:(20+j/2)/w,y:(h-22-j/2)/h,size:j},
    fire:{x:(w-19-f/2)/w,y:(h-24-f/2)/h,size:f},
    jump:{x:x/w,y:(h-23-uh/2)/h,size:u},
-   sprint:{x:x/w,y:(h-23-uh-15-sh/2)/h,size:sp}
+   sprint:{x:x/w,y:(h-23-uh-15-sh/2)/h,size:sp},
+   crouch:{x:(x-u-17)/w,y:(h-23-dimensions("crouch",c).h/2)/h,size:c}
   };
  }
  function loadControls(){
@@ -1084,7 +1099,7 @@ button{font:inherit;cursor:pointer}
  function ui(){
   // iOS: las pulsaciones repetidas y los gestos táctiles no deben ampliar Safari.
   // Evitar el gesto por defecto solo dentro de los controles del juego.
-  const gameTouchTargets=[get("fire"),get("jump"),get("sprint"),get("joy"),get("lookzone"),get("combatControls"),get("moveButtons")];
+  const gameTouchTargets=[get("fire"),get("jump"),get("sprint"),get("crouch"),get("joy"),get("lookzone"),get("combatControls"),get("moveButtons")];
   for(const el of gameTouchTargets){
    for(const eventName of ["touchstart","touchmove","touchend","touchcancel"]){
     el.addEventListener(eventName,e=>{if(running&&e.cancelable)e.preventDefault()},{passive:false});
@@ -1140,6 +1155,7 @@ button{font:inherit;cursor:pointer}
   function stopLook(e){if(e.pointerId===lookingId){lookingId=null;lastLook=null}}
   look.addEventListener("pointerup",stopLook);look.addEventListener("pointercancel",stopLook);
   get("jump").addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||!running)return;jump();e.preventDefault()});
+  get("crouch").addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||!running)return;toggleCrouch();e.preventDefault()});
   const runButton=get("sprint"),sprintPointers=new Set();
   runButton.addEventListener("pointerdown",e=>{
    if(e.pointerType==="touch"||!running)return;e.preventDefault();
@@ -1173,7 +1189,7 @@ button{font:inherit;cursor:pointer}
   // Pointer capture alone may be cancelled by Safari when a second finger joins.
   // Native multi-touch keeps the movement stick working while firing or sprinting.
   let movingFinger=null,aimFinger=null;
-  const shootingFingers=new Set(),sprintingFingers=new Set(),jumpingFingers=new Set();
+  const shootingFingers=new Set(),sprintingFingers=new Set(),jumpingFingers=new Set(),crouchingFingers=new Set();
   const buttonAimLast=new Map();
   let buttonAimOwner=null;
   const touchKey=id=>"touch-"+id;
@@ -1208,13 +1224,13 @@ button{font:inherit;cursor:pointer}
    const key=touchKey(id);
    if(shootingFingers.delete(id))stopFire({pointerId:key});
    if(sprintingFingers.delete(id))stopSprint({pointerId:key});
-   jumpingFingers.delete(id);
+   jumpingFingers.delete(id);crouchingFingers.delete(id);
    buttonAimLast.delete(id);
    if(buttonAimOwner===id)buttonAimOwner=null;
   }
   function clearNativeTouches(){
    movingFinger=null;aimFinger=null;
-   shootingFingers.clear();sprintingFingers.clear();jumpingFingers.clear();
+   shootingFingers.clear();sprintingFingers.clear();jumpingFingers.clear();crouchingFingers.clear();
    buttonAimLast.clear();buttonAimOwner=null;
    joy.x=joy.y=0;knob.style.transform="translate(0,0)";
    for(const key of [...firePointers])if(typeof key==="string"&&key.startsWith("touch-"))firePointers.delete(key);
@@ -1230,7 +1246,7 @@ button{font:inherit;cursor:pointer}
     if(elem.closest("#editorPanel,#menu,#pause,#settingsGear,.hud-top,#healthPanel,#ammo,#deathScreen"))continue;
     const p=gamePoint(t),id=t.identifier;
     const isJoy=!!elem.closest("#joy"),isFire=!!elem.closest("#fire"),
-          isSprint=!!elem.closest("#sprint"),isJump=!!elem.closest("#jump");
+          isSprint=!!elem.closest("#sprint"),isJump=!!elem.closest("#jump"),isCrouch=!!elem.closest("#crouch");
     const isLook=!!elem.closest("#lookzone,#world");
     if(isFire){
      shootingFingers.add(id);
@@ -1246,6 +1262,10 @@ button{font:inherit;cursor:pointer}
     }else if(isSprint){
      sprintingFingers.add(id);sprintPointers.add(touchKey(id));
      runHeld=true;buttonAimLast.set(id,{point:p,hasMoved:false});handled=true;
+    }else if(isCrouch){
+     crouchingFingers.add(id);
+     buttonAimLast.set(id,{point:p,hasMoved:false});
+     toggleCrouch();handled=true;
     }else if(isJump){
      jumpingFingers.add(id);
      buttonAimLast.set(id,{point:p,hasMoved:false});
@@ -1296,7 +1316,7 @@ button{font:inherit;cursor:pointer}
    for(const t of e.changedTouches){
     if((movingFinger&&movingFinger.id===t.identifier)||
        (aimFinger&&aimFinger.id===t.identifier)||
-       shootingFingers.has(t.identifier)||sprintingFingers.has(t.identifier)||jumpingFingers.has(t.identifier)){
+       shootingFingers.has(t.identifier)||sprintingFingers.has(t.identifier)||jumpingFingers.has(t.identifier)||crouchingFingers.has(t.identifier)){
      endNativeFinger(t.identifier);found=true;
     }
    }
@@ -1308,6 +1328,7 @@ button{font:inherit;cursor:pointer}
    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code))e.preventDefault();
    keys.add(e.code);
    if(e.code==="Space"&&!e.repeat)jump();
+   if(e.code==="KeyC"&&!e.repeat&&running)toggleCrouch();
    if(e.code==="Escape"&&running)pause();
    if(e.code==="KeyR"&&dead)respawnPlayer();
   });
