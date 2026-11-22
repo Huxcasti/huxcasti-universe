@@ -199,7 +199,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 03</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 04</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -223,7 +223,7 @@ button{font:inherit;cursor:pointer}
  <div class="menu-card">
   <div class="eyebrow">Huxcasti Games · Primer prototipo jugable</div>
   <h1>BARRIO <span>47</span></h1>
-  <p>Un barrio 3D original con casas, autobús, patios y garajes. Ahora hay tres enemigos que te buscan y disparan. Sobrevive, elimina enemigos y practica tu puntería desde el iPhone.</p>
+  <p>Un barrio 3D original con casas, autobús, patios y garajes. Ahora los enemigos patrullan, te buscan y esquivan obstáculos. Gráficos más nítidos y movimiento más natural para iPhone.</p>
   <div class="pills"><span>🎮 FPS táctil</span><span>📱 iPhone</span><span>🏘️ Mapa original 3D</span><span>🎯 Blancos de práctica</span></div>
   <button id="play">ENTRAR AL MAPA</button>
   <div class="guide">
@@ -232,7 +232,7 @@ button{font:inherit;cursor:pointer}
    <div><b>⌖ DISPARAR</b>Practica con la pistola G2 Combat</div>
    <div><b>⇧ SALTAR / CORRER</b>Muévete por el escenario</div>
   </div>
-  <p class="menu-note">Mejor en horizontal. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Primera versión de prueba: no incluye multijugador ni enemigos que disparen.</p>
+  <p class="menu-note">Mejor en horizontal. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Versión alfa de prueba: combate contra bots sin multijugador.</p>
  </div>
 </div>
 <div id="fatal"><h2>No se pudo iniciar el motor 3D</h2><p id="fatalMsg"></p><p>Prueba abrir la página con Safari y conexión a internet. Este prototipo utiliza Babylon.js para mostrar gráficos 3D.</p></div>
@@ -248,7 +248,7 @@ button{font:inherit;cursor:pointer}
  let engine,scene,camera,weapon,muzzleFlash=null, running=false,score=0,peekTimer=0, elapsed=0,playerHealth=100,kills=0,dead=false,damageFlashTimer=0;
  const canvas=get("world"), colliders=[],targets=[],bots=[],foliage=[],ambientMotion=[],keys=new Set();
  const WORLD={minX:-45,maxX:45,minZ:-36,maxZ:36};
- let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0,lookSwayX=0,lookSwayY=0,landingJolt=0,motionBlend=0,qualityScale=.90,qualityTimer=0,slowFrames=0,fastFrames=0;
+ let joy={x:0,y:0},lookingId=null,lastLook=null,vertical=0,jumpV=0,runHeld=false,firingTimer=0,fireCooldown=0,recoil=0,hitTimeout=0,lookSwayX=0,lookSwayY=0,landingJolt=0,motionBlend=0,velocityX=0,velocityZ=0,qualityScale=.61,qualityTimer=0,slowFrames=0,fastFrames=0;
  const colors={
   grass:"#4b8062",asphalt:"#33465a",road:"#35485c",white:"#edf2ea",yellow:"#eac674",
   walk:"#8c9ba5",blue:"#367ca8",blueD:"#20466f",orange:"#cb7452",orangeD:"#9c4c37",
@@ -389,12 +389,40 @@ button{font:inherit;cursor:pointer}
   pillar.isPickable=false;
   targets.push({root,orb,ring,x,z,index,active:true});
  }
+ function makeSurfaceTexture(name,kind){
+  const tex=new B.DynamicTexture(name,{width:512,height:512},scene,true);
+  const ctx=tex.getContext();
+  ctx.fillStyle=kind==="grass"?"#e3e9e0":"#dce2e5";
+  ctx.fillRect(0,0,512,512);
+  let seed=kind==="grass"?41362:92753;
+  const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+  for(let i=0;i<(kind==="grass"?1550:2300);i++){
+   const x=rand()*512,y=rand()*512;
+   ctx.fillStyle=rand()<.55?"rgba(32,46,42,.14)":"rgba(255,255,255,.17)";
+   if(kind==="grass")ctx.fillRect(x,y,1+rand()*1.7,2+rand()*5);
+   else ctx.fillRect(x,y,1+rand()*2.5,1+rand()*2.5);
+  }
+  if(kind==="asphalt"){
+   ctx.strokeStyle="rgba(35,43,52,.12)";ctx.lineWidth=1.5;
+   for(let i=0;i<8;i++){
+    let x=rand()*512,y=rand()*512;ctx.beginPath();ctx.moveTo(x,y);
+    for(let j=0;j<3;j++){x+=12+rand()*19;y+=rand()*16-8;ctx.lineTo(x,y);}
+    ctx.stroke();
+   }
+  }
+  tex.wrapU=tex.wrapV=B.Texture.WRAP_ADDRESSMODE;
+  tex.uScale=kind==="grass"?17:10;
+  tex.vScale=kind==="grass"?13:2;
+  tex.update(false);return tex;
+ }
  function buildScene(){
   scene=new B.Scene(engine);
   scene.clearColor=new B.Color4(.54,.71,.87,1);
   scene.ambientColor=color("#607988");
   scene.fogMode=B.Scene.FOGMODE_LINEAR;
-  scene.fogStart=87;scene.fogEnd=175;scene.fogColor=color("#8fb6d4");
+  scene.fogStart=115;scene.fogEnd=205;scene.fogColor=color("#8fb6d4");
+  scene.imageProcessingConfiguration.contrast=1.11;
+  scene.imageProcessingConfiguration.exposure=1.04;
   const hemi=new B.HemisphericLight("sunfill",v(.1,1,.1),scene);
   hemi.intensity=.67;hemi.groundColor=color("#647f72");
   const sunlight=new B.DirectionalLight("sun",v(-.5,-1,-.3),scene);
@@ -411,6 +439,8 @@ button{font:inherit;cursor:pointer}
    roof:mat("roof","#20394c"),rubber:mat("rubber","#131c27"),lamp:mat("lamp","#f5f9df","#4c5330"),
    wood:mat("wood","#88694d"),target:mat("target","#ffbf58","#ec6c20"),enemy:mat("tactical red armor","#973c45"),enemyDark:mat("charcoal armor","#202e3a"),enemyFace:mat("helmet visor","#dd8370","#4c241f"),enemyFabric:mat("tactical fabric","#586c65"),enemyPlate:mat("armor plate","#364653"),enemyBoot:mat("combat boot","#161c25"),enemySkin:mat("skin","#bc947b"),enemyTrim:mat("team insignia","#d8c77c"),enemyMuzzle:mat("bot flash","#ffcd79","#ff672a"),botShadow:mat("enemy shadow","#15251f"),warning:mat("drone warning light","#f9b75c","#e18f28"),leafLight:mat("leaf highlights","#54896a")
   };
+  mats.grass.diffuseTexture=makeSurfaceTexture("ground-grass-detail","grass");
+  mats.asphalt.diffuseTexture=makeSurfaceTexture("street-asphalt-detail","asphalt");
   plane("main grass",0,-.06,0,96,77,mats.grass);
   plane("road",0,.011,0,94,15.8,mats.asphalt);
   plane("north pavement",0,.039,-8.9,94,2.3,mats.walk);
@@ -683,7 +713,7 @@ button{font:inherit;cursor:pointer}
  }
  function respawnPlayer(){
   camera.position.set(-36,1.78,0);camera.rotation.set(0,Math.PI/2,0);
-  vertical=0;jumpV=0;recoil=0;landingJolt=0;motionBlend=0;lookSwayX=lookSwayY=0;runHeld=false;joy.x=joy.y=0;keys.clear();
+  vertical=0;jumpV=0;recoil=0;landingJolt=0;motionBlend=0;velocityX=velocityZ=0;lookSwayX=lookSwayY=0;runHeld=false;joy.x=joy.y=0;keys.clear();
   get("knob").style.transform="translate(0,0)";
   playerHealth=100;dead=false;get("healthValue").textContent="100";
   get("healthFill").style.width="100%";get("healthFill").style.background="linear-gradient(90deg,#44d9a0,#a8ffb5)";
@@ -763,24 +793,31 @@ button{font:inherit;cursor:pointer}
   const left=(keys.has("KeyA")||keys.has("ArrowLeft")?-1:0)+(keys.has("KeyD")||keys.has("ArrowRight")?1:0)+joy.x;
   const front=(keys.has("KeyW")||keys.has("ArrowUp")?1:0)-(keys.has("KeyS")||keys.has("ArrowDown")?1:0)-joy.y;
   const norm=Math.max(1,Math.hypot(left,front)),sprint=(runHeld||keys.has("ShiftLeft")||keys.has("ShiftRight"));
-  const speed=sprint?8.0:5.2;
+  const speed=sprint?8.15:5.35;
   const yaw=camera.rotation.y;
-  const mx=(Math.sin(yaw)*front+Math.cos(yaw)*left)/norm*speed*dt;
-  const mz=(Math.cos(yaw)*front-Math.sin(yaw)*left)/norm*speed*dt;
-  if(!collision(camera.position.x+mx,camera.position.z))camera.position.x+=mx;
-  if(!collision(camera.position.x,camera.position.z+mz))camera.position.z+=mz;
+  const desiredX=(Math.sin(yaw)*front+Math.cos(yaw)*left)/norm*speed;
+  const desiredZ=(Math.cos(yaw)*front-Math.sin(yaw)*left)/norm*speed;
+  const response=Math.min(1,dt*(Math.hypot(left,front)>.08?12.8:9.7));
+  velocityX+=(desiredX-velocityX)*response;
+  velocityZ+=(desiredZ-velocityZ)*response;
+  const beforeX=camera.position.x,beforeZ=camera.position.z;
+  if(!collision(camera.position.x+velocityX*dt,camera.position.z))camera.position.x+=velocityX*dt;
+  else velocityX=0;
+  if(!collision(camera.position.x,camera.position.z+velocityZ*dt))camera.position.z+=velocityZ*dt;
+  else velocityZ=0;
   if(jumpV!==0||vertical>0){
    vertical+=jumpV*dt;jumpV-=18.3*dt;
-   if(vertical<=0){landingJolt=jumpV<0?-.10:landingJolt;vertical=0;jumpV=0}
+   if(vertical<=0){landingJolt=jumpV<0?-.10:landingJolt;vertical=0;jumpV=0;}
   }
-  const movement=Math.min(1,Math.hypot(left,front)/norm);
-  motionBlend+=(movement-motionBlend)*Math.min(1,dt*8);
-  const step=elapsed*(sprint?15.5:11);
-  const bob=Math.sin(step)*.042*motionBlend;
-  const sideSway=Math.cos(step*.5)*.025*motionBlend;
+  const actualSpeed=Math.hypot(camera.position.x-beforeX,camera.position.z-beforeZ)/Math.max(dt,.001);
+  const movement=Math.min(1,actualSpeed/Math.max(speed,.01));
+  motionBlend+=(movement-motionBlend)*Math.min(1,dt*9);
+  const step=elapsed*(sprint?15.8:11.1);
+  const bob=Math.sin(step)*.048*motionBlend;
+  const sideSway=Math.cos(step*.5)*.029*motionBlend;
   landingJolt+=(0-landingJolt)*Math.min(1,dt*12);
   camera.position.y=1.78+vertical+bob+landingJolt;
-  camera.rotation.z+=((-left/norm)*.028*motionBlend-camera.rotation.z)*Math.min(1,dt*8);
+  camera.rotation.z+=((-left/norm)*.037*motionBlend-camera.rotation.z)*Math.min(1,dt*8);
   const desiredFov=sprint&&movement>.25?1.255:1.19;
   camera.fov+=(desiredFov-camera.fov)*Math.min(1,dt*4.5);
   lookSwayX+=(0-lookSwayX)*Math.min(1,dt*8);
@@ -885,7 +922,7 @@ button{font:inherit;cursor:pointer}
   },{passive:false});
   get("loading").hidden=true;
   const start=()=>{get("menu").hidden=true;get("hud").hidden=false;running=true;engine.resize();drawRadar();tip("TOCA Y DESLIZA PARA EXPLORAR");};
-  const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
+  const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;velocityX=velocityZ=0;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
   get("play").addEventListener("click",start);
   get("pause").addEventListener("click",pause);
   get("respawn").addEventListener("click",respawnPlayer);
@@ -927,7 +964,7 @@ button{font:inherit;cursor:pointer}
    if(!running)return;
    e.preventDefault();fire.setPointerCapture(e.pointerId);
    fire.classList.add("pressed");shoot();clearInterval(firingTimer);
-   firingTimer=setInterval(shoot,160);
+   firingTimer=setInterval(shoot,185);
   });
   fire.addEventListener("pointerup",stopFire);
   fire.addEventListener("pointercancel",stopFire);
@@ -940,7 +977,7 @@ button{font:inherit;cursor:pointer}
    if(e.code==="KeyR"&&dead)respawnPlayer();
   });
   window.addEventListener("keyup",e=>keys.delete(e.code));
-  window.addEventListener("blur",()=>{keys.clear();runHeld=false;stopFire()});
+  window.addEventListener("blur",()=>{keys.clear();runHeld=false;velocityX=velocityZ=0;stopFire()});
   canvas.addEventListener("click",()=>{if(running&&matchMedia("(pointer:fine)").matches)canvas.requestPointerLock?.()});
   document.addEventListener("mousemove",e=>{
    if(document.pointerLockElement!==canvas||!running)return;
@@ -955,7 +992,7 @@ button{font:inherit;cursor:pointer}
  try{
   engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:false},true);
   // Render near native CSS resolution on high-density iPhone screens.
-  qualityScale=window.devicePixelRatio>=2?.90:1;
+  qualityScale=window.devicePixelRatio>1?Math.max(.57,1/Math.min(window.devicePixelRatio,1.65)):1;
   engine.setHardwareScalingLevel(qualityScale);
   buildScene();
   ui();
@@ -967,14 +1004,14 @@ button{font:inherit;cursor:pointer}
     qualityTimer+=dt;
     if(qualityTimer>2.3){
      const fps=engine.getFps();
-     if(fps<36){slowFrames++;fastFrames=0}
-     else if(fps>55){fastFrames++;slowFrames=0}
+     if(fps<39){slowFrames++;fastFrames=0}
+     else if(fps>57){fastFrames++;slowFrames=0}
      else{slowFrames=0;fastFrames=0}
-     if(slowFrames>=2&&qualityScale<1.18){
-      qualityScale=Math.min(1.18,qualityScale+.09);
+     if(slowFrames>=2&&qualityScale<.94){
+      qualityScale=Math.min(.94,qualityScale+.055);
       engine.setHardwareScalingLevel(qualityScale);slowFrames=0;
-     }else if(fastFrames>=3&&qualityScale>.82){
-      qualityScale=Math.max(.82,qualityScale-.04);
+     }else if(fastFrames>=3&&qualityScale>.54){
+      qualityScale=Math.max(.54,qualityScale-.035);
       engine.setHardwareScalingLevel(qualityScale);fastFrames=0;
      }
      qualityTimer=0;
