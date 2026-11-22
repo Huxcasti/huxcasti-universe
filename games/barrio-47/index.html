@@ -201,6 +201,33 @@ button{font:inherit;cursor:pointer}
  #ammo{right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
 }
 /* Rotate the ENTIRE game including its first menu in portrait on iPhone. */
+
+/* Customizable controls overlay */
+#controlLayer{position:absolute;inset:0;z-index:7;pointer-events:none;touch-action:none}
+#controlLayer #combatControls,#controlLayer #moveButtons{display:contents!important}
+#controlLayer #joy,#controlLayer #fire,#controlLayer #jump,#controlLayer #sprint{
+ position:absolute!important;inset:auto!important;right:auto!important;bottom:auto!important;
+ transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;z-index:8;flex:none!important;
+ -webkit-user-select:none;user-select:none;-webkit-touch-callout:none
+}
+#settingsGear{pointer-events:auto;width:40px;height:41px;border:1px solid #ffffff40;border-radius:11px;background:#123047;color:#d3f9ff;font-size:20px}
+#menuControls{width:100%;min-height:44px;margin-top:10px;border:1px solid #6cd7e7;border-radius:12px;background:#12324a;color:#d7f8ff;font-size:13px;font-weight:900}
+#editorPanel[hidden]{display:none!important}
+#editorPanel{position:absolute;z-index:75;top:7px;left:50%;transform:translateX(-50%);width:min(95%,795px);padding:9px 13px;border-radius:14px;border:1px solid #78deef;background:#071e2def;color:#fff;pointer-events:auto;touch-action:auto}
+#editorPanel .editor-header{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+#editorPanel strong{font-size:12px;letter-spacing:.1em}#editorPanel small{font-size:10px;color:#acd1de}
+#editorPanel .editor-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+#editorPanel label{font-size:10px;font-weight:800}
+#editorPanel select{color:#fff;background:#13344b;border:1px solid #6da2b8;border-radius:8px;min-width:104px;height:33px}
+#editorPanel input[type=range]{width:clamp(90px,14vw,160px);accent-color:#61e8e9;touch-action:pan-x}
+#editorPanel output{font-size:11px;font-weight:800;min-width:39px}
+#editorPanel button{height:33px;border:1px solid #809db5;border-radius:8px;color:#fff;background:#15344a;font-size:10px;font-weight:900;padding:0 9px}
+#editorPanel #controlSave{background:#49ddd8;color:#062e37;border-color:#49ddd8}
+#gameViewport.editing #controlLayer .control-editable{outline:2px dashed #e7ebff;outline-offset:4px;cursor:grab}
+#gameViewport.editing #controlLayer .control-editable.selected{outline:3px solid #ffe382;box-shadow:0 0 24px #ffe38277}
+#gameViewport.editing #lookzone{pointer-events:none!important}
+#gameViewport.editing .hud-top,#gameViewport.editing #healthPanel{opacity:.2;pointer-events:none}
+@media(max-height:405px){#editorPanel{padding:6px 10px}#editorPanel .editor-header{margin-bottom:5px}#editorPanel .editor-row{gap:6px}#editorPanel button,#editorPanel select{height:30px}}
 #gameViewport{position:fixed;inset:0;width:100vw;height:100vh;width:100dvw;height:100dvh;overflow:hidden;isolation:isolate;touch-action:none;transform-origin:top left}
 @media (orientation:portrait) and (pointer:coarse){
  #gameViewport{inset:auto;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform:rotate(90deg) translateY(-100%)}
@@ -230,23 +257,24 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 04</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 05</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
-   <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
+   <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="settingsGear" type="button" aria-label="Configurar botones">⚙</button><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
   <div id="healthPanel" aria-label="Puntos de vida"><span>VIDA <strong><b id="healthValue">100</b>/100</strong></span><div id="healthTrack"><div id="healthFill"></div></div></div>
   <div id="centerTip" role="status"></div>
   <div id="reticle"><i></i></div>
   <div id="hit"></div>
-  <div id="joy" aria-label="Joystick de movimiento"><div id="knob"></div></div>
+  <div id="controlLayer"><div id="joy" class="control-editable" aria-label="Joystick de movimiento"><div id="knob"></div></div>
   <div id="combatControls" aria-label="Controles de combate">
    <div id="moveButtons">
-    <button id="sprint" type="button" aria-label="Correr">CORRER</button>
-    <button id="jump" type="button" aria-label="Saltar">SALTAR</button>
+    <button id="sprint" class="control-editable" type="button" aria-label="Correr">CORRER</button>
+    <button id="jump" class="control-editable" type="button" aria-label="Saltar">SALTAR</button>
    </div>
-   <button id="fire" type="button" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
+   <button id="fire" class="control-editable" type="button" aria-label="Disparar"><span><span class="cross">⌖</span><br>DISPARAR</span></button>
   </div>
-  <span id="ammo">CARGANDO G2 COMBAT...</span>
+  </div><!-- /controlLayer -->
+   <span id="ammo">CARGANDO G2 COMBAT...</span>
 </div>
 <div id="damageFlash" aria-hidden="true"></div>
 <div id="deathScreen" hidden><div class="death-card"><h2>TE ELIMINARON</h2><p>Conseguiste <strong id="deathKills">0</strong> bajas. Los enemigos patrullan el barrio y disparan cuando te tienen a la vista.</p><button id="respawn">VOLVER A APARECER</button></div></div>
@@ -257,6 +285,7 @@ button{font:inherit;cursor:pointer}
   <p>Un barrio 3D original con casas, autobús, patios y garajes. Ahora los enemigos patrullan, te buscan y esquivan obstáculos. Gráficos más nítidos y movimiento más natural para iPhone.</p>
   <div class="pills"><span>🎮 FPS táctil</span><span>📱 iPhone</span><span>🏘️ Mapa original 3D</span><span>🎯 Blancos de práctica</span></div>
   <button id="play">ENTRAR AL MAPA</button>
+   <button id="menuControls" type="button">⚙ PERSONALIZAR CONTROLES</button>
   <div class="guide">
    <div><b>◉ Dedo izquierdo</b>Joystick para caminar</div>
    <div><b>↗ Dedo derecho</b>Desliza para mirar</div>
@@ -264,6 +293,18 @@ button{font:inherit;cursor:pointer}
    <div><b>⇧ SALTAR / CORRER</b>Muévete por el escenario</div>
   </div>
   <p class="menu-note">Pantalla horizontal automática para menú y partida. No es Nuketown ni utiliza mapas, personajes o recursos de Call of Duty. Versión alfa de prueba: combate contra bots sin multijugador.</p>
+ </div>
+</div>
+<div id="editorPanel" hidden>
+ <div class="editor-header"><strong>⚙ EDITAR CONTROLES</strong><small>Arrastra los botones para moverlos. Ajusta su tamaño y guarda.</small></div>
+ <div class="editor-row">
+  <label for="controlChoice">BOTÓN</label>
+  <select id="controlChoice"><option value="joy">Movimiento</option><option value="fire">Disparar</option><option value="jump">Saltar</option><option value="sprint">Correr</option></select>
+  <label for="controlSize">TAMAÑO</label><input id="controlSize" type="range" min="48" max="182" step="2" value="100">
+  <output id="controlSizeValue">100 px</output>
+  <button id="controlReset" type="button">RESTAURAR</button>
+  <button id="controlCancel" type="button">CANCELAR</button>
+  <button id="controlSave" type="button">GUARDAR</button>
  </div>
 </div>
 <div id="fatal"><h2>No se pudo iniciar el motor 3D</h2><p id="fatalMsg"></p><p>Prueba abrir la página con Safari y conexión a internet. Este prototipo utiliza Babylon.js para mostrar gráficos 3D.</p></div>
