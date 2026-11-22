@@ -257,7 +257,7 @@ button{font:inherit;cursor:pointer}
 <div id="hud" hidden>
   <div id="lookzone" aria-label="Arrastra para girar la cámara"></div>
   <div class="hud-top">
-   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 06</small></div>
+   <div><div class="mark"><strong>HUXCASTI / BARRIO 47</strong><small>CAMPO DE COMBATE · ALFA 07</small></div>
    <canvas id="minimap" width="164" height="138"></canvas><div class="minimap-label">RADAR · TÚ ERES EL TRIÁNGULO</div></div>
    <div style="display:flex;gap:8px;align-items:flex-start"><div class="score-card"><span>BLANCOS<br>ALCANZADOS</span><strong id="score">00</strong></div><div class="score-card bot-card"><span>BAJAS</span><strong id="kills">00</strong></div><button id="settingsGear" type="button" aria-label="Configurar botones">⚙</button><button id="pause" aria-label="Pausar el juego">Ⅱ</button></div>
   </div>
@@ -1173,7 +1173,9 @@ button{font:inherit;cursor:pointer}
   // Pointer capture alone may be cancelled by Safari when a second finger joins.
   // Native multi-touch keeps the movement stick working while firing or sprinting.
   let movingFinger=null,aimFinger=null;
-  const shootingFingers=new Set(),sprintingFingers=new Set(),fireAimLast=new Map();
+  const shootingFingers=new Set(),sprintingFingers=new Set(),jumpingFingers=new Set();
+  const buttonAimLast=new Map();
+  let buttonAimOwner=null;
   const touchKey=id=>"touch-"+id;
   const gamePoint=t=>{
    const view=get("gameViewport");
@@ -1206,11 +1208,14 @@ button{font:inherit;cursor:pointer}
    const key=touchKey(id);
    if(shootingFingers.delete(id))stopFire({pointerId:key});
    if(sprintingFingers.delete(id))stopSprint({pointerId:key});
-   fireAimLast.delete(id);
+   jumpingFingers.delete(id);
+   buttonAimLast.delete(id);
+   if(buttonAimOwner===id)buttonAimOwner=null;
   }
   function clearNativeTouches(){
    movingFinger=null;aimFinger=null;
-   shootingFingers.clear();sprintingFingers.clear();fireAimLast.clear();
+   shootingFingers.clear();sprintingFingers.clear();jumpingFingers.clear();
+   buttonAimLast.clear();buttonAimOwner=null;
    joy.x=joy.y=0;knob.style.transform="translate(0,0)";
    for(const key of [...firePointers])if(typeof key==="string"&&key.startsWith("touch-"))firePointers.delete(key);
    for(const key of [...sprintPointers])if(typeof key==="string"&&key.startsWith("touch-"))sprintPointers.delete(key);
@@ -1237,11 +1242,13 @@ button{font:inherit;cursor:pointer}
        clearInterval(firingTimer);firingTimer=setInterval(shoot,185);
       }
      }
-     fireAimLast.set(id,p);handled=true;
+     buttonAimLast.set(id,{point:p,hasMoved:false});handled=true;
     }else if(isSprint){
      sprintingFingers.add(id);sprintPointers.add(touchKey(id));
-     runHeld=true;handled=true;
+     runHeld=true;buttonAimLast.set(id,{point:p,hasMoved:false});handled=true;
     }else if(isJump){
+     jumpingFingers.add(id);
+     buttonAimLast.set(id,{point:p,hasMoved:false});
      jump();handled=true;
     }else if((isJoy||p.x<layerSize().w*.36)&&!movingFinger){
      // The left side acts as an extended joystick pickup area.
@@ -1268,13 +1275,19 @@ button{font:inherit;cursor:pointer}
      moveCameraBy(p.x-aimFinger.p.x,p.y-aimFinger.p.y);
      aimFinger.p=p;handled=true;
     }
-    if(shootingFingers.has(id)){
-     // Holding FIRE does not lock the camera: sliding the fire finger can aim.
-     const prev=fireAimLast.get(id);
-     if(prev&&!aimFinger)moveCameraBy(p.x-prev.x,p.y-prev.y);
-     fireAimLast.set(id,p);handled=true;
+    // Any action button can aim with a drag, while the joystick stays active.
+    const actionPoint=buttonAimLast.get(id);
+    if(actionPoint){
+     const dx=p.x-actionPoint.point.x,dy=p.y-actionPoint.point.y;
+     const hasGesture=actionPoint.hasMoved||Math.hypot(dx,dy)>2.8;
+     if(hasGesture&&!aimFinger&&(buttonAimOwner===null||buttonAimOwner===id)){
+      buttonAimOwner=id;
+      moveCameraBy(dx,dy);
+      actionPoint.hasMoved=true;
+     }
+     actionPoint.point=p;
+     handled=true;
     }
-    if(sprintingFingers.has(id))handled=true;
    }
    if(handled&&e.cancelable)e.preventDefault();
   },{capture:true,passive:false});
@@ -1283,7 +1296,7 @@ button{font:inherit;cursor:pointer}
    for(const t of e.changedTouches){
     if((movingFinger&&movingFinger.id===t.identifier)||
        (aimFinger&&aimFinger.id===t.identifier)||
-       shootingFingers.has(t.identifier)||sprintingFingers.has(t.identifier)){
+       shootingFingers.has(t.identifier)||sprintingFingers.has(t.identifier)||jumpingFingers.has(t.identifier)){
      endNativeFinger(t.identifier);found=true;
     }
    }
