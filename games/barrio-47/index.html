@@ -1104,14 +1104,14 @@ button{font:inherit;cursor:pointer}
   loadControls();applyControls();
   get("loading").hidden=true;
   const start=()=>{
-   get("menu").hidden=true;get("hud").hidden=false;
+   resetInputs();get("menu").hidden=true;get("hud").hidden=false;
    running=true;
    engine.resize();drawRadar();tip("TOCA Y DESLIZA PARA EXPLORAR");
   };
-  const pause=()=>{running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;velocityX=velocityZ=0;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
+  const pause=()=>{resetInputs();running=false;get("hud").hidden=true;get("menu").hidden=false;get("play").textContent="VOLVER AL MAPA";runHeld=false;velocityX=velocityZ=0;keys.clear();joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";};
   get("play").addEventListener("click",start);
   get("pause").addEventListener("click",pause);
-  get("respawn").addEventListener("click",respawnPlayer);
+  get("respawn").addEventListener("click",()=>{resetInputs();respawnPlayer()});
   const joyEl=get("joy"),knob=get("knob");
   let joyId=null;
   function setJoy(e){
