@@ -1028,7 +1028,59 @@ button{font:inherit;cursor:pointer}
  // Landscape layout works even before the first Play tap.
  const portraitGame=()=>window.matchMedia("(orientation: portrait) and (pointer: coarse)").matches;
  function coordinatesForGame(e){return portraitGame()?{x:e.clientY,y:-e.clientX}:{x:e.clientX,y:e.clientY};}
- function syncOrientation(){engine.resize();if(camera)drawRadar();}
+ function syncOrientation(){engine.resize();applyControls();if(camera)drawRadar();}
+
+ // Per-device normalized landscape HUD layout. Allows independent fingers on every control.
+ const CONTROL_IDS=["joy","fire","jump","sprint"];
+ const CONTROL_KEY="barrio47.controls.v1";
+ const clamp=(n,lo,hi)=>Math.min(hi,Math.max(lo,n));
+ let controlConfig=null;
+ function layerSize(){
+  const el=get("controlLayer"),view=get("gameViewport");
+  return {w:Math.max(310,el.clientWidth||view.clientWidth),h:Math.max(215,el.clientHeight||view.clientHeight)};
+ }
+ function dimensions(id,size){return {w:size,h:size*(id==="jump"?.75:id==="sprint"?.65:1)}}
+ function defaultControls(){
+  const {w,h}=layerSize(),factor=h<340?.86:h<410?.94:1;
+  const j=Math.round(110*factor),f=Math.round(96*factor),u=Math.round(73*factor),sp=Math.round(71*factor);
+  const x=w-19-f-23-u/2,uh=dimensions("jump",u).h,sh=dimensions("sprint",sp).h;
+  return {
+   joy:{x:(20+j/2)/w,y:(h-22-j/2)/h,size:j},
+   fire:{x:(w-19-f/2)/w,y:(h-24-f/2)/h,size:f},
+   jump:{x:x/w,y:(h-23-uh/2)/h,size:u},
+   sprint:{x:x/w,y:(h-23-uh-15-sh/2)/h,size:sp}
+  };
+ }
+ function loadControls(){
+  let stored=null;try{stored=JSON.parse(localStorage.getItem(CONTROL_KEY)||"null")}catch(err){}
+  const defaults=defaultControls();controlConfig={};
+  for(const id of CONTROL_IDS){
+   const p=stored&&stored[id];
+   controlConfig[id]=p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.size)
+   ?{x:clamp(p.x,0,1),y:clamp(p.y,0,1),size:clamp(p.size,48,182)}:{...defaults[id]};
+  }
+ }
+ function applyControls(){
+  if(!controlConfig)return;
+  const {w,h}=layerSize();
+  for(const id of CONTROL_IDS){
+   const p=controlConfig[id],el=get(id),d=dimensions(id,p.size);
+   const x=clamp(p.x*w,d.w/2+7,Math.max(d.w/2+7,w-d.w/2-7));
+   const y=clamp(p.y*h,d.h/2+7,Math.max(d.h/2+7,h-d.h/2-7));
+   el.style.left=x+"px";el.style.top=y+"px";
+   el.style.width=d.w+"px";el.style.height=d.h+"px";
+   p.x=x/w;p.y=y/h;
+   if(id==="joy"){
+    const knob=get("knob"),k=Math.round(p.size*.51);
+    knob.style.width=k+"px";knob.style.height=k+"px";
+    knob.style.marginLeft=-k/2+"px";knob.style.marginTop=-k/2+"px";
+   }
+  }
+ }
+ function persistControls(){
+  try{localStorage.setItem(CONTROL_KEY,JSON.stringify(controlConfig));return true}
+  catch(err){console.warn("No se pudo guardar controles",err);return false}
+ }
  function ui(){
   // iOS: las pulsaciones repetidas y los gestos táctiles no deben ampliar Safari.
   // Evitar el gesto por defecto solo dentro de los controles del juego.
@@ -1049,6 +1101,7 @@ button{font:inherit;cursor:pointer}
   document.addEventListener("dblclick",e=>{
    if(running&&e.cancelable)e.preventDefault();
   },{passive:false});
+  loadControls();applyControls();
   get("loading").hidden=true;
   const start=()=>{
    get("menu").hidden=true;get("hud").hidden=false;
@@ -1069,7 +1122,7 @@ button{font:inherit;cursor:pointer}
    dx*=s;dy*=s;joy.x=dx/max;joy.y=dy/max;
    knob.style.transform="translate("+dx+"px,"+dy+"px)";
   }
-  joyEl.addEventListener("pointerdown",e=>{if(!running)return;joyId=e.pointerId;joyEl.setPointerCapture(e.pointerId);setJoy(e);e.preventDefault();});
+  joyEl.addEventListener("pointerdown",e=>{if(!running||joyId!==null)return;joyId=e.pointerId;joyEl.setPointerCapture(e.pointerId);setJoy(e);e.preventDefault();});
   joyEl.addEventListener("pointermove",e=>{if(joyId===e.pointerId)setJoy(e);});
   function endJoy(e){if(e.pointerId!==joyId)return;joyId=null;joy.x=joy.y=0;knob.style.transform="translate(0,0)";}
   joyEl.addEventListener("pointerup",endJoy);joyEl.addEventListener("pointercancel",endJoy);
@@ -1086,23 +1139,35 @@ button{font:inherit;cursor:pointer}
   });
   function stopLook(e){if(e.pointerId===lookingId){lookingId=null;lastLook=null}}
   look.addEventListener("pointerup",stopLook);look.addEventListener("pointercancel",stopLook);
-  get("jump").addEventListener("pointerdown",e=>{jump();e.preventDefault()});
-  const runButton=get("sprint");
-  runButton.addEventListener("pointerdown",e=>{runHeld=true;runButton.setPointerCapture(e.pointerId);e.preventDefault()});
-  for(const event of ["pointerup","pointercancel","lostpointercapture"])runButton.addEventListener(event,()=>{runHeld=false});
-  const fire=get("fire");
-  const stopFire=()=>{
+  get("jump").addEventListener("pointerdown",e=>{if(!running)return;jump();e.preventDefault()});
+  const runButton=get("sprint"),sprintPointers=new Set();
+  runButton.addEventListener("pointerdown",e=>{
+   if(!running)return;e.preventDefault();
+   sprintPointers.add(e.pointerId);runHeld=true;
+   try{runButton.setPointerCapture(e.pointerId)}catch(error){}
+  });
+  const stopSprint=e=>{
+   if(e&&e.pointerId!==undefined)sprintPointers.delete(e.pointerId);else sprintPointers.clear();
+   runHeld=sprintPointers.size>0;
+  };
+  for(const event of ["pointerup","pointercancel","lostpointercapture"])runButton.addEventListener(event,stopSprint);
+  const fire=get("fire"),firePointers=new Set();
+  const stopFire=e=>{
+   if(e&&e.pointerId!==undefined)firePointers.delete(e.pointerId);else firePointers.clear();
+   if(firePointers.size)return;
    clearInterval(firingTimer);firingTimer=0;fire.classList.remove("pressed");
   };
   fire.addEventListener("pointerdown",e=>{
-   if(!running)return;
-   e.preventDefault();fire.setPointerCapture(e.pointerId);
-   fire.classList.add("pressed");shoot();clearInterval(firingTimer);
-   firingTimer=setInterval(shoot,185);
+   if(!running)return;e.preventDefault();
+   if(firePointers.has(e.pointerId))return;
+   firePointers.add(e.pointerId);
+   try{fire.setPointerCapture(e.pointerId)}catch(error){}
+   if(firePointers.size===1){
+    fire.classList.add("pressed");shoot();clearInterval(firingTimer);
+    firingTimer=setInterval(shoot,185);
+   }
   });
-  fire.addEventListener("pointerup",stopFire);
-  fire.addEventListener("pointercancel",stopFire);
-  fire.addEventListener("lostpointercapture",stopFire);
+  for(const event of ["pointerup","pointercancel","lostpointercapture"])fire.addEventListener(event,stopFire);
   window.addEventListener("keydown",e=>{
    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.code))e.preventDefault();
    keys.add(e.code);
@@ -1111,7 +1176,7 @@ button{font:inherit;cursor:pointer}
    if(e.code==="KeyR"&&dead)respawnPlayer();
   });
   window.addEventListener("keyup",e=>keys.delete(e.code));
-  window.addEventListener("blur",()=>{keys.clear();runHeld=false;velocityX=velocityZ=0;stopFire()});
+  window.addEventListener("blur",()=>{keys.clear();runHeld=false;sprintPointers.clear();joyId=null;lookingId=null;lastLook=null;joy.x=joy.y=0;get("knob").style.transform="translate(0,0)";velocityX=velocityZ=0;stopFire()});
   canvas.addEventListener("click",()=>{if(running&&matchMedia("(pointer:fine)").matches)canvas.requestPointerLock?.()});
   document.addEventListener("mousemove",e=>{
    if(document.pointerLockElement!==canvas||!running)return;
@@ -1122,6 +1187,73 @@ button{font:inherit;cursor:pointer}
   });
   canvas.addEventListener("mousedown",e=>{if(e.button===0&&running)shoot()});
   drawRadar();
+
+  // Editing is a paused live preview; dragging does not issue gameplay commands.
+  let editing=false,returnToMatch=false,backup=null,selected="joy",drag=null;
+  const editorRoot=get("editorPanel"),viewport=get("gameViewport");
+  const chooser=get("controlChoice"),slider=get("controlSize"),sizeText=get("controlSizeValue");
+  function chooseControl(id){
+   if(!CONTROL_IDS.includes(id))return;
+   selected=id;chooser.value=id;slider.value=String(controlConfig[id].size);
+   sizeText.textContent=Math.round(controlConfig[id].size)+" px";
+   for(const k of CONTROL_IDS)get(k).classList.toggle("selected",k===id);
+  }
+  function resetInputs(){
+   joyId=null;lookingId=null;lastLook=null;joy.x=joy.y=0;
+   get("knob").style.transform="translate(0,0)";
+   keys.clear();velocityX=velocityZ=0;runHeld=false;sprintPointers.clear();stopFire();
+  }
+  function openControlEditor(){
+   if(editing||dead)return;
+   returnToMatch=running;backup=JSON.stringify(controlConfig);
+   resetInputs();running=false;
+   get("menu").hidden=true;get("hud").hidden=false;
+   editorRoot.hidden=false;viewport.classList.add("editing");editing=true;
+   applyControls();chooseControl(selected);engine.resize();
+  }
+  function closeControlEditor(save){
+   if(!editing)return;
+   drag=null;editing=false;editorRoot.hidden=true;viewport.classList.remove("editing");
+   if(save){if(!persistControls())tip("Tu navegador no permitió guardar controles");}
+   else if(backup)controlConfig=JSON.parse(backup);
+   applyControls();for(const id of CONTROL_IDS)get(id).classList.remove("selected");
+   get("menu").hidden=returnToMatch;get("hud").hidden=!returnToMatch;
+   running=returnToMatch;engine.resize();
+  }
+  get("menuControls").addEventListener("click",openControlEditor);
+  get("settingsGear").addEventListener("click",openControlEditor);
+  chooser.addEventListener("change",()=>chooseControl(chooser.value));
+  slider.addEventListener("input",()=>{
+   if(!editing)return;
+   controlConfig[selected].size=clamp(Number(slider.value),48,182);
+   sizeText.textContent=Math.round(controlConfig[selected].size)+" px";
+   applyControls();
+  });
+  get("controlSave").addEventListener("click",()=>closeControlEditor(true));
+  get("controlCancel").addEventListener("click",()=>closeControlEditor(false));
+  get("controlReset").addEventListener("click",()=>{
+   controlConfig=defaultControls();applyControls();chooseControl(selected);
+  });
+  for(const id of CONTROL_IDS){
+   const el=get(id);
+   el.addEventListener("pointerdown",e=>{
+    if(!editing||drag)return;
+    e.preventDefault();e.stopPropagation();chooseControl(id);
+    drag={id,pid:e.pointerId,sx:e.clientX,sy:e.clientY,
+          x:controlConfig[id].x,y:controlConfig[id].y};
+    try{el.setPointerCapture(e.pointerId)}catch(error){}
+   });
+   el.addEventListener("pointermove",e=>{
+    if(!editing||!drag||drag.id!==id||drag.pid!==e.pointerId)return;
+    e.preventDefault();
+    const {w,h}=layerSize(),dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+    controlConfig[id].x=drag.x+(portraitGame()?dy:dx)/w;
+    controlConfig[id].y=drag.y+(portraitGame()?-dx:dy)/h;
+    applyControls();
+   });
+   const stopDrag=e=>{if(drag&&drag.id===id&&drag.pid===e.pointerId)drag=null};
+   for(const event of ["pointerup","pointercancel","lostpointercapture"])el.addEventListener(event,stopDrag);
+  }
  }
  try{
   engine=new B.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:false},true);
