@@ -4,20 +4,20 @@ hx-language select:focus-visible { outline:3px solid #5cd8df; outline-offset:3px
 .profile-tools { display:flex; gap:18px; align-items:center; }
 #fallback .hx-site-nav { margin-left:auto; }
 #fallback .hx-hero { display:block; }
-#fallback .hx-hero h1 { font-weight:750; letter-spacing:-.05em; max-width:15ch; }
-#fallback .hx-hero h1 span { color:#69e1e3; background:none; }
+#fallback .hx-hero h2 { font-weight:750; letter-spacing:-.05em; max-width:15ch; }
+#fallback .hx-hero h2 span { color:#69e1e3; background:none; }
 #fallback .hx-hero-lead { max-width:48ch; }
 
 @media(min-width:701px) {
   #fallback .hx-hero { text-align:center; }
-  #fallback .hx-hero h1 { max-width:22ch; margin-inline:auto; }
+  #fallback .hx-hero h2 { max-width:22ch; margin-inline:auto; }
   #fallback .hx-hero-lead { max-width:60ch; margin-inline:auto; }
   #fallback .hx-hero-actions { justify-content:center; }
 }
 @media(max-width:700px) {
   #fallback .hx-site-header { flex-wrap:wrap; gap:7px 12px; padding:8px 0; }
   #fallback .hx-site-nav { display:flex; gap:12px; }
-  #fallback .hx-site-nav a[href="#inicio"],#fallback .hx-site-nav a[href="#servicios"] { display:none; }
+  #fallback .hx-site-nav a[href="#servicios"] { display:none; }
   #fallback .hx-site-nav a { display:inline-flex; align-items:center; min-height:40px; font-size:13px; }
   #fallback .hx-hero { padding-top:30px; }
   #fallback .hx-hero-actions { display:flex; flex-wrap:wrap; gap:8px; }
