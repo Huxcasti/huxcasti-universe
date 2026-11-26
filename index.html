@@ -463,7 +463,6 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 #fallback .hx-service p{font-size:12px;line-height:1.65;color:#b5d0e0;margin:0 0 19px;flex:1}
 #fallback .hx-service a{font-size:12px;color:#6eeef4;text-decoration:none;font-weight:750;padding:5px 0}
 #fallback .hx-service a:hover,#fallback .hx-service a:focus-visible{color:#fff;text-decoration:underline}
-#fallback .hx-services-foot{font-size:11px;line-height:1.55;color:#91aebd;margin:22px auto 0}
 @media(max-width:680px){#fallback .hx-services{margin:14px auto 44px;padding:23px 15px 19px;border-radius:18px}#fallback .hx-services-grid{grid-template-columns:1fr;gap:9px}#fallback .hx-service{padding:15px 16px}#fallback .hx-service h3{margin:6px 0}#fallback .hx-service p{margin-bottom:10px}#fallback .hx-services-lead{margin-bottom:17px}}
 
 
@@ -1180,22 +1179,13 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
   #fallback .hx-portfolio .f-core.hx-minimal-core .hx-h-ignition{opacity:.1}
 }
 
-/* Huxcasti: precios transparentes sin convertir los sistemas a paquetes cerrados. */
+/* Service cards and quote links. */
 #fallback .hx-services .hx-service{position:relative}
 #fallback .hx-services .hx-service p{margin-bottom:18px}
-#fallback .hx-services .hx-service-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 7px;width:100%;border-top:1px solid rgba(127,216,232,.17);padding-top:16px;margin-top:auto;margin-bottom:10px}
-#fallback .hx-services .hx-price-from{color:#a9c8d8;font-weight:650;font-size:12px}
-#fallback .hx-services .hx-service-price strong{font-size:clamp(25px,2.5vw,32px);color:#8cf2ef;font-weight:850;letter-spacing:-.045em;line-height:1.1;font-variant-numeric:tabular-nums}
-#fallback .hx-services .hx-price-unit{color:#8baabd;font-size:10px;white-space:nowrap}
-#fallback .hx-services .hx-service>a{display:inline-flex;align-items:center;min-height:38px;margin-top:4px;padding:7px 0;font-size:12px}
-#fallback .hx-services .hx-services-foot{max-width:810px;margin-top:22px}
-@media(max-width:680px){#fallback .hx-services .hx-service{padding:19px 17px}#fallback .hx-services .hx-service-price{padding-top:13px;margin-bottom:7px}#fallback .hx-services .hx-service-price strong{font-size:30px}#fallback .hx-services .hx-service p{margin-bottom:11px}}
+#fallback .hx-services .hx-service>a{display:inline-flex;align-items:center;min-height:44px;margin-top:auto;padding:7px 0;font-size:12px}
+@media(max-width:680px){#fallback .hx-services .hx-service{padding:19px 17px}#fallback .hx-services .hx-service p{margin-bottom:11px}}
 
-/* Diferenciar inversión inicial y servicio mensual opcional sin confundir al cliente. */
-#fallback .hx-services .hx-service-maintenance{display:flex;gap:4px 8px;align-items:baseline;flex-wrap:wrap;margin:0 0 11px;min-height:23px}
-#fallback .hx-services .hx-maint-label{font-size:10px;line-height:1.45;color:#a4c1d1}
-#fallback .hx-services .hx-service-maintenance strong{color:#e1faff;font-size:15px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
-#fallback .hx-services .hx-service-maintenance small{font-size:10px;font-weight:550;color:#a4c1d1}
+/* Maintenance and support. */
 #fallback .hx-maintenance-explainer{display:flex;align-items:center;justify-content:space-between;text-align:left;gap:19px;padding:22px 23px;margin:22px auto 0;border:1px solid rgba(111,219,238,.22);border-radius:15px;background:linear-gradient(120deg,rgba(34,88,116,.28),rgba(7,31,49,.58))}
 #fallback .hx-maintenance-explainer>div{min-width:0;max-width:700px}
 #fallback .hx-maintenance-explainer .hx-maint-kicker{font-size:9px;font-weight:800;letter-spacing:.2em;color:#6be9ef}
@@ -1203,7 +1193,7 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 #fallback .hx-maintenance-explainer p{font-size:11px;line-height:1.6;margin:0;color:#a9c9da}
 #fallback .hx-maintenance-explainer a{display:inline-flex;align-items:center;justify-content:center;flex:none;text-align:center;min-height:40px;border:1px solid rgba(126,229,235,.57);background:rgba(51,206,222,.10);border-radius:10px;padding:10px 14px;color:#9df6f9;font-size:11px;font-weight:800;text-decoration:none}
 #fallback .hx-maintenance-explainer a:hover,#fallback .hx-maintenance-explainer a:focus-visible{background:rgba(72,217,229,.19);color:#fff}
-@media(max-width:680px){#fallback .hx-services .hx-service-maintenance{margin-bottom:8px}#fallback .hx-maintenance-explainer{flex-direction:column;align-items:stretch;gap:13px;padding:17px 16px;margin-top:16px}#fallback .hx-maintenance-explainer a{width:100%}}
+@media(max-width:680px){#fallback .hx-maintenance-explainer{flex-direction:column;align-items:stretch;gap:13px;padding:17px 16px;margin-top:16px}#fallback .hx-maintenance-explainer a{width:100%}}
 
 /* Huxcasti Universe · núcleo planetario: la marca elegida vive en el centro.
    El asset no añade una capa rectangular; conserva las órbitas y el pulso JS existente. */
@@ -1645,12 +1635,6 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
         <a class="hx-secondary-action" href="/cotizar/">Solicitar cotización</a>
       </div>
     </div>
-    <a class="hx-case-preview" href="demo-just-be-you.html">
-      <picture><source width="372" height="345" media="(max-width: 600px)" srcset="/assets/studio-preview-mobile-es.webp" data-image-template="/assets/studio-preview-mobile-{lang}.webp">
-        <img src="/assets/studio-preview-es.webp" data-image-template="/assets/studio-preview-{lang}.webp" width="1085" height="642" alt="Panel de Just Be You con expedientes y sesiones de ejemplo." fetchpriority="high">
-      </picture>
-      <span class="hx-case-caption"><span><small>PROYECTO DESTACADO</small><strong>Just Be You</strong></span><span class="hx-case-link">Abrir demo</span></span>
-    </a>
   </section>
   <section id="servicios" class="hx-services" aria-labelledby="hx-services-title">
     <div class="hx-services-eyebrow">SERVICIOS</div>
@@ -1660,24 +1644,18 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
         <span class="hx-service-icon" aria-hidden="true">↗</span>
         <h3>Páginas web</h3>
         <p>Sitios modernos, adaptados al celular y diseñados para que tus clientes conozcan tu negocio y te contacten.</p>
-        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$799</strong><span class="hx-price-unit">por proyecto</span></div>
-        <div class="hx-service-maintenance"><span class="hx-maint-label">Mantenimiento opcional desde</span><strong>$75<small>/mes</small></strong></div>
         <a href="/cotizar/?servicio=web" rel="noopener noreferrer">Solicitar cotización</a>
       </article>
       <article class="hx-service">
         <span class="hx-service-icon" aria-hidden="true">▦</span>
         <h3>Herramientas digitales</h3>
         <p>Herramientas para resolver una tarea de tu negocio: recibir pedidos, preparar cotizaciones, gestionar solicitudes o coordinar citas.</p>
-        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$1,499</strong><span class="hx-price-unit">por proyecto</span></div>
-        <div class="hx-service-maintenance"><span class="hx-maint-label">Mantenimiento opcional desde</span><strong>$125<small>/mes</small></strong></div>
         <a href="/cotizar/?servicio=booking" rel="noopener noreferrer">Solicitar cotización</a>
       </article>
       <article class="hx-service">
         <span class="hx-service-icon" aria-hidden="true">⌘</span>
         <h3>Sistemas a la medida</h3>
         <p>Soluciones que conectan varios procesos de tu negocio: clientes, ventas, inventario, usuarios y reportes, según lo que necesites.</p>
-        <div class="hx-service-price"><span class="hx-price-from">Desde</span><strong>$2,499</strong><span class="hx-price-unit">por proyecto</span></div>
-        <div class="hx-service-maintenance"><span class="hx-maint-label">Mantenimiento opcional desde</span><strong>$175<small>/mes</small></strong></div>
         <a href="/cotizar/?servicio=admin" rel="noopener noreferrer">Solicitar cotización</a>
       </article>
     </div>
@@ -1685,7 +1663,6 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
       <div><span class="hx-maint-kicker">DESPUÉS DEL LANZAMIENTO</span><h3>Mantenimiento y soporte</h3><p>Los planes pueden incluir revisiones, correcciones menores y soporte. Las funciones nuevas, los rediseños y los servicios externos se cotizan aparte.</p></div>
       <a href="https://wa.me/17875490777?text=Hola%2C%20vi%20los%20planes%20de%20mantenimiento%20de%20Huxcasti.%20Quiero%20saber%20qu%C3%A9%20incluyen%20y%20solicitar%20una%20cotizaci%C3%B3n." target="_blank" rel="noopener noreferrer">Consultar mantenimiento ↗</a>
     </div>
-    <p class="hx-services-foot">Precios de referencia en USD. El precio final depende de las funciones, la complejidad y el alcance de cada proyecto. El desarrollo se cobra por proyecto y el mantenimiento es mensual y opcional. El soporte, el dominio, el hospedaje y las integraciones se definen en cada cotización.</p>
   </section>
   <section class="hx-portfolio" id="proyectos" aria-labelledby="hx-projects-title">
     <div class="f-title"><div class="f-kicker">PORTAFOLIO</div><h2 id="hx-projects-title"><em>Proyectos seleccionados</em></h2><p>Elige un planeta para ver el proyecto.</p></div>
