@@ -123,6 +123,6 @@ HuxcastiLanguage.add({
   "Huxcasti · Portafolio profesional de desarrollo web · Puerto Rico": "Huxcasti · Web development portfolio · Puerto Rico",
   "Regresar a huxcasti.com": "Back to huxcasti.com",
   "Hola, vi los planes de mantenimiento de Huxcasti. Quiero saber qué incluyen y solicitar una cotización.": "Hi, I’d like to know what your maintenance plans cover and request a quote.",
-  "Hola, vi Huxcasti Universe y quisiera información para crear una página web para mi negocio.": "Hi, I saw your portfolio and would like to discuss a website for my business.",
+  "Hola, vi Huxcasti y quisiera información para crear una página web para mi negocio.": "Hi, I saw the Huxcasti portfolio and would like to discuss a website for my business.",
   "Hola, vi tu portafolio profesional en Huxcasti y quisiera conversar sobre una oportunidad de desarrollo web.": "Hi Humberto, I saw your portfolio and would like to discuss a web development opportunity."
 });
