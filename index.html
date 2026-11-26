@@ -507,7 +507,24 @@ body.hx-page-inactive #fallback .f-ball.hx-textured{animation-play-state:paused!
 #fallback .hx-visual-caption{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#7aa3b3;font-size:9px;font-weight:750;letter-spacing:.13em}
 #fallback .hx-services{width:min(1180px,100%);max-width:1180px;margin:0 auto;padding:37px clamp(18px,3vw,38px);background:linear-gradient(145deg,#0c2031ef,#06121ff2);border-color:#84d5e42d}
 #fallback .hx-services h2{max-width:700px}
-#fallback .hx-service{background:#091e2f;border-color:#85d1e333;border-radius:15px}
+#fallback .hx-service{background:linear-gradient(112deg,#091e2ff5 12%,#091e2f99 100%);border-color:#85d1e333;border-radius:15px}
+/* The sky continues with the page as the introduction and services scroll past. */
+#fallback .hx-hero::before,
+#fallback .hx-services::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0 calc(50% - 50vw);
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 24px 37px, #d3ecff9e .65px, transparent 1.4px) 0 0 / 163px 173px,
+    radial-gradient(circle at 89px 118px, #8cdae080 .55px, transparent 1.25px) 0 0 / 199px 139px,
+    radial-gradient(circle at 154px 61px, #b6d2f06b .65px, transparent 1.3px) 0 0 / 223px 211px,
+    radial-gradient(circle at 62px 173px, #d3e5ff82 .8px, transparent 1.6px) 0 0 / 281px 233px,
+    radial-gradient(circle at 137px 92px, #e2f7ffbd .85px, #8edbe761 1.4px, transparent 3px) 0 0 / 347px 281px,
+    radial-gradient(circle at 275px 201px, #e3ddff8c .8px, transparent 1.7px) 0 0 / 389px 317px;
+}
+#fallback .hx-services::before { background-position:57px -43px; }
 #fallback .hx-portfolio{position:relative;z-index:3;width:min(1180px,100%);margin:0 auto;padding:0 16px 22px}
 #fallback .hx-portfolio .f-title{max-width:760px;margin:41px auto 0}
 #fallback .hx-portfolio .f-title h1{color:#f4fbff;font-size:clamp(30px,5vw,50px);font-weight:900;letter-spacing:-.055em;line-height:1.12;margin:12px 0}
