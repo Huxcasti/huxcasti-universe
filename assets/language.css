@@ -64,3 +64,12 @@ hx-language select:focus-visible { outline:3px solid #5cd8df; outline-offset:3px
   .dashboard-shell .dashboard-columns > * { min-width:0; }
   .shell .mobile-bar { overflow-x:auto; }
 }
+
+#fallback #world-cine .cine-box-office {
+  display:block; width:auto; margin:5px 0 0; padding:6px 0;
+  color:#b9dce7; background:transparent; border:0; box-shadow:none; font-size:12px;
+}
+.project .cine-admin-link + a { margin-top:10px; }
+@media(max-width:700px) {
+  #fallback #world-cine { max-height:48vh; }
+}

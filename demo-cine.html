@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explora el panel del Cine Manuel Nieves con reservaciones, tandas y escaneos ficticios.">
+  <title>Administración del cine · Demo | Huxcasti</title>
+  <link rel="icon" href="/assets/cine-marca.webp" type="image/webp">
+  <link rel="stylesheet" href="/assets/language.css">
+  <link rel="stylesheet" href="/assets/cine-demo.css">
+  <script src="/assets/language.js" defer></script>
+  <script src="/assets/cine-demo.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="back" href="/#world-cine">← Volver al proyecto</a>
+      <hx-language></hx-language>
+    </header>
+    <main>
+      <div class="brand">
+        <img src="/assets/cine-marca.webp" alt="" width="78" height="62">
+        <div><p class="cinema">Cine Teatro Manuel Nieves Quintero</p><h1>Administración del cine</h1></div>
+      </div>
+      <p class="notice"><span class="dot" aria-hidden="true"></span><strong>Demo de solo lectura</strong><span>Las reservaciones, ventas y entradas que ves son ficticias.</span></p>
+      <nav aria-label="Secciones del panel">
+        <button type="button" data-view="bookings" aria-controls="bookings" aria-current="page">Reservaciones</button>
+        <button type="button" data-view="movies" aria-controls="movies">Películas</button>
+        <button type="button" data-view="shows" aria-controls="shows">Tandas</button>
+        <button type="button" data-view="staff" aria-controls="staff">Empleados y escaneos</button>
+      </nav>
+      <section id="bookings" aria-labelledby="bookings-title">
+        <dl id="metrics" class="metrics"></dl>
+        <div class="panel">
+          <div class="section-head">
+            <div><h2 id="bookings-title">Reservaciones</h2><p>Consulta los asientos, el pago y la entrada de cada grupo.</p></div>
+            <label for="entry-filter">Entrada
+              <select id="entry-filter">
+                <option value="all">Todas</option>
+                <option value="used">Utilizada</option>
+                <option value="pending">Por validar</option>
+              </select>
+            </label>
+          </div>
+          <div id="bookings-table"></div>
+          <p id="no-results" hidden>No hay reservaciones con ese estado.</p>
+        </div>
+      </section>
+      <section id="movies" class="panel" aria-labelledby="movies-title" hidden>
+        <div class="section-head"><div><h2 id="movies-title">Películas registradas</h2><p>Cartelera, duración y clasificación de cada película.</p></div></div>
+        <div id="movies-table"></div>
+      </section>
+      <section id="shows" class="panel" aria-labelledby="shows-title" hidden>
+        <div class="section-head"><div><h2 id="shows-title">Tandas registradas</h2><p>Horarios y taquillas reservadas por función.</p></div></div>
+        <div id="shows-table"></div>
+      </section>
+      <section id="staff" aria-labelledby="staff-title" hidden>
+        <div class="panel">
+          <div class="section-head"><div><h2 id="staff-title">Empleados y escaneos</h2><p>Cada asiento validado cuenta como una entrada.</p></div></div>
+          <div id="staff-table"></div>
+        </div>
+        <div class="panel">
+          <h2>Historial de escaneos</h2>
+          <div id="scans-table"></div>
+        </div>
+      </section>
+      <noscript>Activa JavaScript para explorar la demo. / Enable JavaScript to explore the demo.</noscript>
+    </main>
+  </div>
+  <dialog id="booking-detail" aria-labelledby="detail-title">
+    <h2 id="detail-title">Detalle de la reservación</h2>
+    <dl id="details" class="details"></dl>
+    <button id="close-detail" type="button">Cerrar</button>
+  </dialog>
+</body>
+</html>

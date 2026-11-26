@@ -69,7 +69,7 @@ window.HuxcastiLanguage = (() => {
     const original = anchor.dataset.sourceHref || anchor.getAttribute('href');
     if (!original || original.startsWith('#')) return;
     const url = new URL(original, location.href);
-    if (explicit && url.origin === location.origin && (['/', '/index.html', '/perfil.html','/demo-just-be-you.html','/cotizar/','/cotizar/index.html'].includes(url.pathname))) {
+    if (explicit && url.origin === location.origin && (['/', '/index.html', '/perfil.html','/demo-just-be-you.html','/demo-cine.html','/cotizar/','/cotizar/index.html'].includes(url.pathname))) {
       anchor.dataset.sourceHref = original;
       url.searchParams.set('lang', language);
       anchor.setAttribute('href', url.pathname + url.search + url.hash);

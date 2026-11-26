@@ -1,4 +1,6 @@
 HuxcastiLanguage.add({
+  "Ver demo administrativa": "View admin demo",
+  "Ver prototipo de boletería ↗": "View ticketing prototype ↗",
   "Huxcasti crea páginas web, herramientas digitales y sistemas a la medida para negocios en Puerto Rico. Explora nuestros proyectos y solicita una cotización.": "Huxcasti builds websites and custom software for businesses in Puerto Rico. Explore the projects or request a quote.",
   "Huxcasti | Diseño web y sistemas digitales en Puerto Rico": "Huxcasti | Websites and custom software in Puerto Rico",
   "Universo tridimensional interactivo con los proyectos de Huxcasti": "Interactive project universe",
