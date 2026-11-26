@@ -92,7 +92,7 @@ HuxcastiLanguage.add({
   "Mi portafolio": "My portfolio",
   "La demo de Just Be You usa fichas ficticias para que puedas explorar el sistema.": "The Just Be You demo uses fictional records so you can explore the workflow.",
   "01 · Sistema de gestión": "01 · Client records",
-  "Mi hermana usa este sistema en su estudio. Puede registrar a una clienta en una tablet y consultar desde el celular qué tratamiento recibió en su última visita.": "My sister uses this app in her studio. She can register a client on a tablet and check the treatment from their last visit on her phone.",
+  "Desarrollé un sistema de expedientes para Just Be You. El estudio puede registrar a sus clientes desde una tablet y consultar desde el celular qué tratamiento recibió cada persona en su última visita.": "I built a client records system for Just Be You. The studio can register clients on a tablet and use a phone to look up the treatment each client received at their last visit.",
   "Trabajo:": "My work:",
   "flujos de usuarios, interfaz, pruebas, ajustes y publicación.": "user flows, interface design, testing, revisions and deployment.",
   "Tecnologías utilizadas:": "Built with:",
