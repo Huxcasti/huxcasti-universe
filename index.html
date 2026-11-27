@@ -1749,6 +1749,20 @@ body.webgl-ready #hx-living-sky{display:none}
   box-shadow:0 0 18px #39cfde55,0 0 32px #27b4b844;
 }
 
+
+/* Gentle breathing light; only the backlight pulses, not the button or text. */
+#fallback .hx-portfolio .f-action::before{
+  animation:hx-contact-halo-pulse 3.8s ease-in-out infinite;
+}
+@keyframes hx-contact-halo-pulse{
+  0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.94)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.09)}
+}
+body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-portfolio .f-action::before{animation:none;opacity:.85}
+}
+
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
