@@ -1763,6 +1763,39 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
   #fallback .hx-portfolio .f-action::before{animation:none;opacity:.85}
 }
 
+
+/* Fourth orbital world: Wheelie Challenge. */
+#fallback .hx-portfolio .f-space{height:clamp(380px,55vh,520px);min-height:380px}
+#fallback .hx-portfolio .f-orbit:not(.two){width:min(78%,490px);height:76%}
+#fallback .hx-portfolio .f-wheelie{left:23%;top:80%;animation-delay:-3.2s!important}
+#fallback .hx-portfolio .f-just{left:78%;top:80%}
+#fallback .hx-portfolio .f-cine{left:22%;top:20%}
+#fallback .hx-portfolio .f-flambo{left:78%;top:20%}
+#fallback .hx-portfolio a.f-wheelie .f-ball,
+#fallback .focus-wheelie .f-focus-ball{
+  color:#ffbb3d;
+  background-image:radial-gradient(ellipse at 30% 24%,#fff0ad80,transparent 46%),
+    radial-gradient(ellipse at 78% 67%,#351209b0,transparent 60%),
+    repeating-linear-gradient(155deg,#d2842e90 0%,#f9cd6b40 8%,#8f441d70 14%,#f7b84a60 20%),
+    radial-gradient(circle at 32% 25%,#ffe58a,#d99027 45%,#a04a1c 72%,#32160d 100%);
+  box-shadow:inset -14px -13px 22px #431b0db3,0 0 20px #f5ac354f;
+}
+#fallback .f-wheelie .hx-wheelie-atv{left:50%;right:auto;top:-12%;transform:translateX(-50%);width:64px;height:56px;filter:drop-shadow(0 5px 7px #000b) drop-shadow(0 0 6px #fbbf2455)}
+#fallback:has(#world-wheelie:target) a.f-wheelie{transform:translate(-50%,-50%) scale(1.5);z-index:10;filter:brightness(1.12)}
+#fallback:has(#world-wheelie:target) a.f-wheelie .f-props{opacity:1;transform:translateY(0) scale(1)}
+#fallback .focus-wheelie .f-focus-eyebrow{color:#ffcf7a}
+@media(max-width:600px){
+  #fallback .hx-portfolio .f-space{height:clamp(355px,50svh,440px);min-height:355px}
+  #fallback .hx-portfolio .f-orbit:not(.two){width:74%;height:76%}
+  #fallback .hx-portfolio a.f-planet{min-width:86px;max-width:98px;gap:5px}
+  #fallback .hx-portfolio a.f-planet .f-ball{width:clamp(52px,15vw,73px);height:clamp(52px,15vw,73px)}
+  #fallback .hx-portfolio a.f-planet strong{font-size:11px;text-align:center}
+  #fallback:has(#world-wheelie:target) a.f-wheelie{transform:translate(-50%,-50%) scale(1.34)}
+  #fallback .focus-wheelie{max-height:40vh;overflow-y:auto}
+  #fallback .focus-wheelie .f-focus-details p{display:block}
+}
+@media(prefers-reduced-motion:reduce){#fallback .f-wheelie .hx-wheelie-atv{animation:none}}
+
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
@@ -1856,7 +1889,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
   </div>
   <section class="hx-portfolio" id="proyectos" aria-labelledby="hx-projects-title">
     <div class="f-title"><div class="f-kicker">PORTAFOLIO</div><h1 id="hx-projects-title"><em>Proyectos seleccionados</em></h1><p>Elige un planeta para ver el proyecto.</p></div>
-  <div class="f-space" aria-label="Tres planetas de proyectos">
+  <div class="f-space" aria-label="Cuatro planetas de proyectos">
     <div class="hx-cosmos-depth" aria-hidden="true"></div>
     <div class="f-orbit"><span class="hx-orbit-glint hx-orbit-glint-outer" aria-hidden="true"></span></div>
     <div class="f-orbit two"><span class="hx-orbit-glint hx-orbit-glint-inner" aria-hidden="true"></span></div>
@@ -1905,6 +1938,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
     <a class="f-planet f-cine" href="#world-cine" aria-label="Acercarse al planeta Cine Manuel Nieves"><span class="f-props" aria-hidden="true"><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcl-body" x1="11" y1="26" x2="53" y2="55" gradientUnits="userSpaceOnUse"><stop stop-color="#7e9cac"/><stop offset=".42" stop-color="#263d54"/><stop offset="1" stop-color="#101c31"/></linearGradient><linearGradient id="xcl-top" x1="14" y1="12" x2="48" y2="28" gradientUnits="userSpaceOnUse"><stop stop-color="#d9f6fc"/><stop offset=".5" stop-color="#6e8494"/><stop offset="1" stop-color="#293a4e"/></linearGradient></defs><ellipse cx="32" cy="56" rx="23" ry="3.5" fill="#040911" opacity=".55"/><rect x="9" y="24" width="47" height="31" rx="5" fill="url(#xcl-body)" stroke="#8da7b8" stroke-width="1.4"/><path d="M13 31H52" stroke="#89f4ff" stroke-width="1.2" opacity=".6"/><path d="M16 39H39M16 45H48" stroke="#a8c6d4" stroke-width="1.5" opacity=".55" stroke-linecap="round"/><path d="M9 21L47 9a4 4 0 0 1 5 2.7l2 6.5L13 32l-4-11Z" fill="url(#xcl-top)" stroke="#bdd4dd" stroke-width="1.5"/><path d="M14 20L20 30M25 17L31 27M36 13L42 23M47 11L52 19" stroke="#101c2c" stroke-width="6"/><path d="M12 22 48 11" stroke="#efffff" stroke-width="1.2" opacity=".72"/><circle cx="15" cy="35" r="1.5" fill="#66f4fd"/><circle cx="48" cy="48" r="2" fill="#d3eaff" opacity=".7"/></svg></span><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xcam-metal" x1="12" y1="19" x2="53" y2="50" gradientUnits="userSpaceOnUse"><stop stop-color="#b5dce7"/><stop offset=".28" stop-color="#4d7890"/><stop offset=".73" stop-color="#1f344e"/><stop offset="1" stop-color="#0d192c"/></linearGradient><radialGradient id="xcam-reel"><stop stop-color="#8edbe9"/><stop offset=".35" stop-color="#345068"/><stop offset=".82" stop-color="#142438"/><stop offset="1" stop-color="#94aabb"/></radialGradient></defs><ellipse cx="32" cy="58" rx="23" ry="3.5" fill="#040911" opacity=".6"/><path d="M28 49v7M40 49v7M20 57h28" stroke="#607d91" stroke-width="3.5" stroke-linecap="round"/><rect x="11" y="29" width="39" height="25" rx="5" fill="url(#xcam-metal)" stroke="#b1dce8" stroke-width="1.2"/><path d="m48 35 10-7v25l-10-7Z" fill="#2e5266" stroke="#95c3cb" stroke-width="1.2"/><circle cx="21" cy="23" r="13" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><circle cx="43" cy="20" r="12" fill="url(#xcam-reel)" stroke="#b7d5dc" stroke-width="1.3"/><g fill="#a4c6d1" opacity=".82"><circle cx="21" cy="15.5" r="3.2"/><circle cx="14" cy="26" r="3.2"/><circle cx="27.5" cy="27" r="3.2"/><circle cx="43" cy="13.5" r="3"/><circle cx="36.8" cy="22.6" r="3"/><circle cx="49.5" cy="24" r="3"/></g><circle cx="21" cy="23" r="2.6" fill="#0d1c30"/><circle cx="43" cy="20" r="2.4" fill="#0d1c30"/><path d="M15 35h29" stroke="#d0faff" opacity=".5"/><circle cx="17" cy="46" r="2" fill="#63f5ff"/></svg></span></span><span class="f-ball"></span><strong>Cine Manuel Nieves</strong></a>
     <a class="f-planet f-flambo" href="#world-flambo" aria-label="Explorar Hacienda El Flambo"><span class="f-props" aria-hidden="true"><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xhr-coat" x1="21" y1="12" x2="51" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#e4b57b"/><stop offset=".34" stop-color="#a66b41"/><stop offset=".7" stop-color="#75442e"/><stop offset="1" stop-color="#32202b"/></linearGradient><linearGradient id="xhr-mane" x1="16" y1="8" x2="29" y2="53" gradientUnits="userSpaceOnUse"><stop stop-color="#423331"/><stop offset="1" stop-color="#130f1b"/></linearGradient></defs><ellipse cx="32" cy="58" rx="20" ry="4" fill="#050d13" opacity=".5"/><path d="M17 51c-1-10 7-19 8-29L19 10l10 5 7-7 5 15c7 8 7 18 11 26l6 8H19Z" fill="url(#xhr-coat)" stroke="#ddaf7d" stroke-width="1.4"/><path d="M18 48c-4-8-1-19 4-25l-8-8 10 3 4-11 7 13c-8 8-8 14-4 22l-6 15H13Z" fill="url(#xhr-mane)"/><path d="M28 18c-2-11-7-15-10-14l6 17M34 17l4-12c4 4 4 10 4 16" fill="url(#xhr-coat)" stroke="#aa7558" stroke-width="1.5"/><path d="M40 26c9 2 10 8 8 12-1 4 2 7 7 9 3 2 3 6 0 8-4 2-12 0-16-4l-8-15" fill="url(#xhr-coat)" stroke="#e3b684" stroke-width="1.2"/><path d="M43 31c-5-3-10-2-13 2" stroke="#f0c99f" stroke-width="2" stroke-linecap="round" opacity=".75"/><path d="m34 32 8 .5" stroke="#21171c" stroke-width="2.5" stroke-linecap="round"/><circle cx="39.5" cy="31.5" r="1.1" fill="#f9edc8"/><ellipse cx="52" cy="49" rx="2.3" ry="1.8" fill="#342128"/><path d="M44 55c4 2 8 2 11 0" stroke="#5d382b" stroke-width="1.4"/><path d="M23 31c-6 6-6 14-4 21" stroke="#6e4334" stroke-width="2" opacity=".6"/></svg></span><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xgo-fur" x1="20" y1="17" x2="51" y2="56" gradientUnits="userSpaceOnUse"><stop stop-color="#fcf8e8"/><stop offset=".4" stop-color="#d6d5c5"/><stop offset=".85" stop-color="#8b9b98"/><stop offset="1" stop-color="#47545b"/></linearGradient><linearGradient id="xgo-horn" x1="18" y1="6" x2="38" y2="25" gradientUnits="userSpaceOnUse"><stop stop-color="#e0c49d"/><stop offset="1" stop-color="#806a65"/></linearGradient></defs><ellipse cx="32" cy="59" rx="21" ry="3.5" fill="#050d13" opacity=".48"/><path d="M17 30C13 22 12 12 15 5c2 11 8 14 14 18l-4 8M38 27c3-11 7-17 16-21-5 11-3 18-8 26" fill="url(#xgo-horn)" stroke="#efdbb7" stroke-width="1.2"/><path d="M20 23c-9-6-16-4-18 3l16 8M44 24c9-8 16-5 18 3L49 35" fill="#b2a999" stroke="#e8d6be" stroke-width="1.4"/><path d="M15 30c1-11 12-16 20-16 10 1 17 10 15 22l-5 15-10 10-10-11-9-7Z" fill="url(#xgo-fur)" stroke="#e9e9d8" stroke-width="1.4"/><path d="M26 42c-4 5-3 13-1 16l6-4 3 8 5-9 6 3c1-6-1-11-4-15" fill="#d5d9ce"/><path d="M22 32c3-2 6-1 8 0m9 0c3-2 6-2 8-1" stroke="#5b504a" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="27" cy="33" rx="1.5" ry="1.9" fill="#29252a"/><ellipse cx="43" cy="33" rx="1.5" ry="1.9" fill="#29252a"/><path d="m31 43 5-3 5 3-4 4h-3Z" fill="#8c7774"/><path d="M35 47v3m0 0-4 2m4-2 4 2" stroke="#766763" stroke-width="1.4" stroke-linecap="round"/><path d="M19 24c4-3 7-5 12-5" stroke="#fff" stroke-width="2" opacity=".6"/></svg></span></span><span class="f-ball"></span><strong>Hacienda El Flambo</strong></a>
     <a class="f-planet f-just" href="#world-just" aria-label="Explorar Just Be You"><span class="f-props" aria-hidden="true"><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xfa-skin" x1="26" y1="10" x2="49" y2="55" gradientUnits="userSpaceOnUse"><stop stop-color="#ffe8d7"/><stop offset=".48" stop-color="#e9aeb2"/><stop offset="1" stop-color="#9b6592"/></linearGradient><linearGradient id="xfa-hair" x1="17" y1="9" x2="41" y2="53" gradientUnits="userSpaceOnUse"><stop stop-color="#573d70"/><stop offset="1" stop-color="#1c213d"/></linearGradient></defs><ellipse cx="33" cy="58" rx="20" ry="3.5" fill="#080814" opacity=".44"/><path d="M15 52C9 35 11 16 21 9c10-7 28-1 30 13 1 11-3 20-8 25l5 9H17Z" fill="url(#xfa-hair)" stroke="#9e80b7" stroke-width="1.2"/><path d="M24 13c10-5 20 0 22 10l1 9 5 6-6 4-2 10c-2 5-12 5-16-1l-5-11-5-8 3-13Z" fill="url(#xfa-skin)" stroke="#ffcad7" stroke-width="1.1"/><path d="M28 19c-6 7-7 18-3 26l-7 9c-7-15-3-34 10-41" fill="url(#xfa-hair)"/><path d="M39 31c3-1 6-1 8 1" stroke="#513d52" stroke-width="1.5" stroke-linecap="round"/><circle cx="44" cy="31.5" r="1.1" fill="#382e48"/><path d="m46 39-3 1m-1 7 5 1" stroke="#b56b89" stroke-width="1.3" stroke-linecap="round"/><path d="M20 55c5-2 9-4 13-10" stroke="#f8ced8" stroke-width="3" stroke-linecap="round"/><circle cx="51" cy="16" r="2" fill="#dcf7ff" opacity=".95"/><path d="M51 11v10m-5-5h10" stroke="#b6f7ff" stroke-width="1.2"/></svg></span><span class="f-prop"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" focusable="false" aria-hidden="true"><defs><linearGradient id="xse-glass" x1="14" y1="25" x2="52" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#e5f9ff" stop-opacity=".95"/><stop offset=".3" stop-color="#78b7c6" stop-opacity=".8"/><stop offset=".7" stop-color="#6a789f" stop-opacity=".75"/><stop offset="1" stop-color="#dee8ff" stop-opacity=".95"/></linearGradient><linearGradient id="xse-liquid" x1="20" y1="40" x2="45" y2="56" gradientUnits="userSpaceOnUse"><stop stop-color="#efd3fc"/><stop offset="1" stop-color="#8c69ba"/></linearGradient><linearGradient id="xse-cap" x1="27" y1="11" x2="40" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#e9ebf3"/><stop offset=".5" stop-color="#778fa4"/><stop offset="1" stop-color="#304458"/></linearGradient></defs><ellipse cx="32" cy="59" rx="23" ry="3" fill="#040911" opacity=".48"/><rect x="18" y="28" width="29" height="29" rx="6" fill="url(#xse-glass)" stroke="#d4edf8" stroke-width="1.5"/><path d="M21 42h23v10a3 3 0 0 1-3 3H24a3 3 0 0 1-3-3Z" fill="url(#xse-liquid)" opacity=".9"/><path d="M23 32v21" stroke="#fff" stroke-width="2" opacity=".7" stroke-linecap="round"/><rect x="24" y="21" width="17" height="10" rx="2" fill="url(#xse-cap)" stroke="#c5d9e6"/><rect x="27" y="10" width="11" height="14" rx="3" fill="url(#xse-cap)" stroke="#d3e2e9"/><path d="M30 9V5c0-4 6-4 6 0v4" stroke="#a5c0d0" stroke-width="3" stroke-linecap="round"/><rect x="25" y="42" width="15" height="8" rx="2" fill="#ecf4fb" opacity=".82"/><path d="M29 46h7" stroke="#987ab6" stroke-width="1.4" stroke-linecap="round"/><path d="m51 29 3-5m-3 5 5 2m-5-2-4 4" stroke="#a5f4fa" stroke-width="1.3" stroke-linecap="round"/></svg></span></span><span class="f-ball"></span><strong>Just Be You</strong></a>
+    <a class="f-planet f-wheelie" href="#world-wheelie" aria-label="Explorar Wheelie Challenge"><span class="f-props" aria-hidden="true"><span class="f-prop hx-wheelie-atv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 60" fill="none" focusable="false"><g transform="rotate(-20 38 39)"><ellipse cx="15" cy="45" rx="12" ry="12" fill="#111827" stroke="#64748b" stroke-width="2"/><ellipse cx="60" cy="45" rx="12" ry="12" fill="#111827" stroke="#64748b" stroke-width="2"/><g fill="#94a3b8" stroke="#1e293b" stroke-width="2"><circle cx="15" cy="45" r="5.5"/><circle cx="60" cy="45" r="5.5"/></g><path d="M13 39 23 26h15l11 12 12 3" stroke="#94a3b8" stroke-width="5" stroke-linejoin="round"/><path d="m5 32 7-8h17l8 8 9-5h15l10 9-2 4H48l-11-4-16 4H6Z" fill="#fbbf24" stroke="#b45309" stroke-width="2" stroke-linejoin="round"/><path d="M26 22h20l-4 8H23Z" fill="#172033"/><path d="m48 28 4-14 8-2" stroke="#d1d5db" stroke-width="3" stroke-linecap="round"/><path d="M58 12h7" stroke="#111827" stroke-width="4" stroke-linecap="round"/><path d="M53 33h11" stroke="#fff4bd" stroke-width="3" stroke-linecap="round"/></g></svg></span></span><span class="f-ball"></span><strong>Wheelie Challenge</strong></a>
   </div>
   <div class="f-action" aria-label="Contacto de Huxcasti">
     <a class="hx-contact" href="https://wa.me/17875490777?text=Hola%2C%20vi%20Huxcasti%20y%20quisiera%20informaci%C3%B3n%20para%20crear%20una%20p%C3%A1gina%20web%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" aria-label="Crea tu universo: contactar a Huxcasti por WhatsApp al 787-549-0777">Hablemos de tu proyecto ↗</a>
@@ -1914,7 +1948,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
       <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
-      <div class="f-focus-details"><span class="f-focus-eyebrow">CINE · PLANETA 01 / 03</span>
+      <div class="f-focus-details"><span class="f-focus-eyebrow">CINE · PLANETA 01 / 04</span>
       <h2>Cine Manuel Nieves</h2><strong>Prototipo de boletería</strong><p>El cliente elige su asiento y recibe una taquilla con código QR. El personal puede escanearla en la entrada.</p>
       <a class="f-focus-visit" href="demo-cine.html">Ver demo administrativa</a>
       <a class="cine-box-office" href="https://cine-manuel-nieves.netlify.app/" target="_blank" rel="noopener noreferrer">Ver prototipo de boletería ↗</a></div>
@@ -1924,7 +1958,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
       <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
-      <div class="f-focus-details"><span class="f-focus-eyebrow">HACIENDA · PLANETA 02 / 03</span>
+      <div class="f-focus-details"><span class="f-focus-eyebrow">HACIENDA · PLANETA 02 / 04</span>
       <h2>Hacienda El Flambo</h2><strong>Reservas para una hacienda en Morovis</strong><p>El visitante solicita una fecha y registra a sus invitados. El personal revisa las solicitudes y lleva el control de entrada.</p>
       <a class="f-focus-visit" href="https://huxcasti.github.io/hacienda-el-flambo/" target="_blank" rel="noopener noreferrer">Explorar la hacienda ↗</a></div>
     </div>
@@ -1933,9 +1967,19 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
       <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
-      <div class="f-focus-details"><span class="f-focus-eyebrow">ESTÉTICA · PLANETA 03 / 03</span>
+      <div class="f-focus-details"><span class="f-focus-eyebrow">ESTÉTICA · PLANETA 03 / 04</span>
       <h2>Just Be You</h2><strong>Expedientes para un estudio de estética</strong><p>La esteticista puede abrir una ficha desde el celular y consultar las notas de la visita anterior. La demo utiliza clientes ficticios.</p>
       <a class="f-focus-visit" href="demo-just-be-you.html" aria-label="Abrir demostración interactiva de Just Be You con datos ficticios">Probar demo interactiva ↗</a></div>
+    </div>
+  </article>
+
+  <article id="world-wheelie" class="f-focus focus-wheelie" role="region" aria-label="Vista cercana de Wheelie Challenge">
+    <div class="f-focus-inner">
+      <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
+      <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
+      <div class="f-focus-details"><span class="f-focus-eyebrow">VIDEOJUEGO · PLANETA 04 / 04</span>
+      <h2>Wheelie Challenge</h2><strong>Videojuego 3D · En desarrollo</strong><p>Domina el equilibrio de un fourtrack, esquiva el tráfico y los obstáculos, recoge monedas y supera distintos niveles de dificultad.</p>
+      <a class="f-focus-visit" href="https://huxcasti.github.io/Juego_wheelie/" target="_blank" rel="noopener noreferrer">Jugar demo ↗</a></div>
     </div>
   </article>
 
@@ -1985,7 +2029,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
   const space = document.querySelector('#fallback .f-space');
   if (!space || !window.PointerEvent) return;
   const worlds = [...space.querySelectorAll('a.f-planet')];
-  if (worlds.length !== 3) return;
+  if (worlds.length < 2) return;
 
   const orbit = space.querySelector('.f-orbit:not(.two)');
   if (!orbit) return;
@@ -2015,19 +2059,12 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
     return Math.atan2(y / t.b, x / t.a);
   }
   function originalPositions() {
-    const old = worlds.map(p => [p.style.left, p.style.top]);
-    worlds.forEach(p => { p.style.left = ''; p.style.top = ''; });
-    const t = track();
-    points = worlds.map(p => {
-      const offset = ballOffset(p);
-      return ellipseAngle(p.offsetLeft + offset.x - t.cx,
-                          p.offsetTop + offset.y - t.cy, t);
-    });
-    worlds.forEach((p, i) => { p.style.left = old[i][0]; p.style.top = old[i][1]; });
+    // Equal angular spacing prevents the four worlds from clustering.
+    points = worlds.map((_,i) => -3*Math.PI/4 + i*2*Math.PI/worlds.length);
   }
   function draw() {
     const t = track();
-    if (!t.a || !t.b || points.length !== 3) return;
+    if (!t.a || !t.b || points.length !== worlds.length) return;
     worlds.forEach((p, i) => {
       const phi = points[i] + angle;
       const u = t.a * Math.cos(phi), v = t.b * Math.sin(phi);
@@ -2108,7 +2145,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
 <!-- Huxcasti: dismiss selected planet on empty-space tap. -->
 <script>
 (() => {
-  const planetHashes = new Set(['#world-cine', '#world-flambo', '#world-just']);
+  const planetHashes = new Set(['#world-cine', '#world-flambo', '#world-just', '#world-wheelie']);
   function dismissPlanet() {
     if (planetHashes.has(window.location.hash)) {
       window.location.hash = 'proyectos';
