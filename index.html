@@ -1795,6 +1795,23 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
   #fallback .focus-wheelie .f-focus-details p{display:block}
 }
 @media(prefers-reduced-motion:reduce){#fallback .f-wheelie .hx-wheelie-atv{animation:none}}
+/* Wheelie Challenge: dedicated game cover in the selected planet's panel. */
+#fallback .focus-wheelie{width:min(420px,calc(100vw - 24px));max-height:min(70vh,560px)}
+#fallback .focus-wheelie .hx-wheelie-cover{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;border-radius:12px;border:1px solid #fbbf2440;margin:0 0 12px;background:#07101b}
+#fallback .focus-wheelie .f-focus-details h2{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#fallback .focus-wheelie .f-focus-details strong{margin-top:6px}
+#fallback:has(#world-wheelie:target) a.f-wheelie .hx-wheelie-atv{visibility:hidden}
+@media(max-width:600px){
+ #fallback .focus-wheelie{width:auto;max-height:65svh}
+}
+@media(orientation:landscape) and (max-height:500px){
+ #fallback .focus-wheelie{width:min(520px,calc(100vw - 24px));left:auto;max-height:80svh}
+ #fallback .focus-wheelie .f-focus-inner{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:8px 12px;align-items:center}
+ #fallback .focus-wheelie .f-focus-back{grid-column:1/-1;margin:0}
+ #fallback .focus-wheelie .hx-wheelie-cover{grid-column:1;grid-row:2;margin:0}
+ #fallback .focus-wheelie .f-focus-details{grid-column:2;grid-row:2}
+}
+
 
 </style>
 <script src="/assets/language.js"></script>
@@ -1976,7 +1993,7 @@ body.hx-page-inactive #fallback .hx-portfolio .f-action::before{animation-play-s
   <article id="world-wheelie" class="f-focus focus-wheelie" role="region" aria-label="Vista cercana de Wheelie Challenge">
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
-      <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
+      <img class="hx-wheelie-cover" src="assets/wheelie-challenge-cover.svg" alt="Dos fourtracks en una carretera con monedas doradas" width="1280" height="720" decoding="async" loading="lazy">
       <div class="f-focus-details"><span class="f-focus-eyebrow">VIDEOJUEGO · PLANETA 04 / 04</span>
       <h2>Wheelie Challenge</h2><strong>Videojuego 3D · En desarrollo</strong><p>Domina el equilibrio de un fourtrack, esquiva el tráfico y los obstáculos, recoge monedas y supera distintos niveles de dificultad.</p>
       <a class="f-focus-visit" href="https://huxcasti.github.io/Juego_wheelie/" target="_blank" rel="noopener noreferrer">Jugar demo ↗</a></div>
