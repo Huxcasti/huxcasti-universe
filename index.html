@@ -1694,6 +1694,36 @@ body.webgl-ready #hx-living-sky{display:none}
 #fallback .hx-portfolio .hx-cosmos-depth::before,
 #fallback .hx-portfolio .hx-cosmos-depth::after{display:none!important;animation:none!important}
 
+
+/* hx-quote-button-spacing: comfortable, consistent quotation buttons. */
+#fallback .hx-hero-actions{
+  display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-top:24px;
+}
+#fallback .hx-hero-actions>a{
+  box-sizing:border-box;min-height:52px;max-width:100%;margin:0;
+  padding:15px 25px;font-size:14px;line-height:1.35;
+  text-align:center;white-space:normal;
+}
+#fallback .hx-hero-actions>.hx-secondary-action{
+  min-width:min(218px,100%);padding-inline:28px;
+}
+#fallback .hx-services .hx-service>a[href^="/cotizar/"]{
+  box-sizing:border-box;justify-content:center;align-self:flex-start;
+  min-height:46px;max-width:100%;margin: auto 0 0;
+  padding:12px 18px;line-height:1.35;font-size:13px;text-align:center;
+  border:1px solid #97d7e14a;border-radius:10px;background:#102235a8;
+}
+#fallback .hx-services .hx-service>a[href^="/cotizar/"]:hover,
+#fallback .hx-services .hx-service>a[href^="/cotizar/"]:focus-visible{
+  background:#15394c;text-decoration:none;color:#fff;
+}
+#fallback .hx-services .hx-service p{margin-bottom:18px}
+@media(max-width:520px){
+  #fallback .hx-hero-actions{flex-direction:column;align-items:stretch;gap:14px;margin-top:24px}
+  #fallback .hx-hero-actions>a{width:100%;min-width:0;max-width:none;min-height:54px;padding:16px 20px}
+  #fallback .hx-services .hx-service>a[href^="/cotizar/"]{width:100%;max-width:none;min-height:48px}
+}
+
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
