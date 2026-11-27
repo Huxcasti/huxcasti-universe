@@ -34,7 +34,7 @@ HuxcastiLanguage.add({
   "Perfil": "About me",
   "Páginas web y sistemas": "Websites and tools",
   "para negocios.": "for small businesses.",
-  "Soy Humberto, desarrollador web en Puerto Rico. Construyo herramientas para tareas que conozco de cerca: reservar una fecha, emitir una taquilla o consultar el historial de un cliente.": "I’m Humberto, a web developer in Puerto Rico. I build software for the tasks behind a business: booking a date, selling a ticket or looking up a client’s last visit.",
+  "Huxcasti desarrolla soluciones digitales adaptadas a tu negocio, desde páginas web hasta sistemas de gestión que te ayudan a organizar tus operaciones, ahorrar tiempo y atender mejor a tus clientes.": "Huxcasti builds digital solutions tailored to your business, from websites to management systems that help you organize operations, save time and better serve your customers.",
   "Ver proyectos": "View projects",
   "Solicitar cotización": "Request a quote",
   "SERVICIOS": "SERVICES",
