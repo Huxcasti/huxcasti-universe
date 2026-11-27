@@ -1647,6 +1647,32 @@ body.hx-page-inactive #fallback .hx-services::before{animation-play-state:paused
   #fallback .hx-live-star,#fallback .hx-hero::before,#fallback .hx-services::before{animation:none;opacity:.5}
 }
 
+
+/* Occasional shooting stars, behind every section of the portfolio. */
+#fallback .hx-meteor{
+  position:absolute;left:var(--meteor-x,50%);top:var(--meteor-y,20%);
+  width:clamp(65px,15vw,145px);height:2px;border-radius:100%;
+  background:linear-gradient(90deg,transparent,rgba(126,208,255,.12) 24%,rgba(169,230,255,.65) 77%,#f4fdff);
+  transform-origin:100% 50%;opacity:0;pointer-events:none;
+}
+#fallback .hx-meteor::after{
+  content:"";position:absolute;right:0;top:50%;width:3px;height:3px;
+  transform:translateY(-50%);border-radius:50%;background:#f4fdff;
+  box-shadow:0 0 5px 1px #b3e7ff,0 0 11px 2px #70c7ff77;
+}
+#fallback .hx-meteor.is-flying{
+  animation:hx-meteor-flight var(--meteor-time,1.25s) linear both;
+}
+@keyframes hx-meteor-flight{
+  0%{opacity:0;transform:translate3d(0,0,0) rotate(var(--meteor-angle,25deg))}
+  17%{opacity:.88}
+  62%{opacity:.73}
+  100%{opacity:0;transform:translate3d(var(--meteor-dx),var(--meteor-dy),0) rotate(var(--meteor-angle,25deg))}
+}
+@media(prefers-reduced-motion:reduce){
+  #fallback .hx-meteor{display:none!important;animation:none!important}
+}
+
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
@@ -1666,6 +1692,7 @@ body.hx-page-inactive #fallback .hx-services::before{animation-play-state:paused
 </div>
 <main id="fallback" aria-label="Huxcasti: soluciones digitales y portafolio">
   <div class="hx-living-sky" aria-hidden="true">
+    <span class="hx-meteor"></span>
     <span class="hx-live-star hx-bright-star" style="--x:0.01%;--y:0.26%;--s:2.21px;--tone:#d9f1ff;--duration:11.68s;--delay:-12.86s;--dx:4.0px;--dy:-0.4px"></span>
     <span class="hx-live-star" style="--x:12.56%;--y:0.80%;--s:0.79px;--tone:#c2e8ff;--duration:9.32s;--delay:-2.08s;--dx:2.7px;--dy:1.7px"></span>
     <span class="hx-live-star" style="--x:29.05%;--y:7.11%;--s:1.41px;--tone:#f2f6ff;--duration:5.44s;--delay:-6.86s;--dx:-2.7px;--dy:-2.1px"></span>
@@ -2296,6 +2323,48 @@ body.hx-page-inactive #fallback .hx-services::before{animation-play-state:paused
 })();
 </script>
 
+<script>
+(()=> {
+  'use strict';
+  const meteor=document.querySelector('#fallback .hx-meteor');
+  if(!meteor)return;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let timer=0;
+  const random=(a,b)=>a+Math.random()*(b-a);
+  function stop(){
+    window.clearTimeout(timer);timer=0;
+    meteor.classList.remove('is-flying');
+  }
+  function schedule(first=false){
+    stop();
+    if(document.hidden||reduced.matches)return;
+    timer=window.setTimeout(launch,first?random(3000,6500):random(11000,23000));
+  }
+  function launch(){
+    timer=0;
+    if(document.hidden||reduced.matches)return;
+    const w=meteor.parentElement.clientWidth;
+    const h=meteor.parentElement.clientHeight;
+    if(!w||!h){schedule();return;}
+    const direction=Math.random()<.65?1:-1;
+    const dx=direction*Math.min(w*random(.43,.67),480);
+    const dy=Math.min(Math.abs(dx)*random(.38,.62),h*.32);
+    meteor.style.setProperty('--meteor-x',random(direction===1?8:45,direction===1?48:89)+'%');
+    meteor.style.setProperty('--meteor-y',random(7,54)+'%');
+    meteor.style.setProperty('--meteor-dx',dx.toFixed(1)+'px');
+    meteor.style.setProperty('--meteor-dy',dy.toFixed(1)+'px');
+    meteor.style.setProperty('--meteor-angle',(Math.atan2(dy,dx)*180/Math.PI).toFixed(1)+'deg');
+    meteor.style.setProperty('--meteor-time',random(.95,1.65).toFixed(2)+'s');
+    meteor.classList.add('is-flying');
+    timer=window.setTimeout(()=>schedule(),1900);
+  }
+  document.addEventListener('visibilitychange',()=>schedule(true));
+  reduced.addEventListener?.('change',()=>schedule(true));
+  window.addEventListener('pagehide',stop);
+  window.addEventListener('pageshow',()=>schedule(true));
+  schedule(true);
+})();
+</script>
 <script src="/assets/portfolio.en.js"></script>
 <script>HuxcastiLanguage.bindPage();</script>
 </body></html>
