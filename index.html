@@ -1728,6 +1728,27 @@ body.webgl-ready #hx-living-sky{display:none}
 /* Keep the quotation call to action unique; service cards are informational. */
 #fallback .hx-services .hx-service p{margin-bottom:0;flex:0}
 
+
+/* hx-contact-green-halo: soft backlight behind the project contact CTA. */
+#fallback .hx-portfolio .f-action{
+  isolation:isolate;overflow:visible;
+}
+#fallback .hx-portfolio .f-action::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  left:50%;top:50%;width:min(340px,calc(100% + 12px));height:94px;
+  border-radius:28px;transform:translate(-50%,-50%);
+  background:radial-gradient(ellipse at center,rgba(57,207,222,.36) 0%,rgba(39,180,184,.21) 38%,rgba(27,153,158,.09) 61%,transparent 78%);
+  filter:blur(13px);
+}
+#fallback .hx-portfolio .f-action a.hx-contact{
+  position:relative;z-index:1;
+  box-shadow:0 0 12px #39cfde36,0 0 26px #27b4b82e,0 0 1px #83efeb50 inset;
+}
+#fallback .hx-portfolio .f-action a.hx-contact:hover,
+#fallback .hx-portfolio .f-action a.hx-contact:focus-visible{
+  box-shadow:0 0 18px #39cfde55,0 0 32px #27b4b844;
+}
+
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
