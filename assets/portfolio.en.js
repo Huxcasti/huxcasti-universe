@@ -139,3 +139,20 @@ HuxcastiLanguage.add({
   "Creamos páginas web, sistemas de reservas y herramientas para gestionar clientes y operaciones. Cuéntanos qué quieres mejorar en tu negocio y diseñamos una solución según tus necesidades.": "We build websites, booking systems and tools for managing customers and operations. Tell us what you want to improve in your business and we’ll design a solution around your needs.",
   "Hola, vi Huxcasti y quisiera información sobre una solución digital para mi negocio.": "Hi, I saw Huxcasti and would like to discuss a digital solution for my business."
 });
+
+HuxcastiLanguage.add({
+  "Humberto Castillo | Fundador de Huxcasti · Puerto Rico": "Humberto Castillo | Founder of Huxcasti · Puerto Rico",
+  "Conoce al fundador de Huxcasti: soluciones digitales para negocios, proyectos interactivos y experiencia en operaciones y logística.": "Meet the founder of Huxcasti: digital solutions for businesses, interactive projects, and operations and logistics experience.",
+  "FUNDADOR DE HUXCASTI · PUERTO RICO": "FOUNDER OF HUXCASTI · PUERTO RICO",
+  "Soy el fundador de Huxcasti. Desarrollo soluciones digitales para negocios desde Puerto Rico: páginas web, sistemas de reservas, expedientes y herramientas de gestión. Mi experiencia como supervisor de operaciones y logística me ayuda a entender las necesidades reales de una empresa. Actualmente sigo fortaleciendo mis conocimientos de programación.": "I'm the founder of Huxcasti. I build digital solutions for businesses from Puerto Rico: websites, booking systems, client records and management tools. My background in operations and logistics supervision helps me understand real business needs. I continue to develop my programming skills.",
+  "Explora cuatro proyectos. Las demostraciones administrativas utilizan datos ficticios; los prototipos y el videojuego siguen en desarrollo.": "Explore four projects. Admin demonstrations use fictional data; prototypes and the game remain in development.",
+  "Acepto proyectos por contrato y estoy abierto a oportunidades remotas de desarrollo web junior, QA y operaciones. Español nativo e inglés escrito para instrucciones y comunicación profesional.": "I welcome contract projects and remote opportunities in junior web development, QA and operations. Native Spanish speaker; comfortable with written English instructions and professional communication.",
+  "04 · Videojuego 3D en desarrollo": "04 · 3D game in development",
+  "Juego web de fourtracks con controles táctiles, equilibrio, obstáculos, tráfico y niveles de dificultad. Es un proyecto experimental en desarrollo.": "A web-based ATV game with touch controls, balance mechanics, obstacles, traffic and difficulty levels. An experimental project in development.",
+  "diseño de mecánicas, interfaz móvil y pruebas de jugabilidad.": "game mechanics, mobile interface and gameplay testing.",
+  "JavaScript y gráficos 3D en la web.": "JavaScript and web-based 3D graphics.",
+  "Experiencia profesional": "Professional experience",
+  "Operaciones y logística": "Operations and logistics",
+  "Comencé como repartidor y pasé a supervisar operaciones de entrega, coordinar tiempos y resolver incidencias.": "I started as a delivery driver and moved into supervising delivery operations, coordinating schedules and resolving issues.",
+  "Experiencia en supervisión de logística y producción, coordinación de salidas, choferes y tiempos operacionales.": "Experience supervising logistics and production, coordinating dispatches, drivers and operational schedules."
+});
