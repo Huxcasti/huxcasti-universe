@@ -1889,6 +1889,22 @@ body.hx-page-inactive #fallback .hx-portfolio a.f-wheelie .f-ball{animation-play
 
 /* Keep Hacienda El Flambo on a single centered line. */
 #fallback .hx-portfolio a.f-flambo strong{white-space:nowrap;text-align:center;max-width:none;flex-shrink:0;font-size:clamp(9px,2.4vw,13px)}
+
+/* Hacienda El Flambo: original high-resolution image in the project panel. */
+#fallback .focus-flambo{width:min(420px,calc(100vw - 24px));max-height:min(70vh,560px);overflow-y:auto}
+#fallback .focus-flambo .hx-flambo-cover{display:block;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid #d4c79a55;margin:0 0 12px;background:linear-gradient(130deg,#263f32,#42624b)}
+#fallback .focus-flambo .hx-flambo-cover img{display:block;width:100%;height:100%;object-fit:contain}
+#fallback .focus-flambo .f-focus-eyebrow{color:#dccb9c}
+#fallback .focus-flambo a.f-focus-visit{background:#c4d4b9;color:#1b3426;box-shadow:0 5px 20px #a4c69a25}
+#fallback .focus-flambo a.f-focus-visit:hover,#fallback .focus-flambo a.f-focus-visit:focus-visible{background:#f6ecd5;color:#29412e}
+@media(max-width:600px){#fallback .focus-flambo{width:auto;max-height:65svh}#fallback .focus-flambo .f-focus-details p{display:block}}
+@media(orientation:landscape) and (max-height:500px){
+#fallback .focus-flambo{width:min(520px,calc(100vw - 24px));left:auto;max-height:80svh}
+#fallback .focus-flambo .f-focus-inner{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:8px 12px;align-items:center}
+#fallback .focus-flambo .f-focus-back{grid-column:1/-1;margin:0}
+#fallback .focus-flambo .hx-flambo-cover{grid-column:1;grid-row:2;margin:0}
+#fallback .focus-flambo .f-focus-details{grid-column:2;grid-row:2}
+}
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
@@ -2050,7 +2066,7 @@ body.hx-page-inactive #fallback .hx-portfolio a.f-wheelie .f-ball{animation-play
   <article id="world-flambo" class="f-focus focus-flambo" role="region" aria-label="Vista cercana de Hacienda El Flambo">
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
-      <div class="f-focus-visual" aria-hidden="true"><span class="f-focus-aura"></span><span class="f-focus-ball f-ball"></span><span class="f-focus-orbit"></span></div>
+      <div class="hx-flambo-cover"><img src="assets/flambo-cover.svg" alt="Hacienda El Flambo" width="1254" height="1254" decoding="async" loading="lazy"></div>
       <div class="f-focus-details"><span class="f-focus-eyebrow">HACIENDA · PLANETA 02 / 04</span>
       <h2>Hacienda El Flambo</h2><strong>Reservas para una hacienda en Morovis</strong><p>El visitante solicita una fecha y registra a sus invitados. El personal revisa las solicitudes y lleva el control de entrada.</p>
       <a class="f-focus-visit" href="https://huxcasti.github.io/hacienda-el-flambo/" target="_blank" rel="noopener noreferrer">Explorar la hacienda ↗</a></div>
