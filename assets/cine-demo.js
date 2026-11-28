@@ -104,7 +104,7 @@
     if (!dialog.open) dialog.showModal();
   }
   function renderBookings() {
-    const rows = bookings.filter(b => filter.value === 'all' || (filter.value === 'used') === Boolean(b.scan));
+    const rows = bookings.filter(b => !b.voided).filter(b => filter.value === 'all' || (filter.value === 'used') === Boolean(b.scan));
     renderTable('bookings-table',['Fecha','Cliente','Reservación','Película','Tanda','Asientos','Total','Pago','Entrada'],rows.map(b => {
       const link = el('button',b.id); link.type = 'button'; link.className = 'detail-link';
       link.setAttribute('aria-haspopup','dialog');
@@ -118,8 +118,8 @@
     // Translate the static shell first and then rebuild the formatted tables for this locale.
     lang.localize(document.documentElement);
     pairs('metrics', [
-      ['Reservaciones',bookings.length], ['Taquillas vendidas',seatCount(bookings)],
-      ['Ventas pagadas',money(bookings.reduce((sum,b) => sum + b.cents,0))], ['Entradas utilizadas',seatCount(scanned)]
+      ['Reservaciones',bookings.filter(b=>!b.voided).length], ['Taquillas vendidas',seatCount(bookings.filter(b=>!b.voided))],
+      ['Ventas pagadas',money(bookings.filter(b=>!b.voided).reduce((sum,b) => sum + b.cents,0))], ['Entradas utilizadas',seatCount(scanned)]
     ]);
     renderBookings();
     const movieSelect=byId('show-movie'), previous=movieSelect.value;
@@ -132,7 +132,7 @@
     }), 'Películas registradas');
     renderTable('shows-table',['Película','Tanda','Idioma','Taquillas reservadas','Estado'],
       Object.entries(shows).map(([id,s]) => [movies[s.movie].title,dateTime(s.time),t(s.language),
-        String(seatCount(bookings.filter(b => b.show === id))),t(s.active===false?'Inactivo':'Activo')]), 'Tandas registradas');
+        String(seatCount(bookings.filter(b => b.show === id && !b.voided))),t(s.active===false?'Inactivo':'Activo')]), 'Tandas registradas');
     renderTable('staff-table',['Responsable','Usuario','Estado','Escaneos','Taquillas','Último escaneo'],
       Object.entries(staff).map(([id,name]) => {
         const activity = scanned.filter(b => b.scan.staff === id);
@@ -140,6 +140,7 @@
       }), 'Empleados y escaneos');
     renderTable('scans-table',['Fecha y hora','Responsable','Película','Asientos'],
       scanned.map(b => [dateTime(b.scan.time),t(staff[b.scan.staff]),film(b),b.seats.join(', ')]), 'Historial de escaneos');
+    renderBoxOffice();
     if (dialog.open) showDetails(selectedBooking);
   }
   const buttons = document.querySelectorAll('button[data-view]');
@@ -156,6 +157,50 @@
   filter.addEventListener('change',renderBookings);
   byId('close-detail').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => {selectedBooking = undefined;});
+
+  const boPrices={adult:825,child:600,senior:600};
+  const boQty={adult:0,child:0,senior:0};
+  const boLabels={adult:'Adulto',child:'Niño',senior:'Senior'};
+  const boSelected=new Set(),boSales=[];
+  const bm=byId('bo-movie'),bd=byId('bo-date'),bs=byId('bo-show');
+  const boTicket=byId('bo-ticket');
+  const boCount=()=>Object.values(boQty).reduce((a,b)=>a+b,0);
+  const boTotal=()=>Object.keys(boQty).reduce((a,k)=>a+boQty[k]*boPrices[k],0);
+  const boMessage=message=>byId('bo-message').textContent=t(message);
+  lang.add({"🎟️ Boletería":"🎟️ Box office","La venta de prueba quedará registrada a nombre de Administrador.":"The sample sale is recorded under Administrator.","Nueva venta":"New sale","Método de pago":"Payment method","Efectivo":"Cash","Tarjeta":"Card","Simulación local. No se procesa ningún pago.":"Local simulation. No payment is processed.","Usa los botones + y − para indicar la cantidad.":"Use + and − to choose quantities.","Seleccionar asientos":"Select seats","Verde disponible · rojo ocupado · azul seleccionado · violeta accesible.":"Green available · red occupied · blue selected · purple accessible.","Actualizar asientos":"Refresh seats","Disponible":"Available","Ocupado":"Occupied","Seleccionado":"Selected","Accesible":"Accessible","Asientos seleccionados:":"Selected seats:","Ninguno":"None","Confirmar venta":"Confirm sale","La taquilla de prueba queda pendiente de validación. No es válida para entrar al cine.":"The sample ticket is pending validation and is not valid for admission.","🎟 Registrar venta":"🎟 Record sale","Historial de ventas físicas":"In-person sales history","Consulta, reimprime o anula las ventas ficticias.":"Review, reprint or void sample sales.","Buscar venta":"Search sale","Película, asiento o folio":"Movie, seat or reference","Reimprimir última venta":"Reprint last sale","Taquilla de demostración":"Demo ticket","DEMO · NO VÁLIDA":"DEMO · NOT VALID","Código de prueba. No válido para escanear.":"Sample code. Not valid for scanning.","Imprimir taquilla":"Print ticket","Pantalla":"Screen","Venta de prueba registrada.":"Sample sale recorded.","Selecciona la cantidad de taquillas primero.":"Choose ticket quantities first.","Anular":"Void","Reimprimir":"Reprint","Anulada":"Voided","Folio":"Reference","Todavía no hay ventas físicas.":"No in-person sales yet.","¿Anular esta venta ficticia?":"Void this sample sale?"});
+  function boOptions(node,entries){const previous=node.value;node.replaceChildren(...entries.map(([v,label])=>{const o=el('option',label);o.value=v;return o}));if(entries.some(([v])=>v===previous))node.value=previous;}
+  function boSelectors(){
+    boOptions(bm,Object.entries(movies).filter(([id,m])=>m.status!=='Próximamente'&&Object.values(shows).some(s=>s.movie===id&&s.active!==false)).map(([id,m])=>[id,m.title]));
+    const available=Object.entries(shows).filter(([id,s])=>s.movie===bm.value&&s.active!==false);
+    const days=[...new Set(available.map(([id,s])=>s.time.slice(0,10)))];
+    boOptions(bd,days.map(d=>[d,d]));
+    boOptions(bs,available.filter(([id,s])=>s.time.slice(0,10)===bd.value).map(([id,s])=>[id,dateTime(s.time)]));
+  }
+  function boDraw(){
+    const occupied=new Set(bookings.filter(b=>b.show===bs.value&&!b.voided).flatMap(b=>b.seats));
+    for(const seat of boSelected)if(occupied.has(seat))boSelected.delete(seat);
+    byId('bo-pickers').replaceChildren(...Object.keys(boQty).map(k=>{
+      const card=el('div');card.className='bo-picker';const desc=el('div');desc.append(el('strong',t(boLabels[k])),el('p',money(boPrices[k])));const step=el('div');step.className='bo-step';
+      for(const delta of [-1,1]){const b=el('button',delta<0?'−':'+');b.type='button';b.setAttribute('aria-label',(delta<0?'− ':'+ ')+t(boLabels[k]));b.addEventListener('click',()=>{boQty[k]=Math.max(0,Math.min(12,boQty[k]+delta));while(boSelected.size>boCount())boSelected.delete([...boSelected].pop());boDraw()});if(delta===1)step.append(el('output',String(boQty[k])));step.append(b);}
+      card.append(desc,step);return card;
+    }));
+    byId('bo-count').textContent=boCount();byId('bo-total').textContent=money(boTotal());
+    const hall=el('div');hall.className='bo-auditorium';
+    if(bs.value){for(const row of 'MLKJIHGFEDCBA'){const line=el('div');line.className='bo-row';line.append(el('strong',row));let n=row==='M'?11:row==='L'?15:row==='A'?10:16;
+      for(let i=1;i<=n;i++){const label=row+i;const access=(row==='A'&&(i===1||i===10))||(row==='M'&&i===1);const seat=el('button',label+(access?' ♿':''));seat.type='button';seat.className='bo-seat'+(access?' accessible':'')+(occupied.has(label)?' occupied':'')+(boSelected.has(label)?' selected':'');seat.disabled=occupied.has(label);seat.setAttribute('aria-pressed',String(boSelected.has(label)));seat.addEventListener('click',()=>{if(boSelected.has(label))boSelected.delete(label);else if(boSelected.size<boCount())boSelected.add(label);else{boMessage('Selecciona la cantidad de taquillas primero.');return;}boDraw();});line.append(seat);}
+      hall.append(line);
+    }const screen=el('div',t('Pantalla'));screen.className='bo-screen';hall.append(screen);}
+    byId('bo-map').replaceChildren(hall);byId('bo-seats').textContent=[...boSelected].join(', ')||t('Ninguno');byId('bo-sale').disabled=!bs.value||!boCount()||boSelected.size!==boCount();
+  }
+  function boReset(){Object.keys(boQty).forEach(k=>boQty[k]=0);boSelected.clear();boDraw();}
+  function boOpen(b){pairs('bo-ticket-info',[['Folio',b.id],['Película',film(b)],['Tanda',dateTime(shows[b.show].time)],['Asientos',b.seats.join(', ')],['Total',money(b.cents)],['Método de pago',t(b.payment)],['Estado',t(b.voided?'Anulada':'Por validar')]]);if(!boTicket.open)boTicket.showModal();}
+  function boHistory(){const q=byId('bo-search').value.trim().toLowerCase();const records=boSales.filter(b=>(b.id+' '+film(b)+' '+b.seats.join(' ')).toLowerCase().includes(q));renderTable('bo-history',['Folio','Película','Asientos','Total','Método de pago','Estado','Acciones'],records.map(b=>{const actions=el('div');if(!b.voided){const re=el('button',t('Reimprimir'));re.className='btn btn-secondary btn-small';re.type='button';re.addEventListener('click',()=>boOpen(b));const v=el('button',t('Anular'));v.className='btn btn-danger btn-small';v.type='button';v.addEventListener('click',()=>{if(confirm(t('¿Anular esta venta ficticia?'))){b.voided=true;render();}});actions.append(re,v);}return [b.id,film(b),b.seats.join(', '),money(b.cents),t(b.payment),t(b.voided?'Anulada':'Pagado'),actions]}),'Historial de ventas físicas');if(!records.length)byId('bo-history').append(el('p',t('Todavía no hay ventas físicas.')));byId('bo-last').disabled=!boSales.some(b=>!b.voided);}
+  function renderBoxOffice(){boSelectors();boDraw();boHistory();}
+  [bm,bd,bs].forEach(node=>node.addEventListener('change',()=>{boSelected.clear();renderBoxOffice();}));
+  byId('bo-refresh').addEventListener('click',renderBoxOffice);byId('bo-clear').addEventListener('click',boReset);byId('bo-search').addEventListener('input',boHistory);
+  byId('bo-sale').addEventListener('click',()=>{if(byId('bo-sale').disabled)return;const b={id:'DEMO-BO-'+(++counter),show:bs.value,seats:[...boSelected],cents:boTotal(),payment:byId('bo-pay').value};bookings.unshift(b);clients[b.id]='Cliente demo';boSales.unshift(b);boReset();render();boMessage('Venta de prueba registrada.');boOpen(b);});
+  byId('bo-last').addEventListener('click',()=>{const b=boSales.find(x=>!x.voided);if(b)boOpen(b);});byId('bo-close').addEventListener('click',()=>boTicket.close());byId('bo-print').addEventListener('click',()=>window.print());
+
   function notify(message){byId('demo-status').textContent=t(message);}
   byId('refresh-demo').addEventListener('click',()=>{render();notify('Demo actualizada.');});
   byId('reset-demo').addEventListener('click',()=>location.reload());
@@ -163,7 +208,7 @@
   byId('movie-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form),key=movieEdit||'movie-demo-'+(++counter);movies[key]={title:String(d.get('title')).trim(),description:String(d.get('description')),minutes:Number(d.get('minutes')),rating:String(d.get('rating')),status:d.has('coming')?'Próximamente':'En cartelera'};form.reset();render();notify('Cambios guardados en la demo.');});
   byId('show-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form);if(!movies[d.get('movie')])return;shows['show-demo-'+(++counter)]={movie:d.get('movie'),time:d.get('date')+'T'+d.get('time')+':00-04:00',language:d.get('language'),active:d.has('active')};form.reset();render();notify('Cambios guardados en la demo.');});
   byId('staff-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form),id='staff-demo-'+(++counter);staff[id]=String(d.get('name')).trim();staffUsers[id]=String(d.get('user')).trim();staffActive[id]=d.has('active');form.reset();render();notify('Cambios guardados en la demo.');});
-  byId('prices-form').addEventListener('submit',e=>{e.preventDefault();notify('Cambios guardados en la demo.');});
+  byId('prices-form').addEventListener('submit',e=>{e.preventDefault();for(const k of Object.keys(boPrices))boPrices[k]=Math.round(Number(byId(k+'-price').value)*100);boDraw();notify('Cambios guardados en la demo.');});
   render();
   lang.subscribe(render);
 })();
