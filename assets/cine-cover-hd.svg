@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 480 270" role="img" aria-labelledby="title">
+<title id="title">Cine Teatro Manuel Nieves Quintero</title>
+<defs><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#0099da"/><stop offset=".52" stop-color="#006dbb"/><stop offset="1" stop-color="#063b8c"/></linearGradient></defs>
+<rect width="480" height="270" fill="url(#blue)"/>
+<g transform="translate(68 14) scale(1.35)">
+<path fill="#ffcc00" fill-rule="evenodd" d="M82 67V59C82 49 90 43 99 43c5 0 10 2 13 5C115 37 124 30 135 30c11 0 20 9 20 20 0 6-2 12-6 17H82Zm16-15a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Zm34-7a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Z"/>
+<g fill="#fff">
+<path d="M91 80l-8 8c-3-4-6-6-11-6-7 0-11 5-11 13s4 13 11 13c5 0 9-2 12-6l8 8c-5 6-12 9-21 9-13 0-24-10-24-24s10-24 24-24c9 0 15 3 20 9Z" transform="translate(8 0) scale(.92 .88) translate(0 11)"/>
+<path d="M94 72h11v39H94zM110 72h10l17 22V72h11v39h-10l-17-22v22h-11zM154 72h30v10h-19v5h17v9h-17v5h19v10h-30z"/>
+<path d="M56 115h21v6h-7v18h-7v-18h-7zM79 115h19v6H86v3h11v5H86v4h12v6H79z"/>
+<path fill-rule="evenodd" d="M108 115h8l11 24h-8l-2-5h-10l-2 5h-8zm4 7-3 7h6z"/>
+<path d="M124 115h21v6h-7v18h-7v-18h-7z"/>
+<path fill-rule="evenodd" d="M147 115h12c7 0 11 4 11 9 0 4-2 6-5 8l7 7h-9l-6-7h-3v7h-7zm7 6v5h5c3 0 4-1 4-3s-1-2-4-2z"/>
+<path fill-rule="evenodd" d="M182 114c8 0 14 5 14 13s-6 13-14 13-14-5-14-13 6-13 14-13Zm0 7c-4 0-7 2-7 6s3 6 7 6 7-2 7-6-3-6-7-6Z" transform="translate(12 0) scale(.94 1)"/>
+</g>
+<path fill="#41bec8" d="M189 103l31-16v53l-31-16z" transform="translate(8 0)"/>
+<text x="56" y="153" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="8.4" font-weight="600" letter-spacing="1.1" textLength="140" lengthAdjust="spacingAndGlyphs">MANUEL NIEVES QUINTERO</text>
+</g></svg>
