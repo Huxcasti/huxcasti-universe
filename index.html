@@ -1928,6 +1928,9 @@ body.hx-page-inactive #fallback .hx-portfolio a.f-wheelie .f-ball{animation-play
 #fallback .focus-cine .f-focus-details{grid-column:2;grid-row:2}
 }
 
+
+/* Scalable cinema cover, full bleed, no raster enlargement or masks. */
+#fallback .focus-cine .hx-cine-cover img{width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;-webkit-mask-image:none;mask-image:none}
 </style>
 <script src="/assets/language.js"></script>
 <link rel="stylesheet" href="/assets/language.css">
@@ -2079,7 +2082,7 @@ body.hx-page-inactive #fallback .hx-portfolio a.f-wheelie .f-ball{animation-play
   <article id="world-cine" class="f-focus focus-cine" role="region" aria-label="Vista cercana de Cine Manuel Nieves">
     <div class="f-focus-inner">
       <a href="#proyectos" class="f-focus-back" aria-label="Regresar al universo">← Volver al universo</a>
-      <div class="hx-cine-cover"><img src="assets/cine-marca.webp" alt="Cine Teatro Manuel Nieves Quintero" width="260" height="195" decoding="async" loading="lazy"></div>
+      <div class="hx-cine-cover"><img src="assets/cine-cover-hd.svg" alt="Cine Teatro Manuel Nieves Quintero" width="1600" height="900" decoding="async" loading="lazy"></div>
       <div class="f-focus-details"><span class="f-focus-eyebrow">CINE · PLANETA 01 / 04</span>
       <h2>Cine Manuel Nieves Quintero</h2><strong>Prototipo de boletería</strong><p>El cliente elige su asiento y recibe una taquilla con código QR. El personal puede escanearla en la entrada.</p>
       <a class="f-focus-visit" href="demo-cine.html">Ver demo administrativa</a>
