@@ -132,3 +132,10 @@ HuxcastiLanguage.add({
   "Hola, vi Huxcasti y quisiera información para crear una página web para mi negocio.": "Hi, I saw the Huxcasti portfolio and would like to discuss a website for my business.",
   "Hola, vi tu portafolio profesional en Huxcasti y quisiera conversar sobre una oportunidad de desarrollo web.": "Hi Humberto, I saw your portfolio and would like to discuss a web development opportunity."
 });
+
+// Commercial copy, localized in both languages.
+HuxcastiLanguage.add({
+  "Páginas web y sistemas a la medida. Explora los planetas para conocer nuestro trabajo.": "Websites and custom software. Explore the planets to see our work.",
+  "Creamos páginas web, sistemas de reservas y herramientas para gestionar clientes y operaciones. Cuéntanos qué quieres mejorar en tu negocio y diseñamos una solución según tus necesidades.": "We build websites, booking systems and tools for managing customers and operations. Tell us what you want to improve in your business and we’ll design a solution around your needs.",
+  "Hola, vi Huxcasti y quisiera información sobre una solución digital para mi negocio.": "Hi, I saw Huxcasti and would like to discuss a digital solution for my business."
+});
