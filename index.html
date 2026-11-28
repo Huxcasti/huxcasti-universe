@@ -1940,14 +1940,23 @@ body.hx-page-inactive #fallback .hx-portfolio a.f-wheelie .f-ball{animation-play
 @keyframes hx-spark-glimmer{from{opacity:.25}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){#fallback .hx-santa-lane *{animation:none!important}}
 body.hx-page-inactive #fallback .hx-santa-lane *{animation-play-state:paused!important}
-#fallback .hx-site-header .hx-santa-lane{position:relative;flex:1 1 0;min-width:0;height:42px;overflow:hidden;pointer-events:none;isolation:isolate}
+#fallback .hx-site-header .hx-santa-lane{position:relative;flex:1 1 0;min-width:0;height:42px;overflow:visible;pointer-events:none;z-index:3}
+#fallback .hx-site-header{overflow:visible}
 #fallback .hx-site-header .hx-site-nav{flex:0 0 auto;margin-left:0}
-#fallback .hx-santa-flight{position:absolute;left:0;top:0;width:min(100%,145px);height:42px;animation:hx-santa-arrive 16s linear infinite;filter:drop-shadow(0 0 4px #ffd88b66)}
-#fallback .hx-santa-flight svg{width:100%;height:100%}
-@keyframes hx-santa-arrive{0%{left:100%;transform:translateY(-24px) rotate(-12deg);opacity:0}8%{opacity:1}38%{left:0;transform:translateY(3px) rotate(0);opacity:1}55%{left:0;transform:translateY(3px);opacity:1}75%,100%{left:-145px;transform:translateY(-18px) rotate(12deg);opacity:0}}
-@media(max-width:700px){#fallback .hx-site-header .hx-santa-lane{height:34px}#fallback .hx-santa-flight{height:34px}}
-@media(max-width:350px){#fallback .hx-santa-lane{display:none}#fallback .hx-site-header .hx-site-nav{margin-left:auto}}
-@media(prefers-reduced-motion:reduce){#fallback .hx-santa-flight{animation:none;left:0}}
+#fallback .hx-santa-flight{position:absolute;left:50%;top:50%;width:145px;height:46px;overflow:visible;animation:hx-santa-arrive 16s infinite;filter:drop-shadow(0 0 4px #ffd88b66);will-change:transform,opacity;pointer-events:none}
+#fallback .hx-santa-flight svg{width:100%;height:100%;overflow:visible}
+@keyframes hx-santa-arrive{
+0%,5%{transform:translate(calc(-50% + 95px),-105px) scale(.35) rotate(-18deg);opacity:0}
+12%{transform:translate(calc(-50% + 65px),-70px) scale(.55) rotate(-15deg);opacity:.8}
+30%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1;animation-timing-function:ease-in-out}
+42%{transform:translate(calc(-50% - 5px),calc(-50% - 4px)) scale(1) rotate(2deg);opacity:1}
+53%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1;animation-timing-function:ease-in}
+68%{transform:translate(calc(-50% - 65px),-72px) scale(.55) rotate(18deg);opacity:.85}
+78%,100%{transform:translate(calc(-50% - 110px),-125px) scale(.2) rotate(22deg);opacity:0}
+}
+@media(max-width:700px){#fallback .hx-site-header .hx-santa-lane{height:34px}#fallback .hx-santa-flight{width:clamp(48px,17vw,76px);height:34px}}
+@media(max-width:350px){#fallback .hx-santa-flight{width:44px}}
+@media(prefers-reduced-motion:reduce){#fallback .hx-santa-flight{animation:none;transform:translate(-50%,-50%)}}
 body.hx-page-inactive #fallback .hx-santa-flight{animation-play-state:paused!important}
 
 </style>
