@@ -1,77 +1,39 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explora el panel del Cine Manuel Nieves con reservaciones, tandas y escaneos ficticios.">
-  <title>Administración del cine · Demo | Huxcasti</title>
-  <link rel="icon" href="/assets/cine-marca.webp" type="image/webp">
-  <link rel="stylesheet" href="/assets/language.css">
-  <link rel="stylesheet" href="/assets/cine-demo.css">
-  <script src="/assets/language.js" defer></script>
-  <script src="/assets/cine-demo.js" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'; object-src 'none'">
+<title>Administración del cine · Demo | Huxcasti</title>
+<link rel="icon" href="/assets/cine-marca.webp" type="image/webp">
+<link rel="stylesheet" href="/assets/language.css"><link rel="stylesheet" href="/assets/cine-demo.css">
+<script src="/assets/language.js" defer></script><script src="/assets/cine-demo.js" defer></script>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <a class="back" href="/#world-cine">← Volver al proyecto</a>
-      <hx-language></hx-language>
-    </header>
-    <main>
-      <div class="brand">
-        <img src="/assets/cine-marca.webp" alt="" width="78" height="62">
-        <div><p class="cinema">Cine Teatro Manuel Nieves Quintero</p><h1>Administración del cine</h1></div>
-      </div>
-      <p class="notice"><span class="dot" aria-hidden="true"></span><strong>Demo de solo lectura</strong><span>Las reservaciones, ventas y entradas que ves son ficticias.</span></p>
-      <nav aria-label="Secciones del panel">
-        <button type="button" data-view="bookings" aria-controls="bookings" aria-current="page">Reservaciones</button>
-        <button type="button" data-view="movies" aria-controls="movies">Películas</button>
-        <button type="button" data-view="shows" aria-controls="shows">Tandas</button>
-        <button type="button" data-view="staff" aria-controls="staff">Empleados y escaneos</button>
-      </nav>
-      <section id="bookings" aria-labelledby="bookings-title">
-        <dl id="metrics" class="metrics"></dl>
-        <div class="panel">
-          <div class="section-head">
-            <div><h2 id="bookings-title">Reservaciones</h2><p>Consulta los asientos, el pago y la entrada de cada grupo.</p></div>
-            <label for="entry-filter">Entrada
-              <select id="entry-filter">
-                <option value="all">Todas</option>
-                <option value="used">Utilizada</option>
-                <option value="pending">Por validar</option>
-              </select>
-            </label>
-          </div>
-          <div id="bookings-table"></div>
-          <p id="no-results" hidden>No hay reservaciones con ese estado.</p>
-        </div>
-      </section>
-      <section id="movies" class="panel" aria-labelledby="movies-title" hidden>
-        <div class="section-head"><div><h2 id="movies-title">Películas registradas</h2><p>Cartelera, duración y clasificación de cada película.</p></div></div>
-        <div id="movies-table"></div>
-      </section>
-      <section id="shows" class="panel" aria-labelledby="shows-title" hidden>
-        <div class="section-head"><div><h2 id="shows-title">Tandas registradas</h2><p>Horarios y taquillas reservadas por función.</p></div></div>
-        <div id="shows-table"></div>
-      </section>
-      <section id="staff" aria-labelledby="staff-title" hidden>
-        <div class="panel">
-          <div class="section-head"><div><h2 id="staff-title">Empleados y escaneos</h2><p>Cada asiento validado cuenta como una entrada.</p></div></div>
-          <div id="staff-table"></div>
-        </div>
-        <div class="panel">
-          <h2>Historial de escaneos</h2>
-          <div id="scans-table"></div>
-        </div>
-      </section>
-      <noscript>Activa JavaScript para explorar la demo. / Enable JavaScript to explore the demo.</noscript>
-    </main>
-  </div>
-  <dialog id="booking-detail" aria-labelledby="detail-title">
-    <h2 id="detail-title">Detalle de la reservación</h2>
-    <dl id="details" class="details"></dl>
-    <button id="close-detail" type="button">Cerrar</button>
-  </dialog>
-</body>
-</html>
+<body><div class="demo-top"><a href="/#world-cine">← Volver al proyecto</a><hx-language></hx-language></div>
+<main>
+<header class="dashboard-header">
+<div class="dashboard-brand"><img class="dashboard-logo" src="/assets/cine-marca.webp" alt="Cine Teatro Manuel Nieves Quintero" width="96" height="78"><div><h1>Administración del cine</h1><p class="subtitle">Reservaciones, películas, tandas, empleados y configuración.</p></div></div>
+<div class="header-actions"><button class="btn btn-secondary" type="button" id="refresh-demo">Actualizar</button><button class="btn btn-danger" type="button" id="reset-demo">Reiniciar demo</button></div>
+</header>
+<p class="demo-notice"><strong>Modo demostración.</strong> Todos los datos son ficticios. Los cambios se simulan en esta pestaña y no afectan al cine real.</p>
+<nav class="navigation" aria-label="Secciones del panel">
+<button type="button" data-view="bookings" aria-controls="bookings" aria-current="page">🎟 Reservaciones</button>
+<button type="button" data-view="movies" aria-controls="movies">🎬 Películas</button>
+<button type="button" data-view="shows" aria-controls="shows">🕒 Tandas</button>
+<button type="button" data-view="staff" aria-controls="staff">👥 Empleados</button>
+<button type="button" data-view="configuration" aria-controls="configuration">🔐 Configuración</button>
+</nav>
+<p id="demo-status" role="status"></p>
+<section id="bookings" aria-labelledby="bookings-title">
+<dl id="metrics" class="stats"></dl>
+<div class="card"><div class="section-header"><div><h2 id="bookings-title">Reservaciones</h2><p class="subtitle">Ventas y entradas registradas.</p></div><div class="demo-filter"><label for="entry-filter">Entrada</label><select id="entry-filter"><option value="all">Todas</option><option value="used">Utilizada</option><option value="pending">Por validar</option></select></div></div><div class="table-wrapper" id="bookings-table"></div><p id="no-results" hidden>No hay reservaciones con ese estado.</p></div></section>
+<section id="movies" aria-labelledby="movies-title" hidden><div class="grid-two demo-grid">
+<div class="card"><h2>Añadir película</h2><form id="movie-form"><label for="movie-name">Título</label><input id="movie-name" name="title" required maxlength="90" placeholder="Nombre de la película"><label for="movie-description">Descripción</label><textarea id="movie-description" name="description" maxlength="500" placeholder="Sinopsis o información"></textarea><label>Afiche de la película</label><div class="poster-uploader">Afiche ficticio de demostración</div><label>Tráiler de la película</label><div class="poster-uploader">Carga de archivos desactivada en la demo</div><label for="movie-minutes">Duración en minutos</label><input id="movie-minutes" name="minutes" type="number" min="1" max="600" value="120" required><label for="movie-rating">Clasificación</label><select id="movie-rating" name="rating"><option>G</option><option>PG</option><option selected>PG-13</option><option>R</option></select><label class="checkbox-row"><input name="coming" type="checkbox">Mostrar como “Próximamente”</label><div class="form-actions"><button class="btn btn-primary" type="submit">Guardar película</button><button class="btn btn-secondary" type="reset">Limpiar</button></div></form></div>
+<div class="card"><div class="section-header"><div><h2 id="movies-title">Películas registradas</h2><p class="subtitle">Edita, activa o elimina películas de prueba.</p></div></div><div class="table-wrapper" id="movies-table"></div></div></div></section>
+<section id="shows" aria-labelledby="shows-title" hidden>
+<div class="card"><h2>Precios generales de taquillas</h2><p class="subtitle">Precios de ejemplo para todas las tandas de la demo.</p><form id="prices-form"><div class="demo-prices"><div><label for="adult-price">Adulto</label><input id="adult-price" type="number" min="0" max="100" step=".01" value="8.25" required></div><div><label for="child-price">Niño</label><input id="child-price" type="number" min="0" max="100" step=".01" value="6.00" required></div><div><label for="senior-price">Senior</label><input id="senior-price" type="number" min="0" max="100" step=".01" value="6.00" required></div></div><button type="submit" class="btn btn-primary">Guardar precios</button></form></div>
+<div class="grid-two demo-grid"><div class="card"><h2>Añadir tanda</h2><form id="show-form"><label for="show-movie">Película</label><select id="show-movie" name="movie" required></select><label for="show-date">Fecha</label><input id="show-date" name="date" type="date" required><label for="show-time">Hora</label><input id="show-time" name="time" type="time" required><label for="show-language">Idioma de la tanda</label><select id="show-language" name="language"><option>Español</option><option>Inglés</option><option>Inglés con subtítulos</option></select><label class="checkbox-row"><input type="checkbox" name="active" checked>Tanda activa y disponible</label><div class="form-actions"><button class="btn btn-primary" type="submit">Guardar tanda</button><button class="btn btn-secondary" type="reset">Limpiar</button></div></form></div><div class="card"><h2 id="shows-title">Tandas registradas</h2><p class="subtitle">Horarios disponibles para cada película.</p><div class="table-wrapper" id="shows-table"></div></div></div></section>
+<section id="staff" aria-labelledby="staff-title" hidden><div class="grid-two demo-grid"><div class="card"><h2>Añadir empleado</h2><form id="staff-form"><label for="staff-name">Nombre completo</label><input id="staff-name" name="name" placeholder="Nombre ficticio" required maxlength="80"><label for="staff-user">Usuario</label><input id="staff-user" name="user" placeholder="usuario_demo" required maxlength="40" autocomplete="off"><p class="demo-form-note">No introduzcas contraseñas ni datos personales reales.</p><label class="checkbox-row"><input name="active" type="checkbox" checked>Empleado activo</label><div class="form-actions"><button type="submit" class="btn btn-primary">Guardar empleado</button><button class="btn btn-secondary" type="reset">Limpiar</button></div></form></div><div class="card"><h2 id="staff-title">Empleados y escaneos</h2><p class="subtitle">Cada asiento validado cuenta como una entrada.</p><div class="table-wrapper" id="staff-table"></div></div></div><div class="card"><h2>Historial de escaneos</h2><div class="table-wrapper" id="scans-table"></div></div></section>
+<section id="configuration" hidden><div class="card"><h2>Configuración del administrador</h2><p class="subtitle">En el sistema real esta sección permite cambiar la contraseña. Por seguridad, la demostración no solicita ni guarda credenciales.</p></div></section>
+<noscript>Activa JavaScript para explorar la demo. / Enable JavaScript to explore the demo.</noscript>
+</main><dialog id="booking-detail" aria-labelledby="detail-title"><h2 id="detail-title">Detalle de la reservación</h2><dl id="details" class="details"></dl><button id="close-detail" class="btn btn-primary" type="button">Cerrar</button></dialog></body></html>
