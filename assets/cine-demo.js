@@ -26,6 +26,8 @@
     'Entrada norte': 'North entrance', 'Entrada sur': 'South entrance', 'Fecha y hora': 'Date and time'
   });
 
+  lang.add({"Reservaciones, películas, tandas, empleados y configuración.":"Bookings, movies, showtimes, staff and settings.","Modo demostración.":"Demo mode.","Todos los datos son ficticios. Los cambios se simulan en esta pestaña y no afectan al cine real.":"All data is fictional. Changes are simulated in this tab and do not affect the real cinema.","Actualizar":"Refresh","Reiniciar demo":"Reset demo","🎟 Reservaciones":"🎟 Bookings","🎬 Películas":"🎬 Movies","🕒 Tandas":"🕒 Showtimes","👥 Empleados":"👥 Staff","🔐 Configuración":"🔐 Settings","Ventas y entradas registradas.":"Recorded sales and admissions.","Añadir película":"Add movie","Título":"Title","Descripción":"Description","Nombre de la película":"Movie title","Sinopsis o información":"Synopsis or information","Afiche de la película":"Movie poster","Afiche ficticio de demostración":"Sample demo poster","Tráiler de la película":"Movie trailer","Carga de archivos desactivada en la demo":"File uploads disabled in demo","Duración en minutos":"Running time in minutes","Mostrar como “Próximamente”":"Show as coming soon","Guardar película":"Save movie","Limpiar":"Clear","Edita, activa o elimina películas de prueba.":"Edit, activate or remove sample movies.","Precios generales de taquillas":"General ticket prices","Precios de ejemplo para todas las tandas de la demo.":"Sample prices for all demo showtimes.","Adulto":"Adult","Niño":"Child","Senior":"Senior","Guardar precios":"Save prices","Añadir tanda":"Add showtime","Fecha":"Date","Hora":"Time","Idioma de la tanda":"Showtime language","Inglés":"English","Tanda activa y disponible":"Showtime active and available","Guardar tanda":"Save showtime","Horarios disponibles para cada película.":"Available showtimes for each movie.","Añadir empleado":"Add staff member","Nombre completo":"Full name","Nombre ficticio":"Fictional name","Usuario":"Username","No introduzcas contraseñas ni datos personales reales.":"Do not enter passwords or real personal information.","Empleado activo":"Active staff member","Guardar empleado":"Save staff member","Configuración del administrador":"Administrator settings","En el sistema real esta sección permite cambiar la contraseña. Por seguridad, la demostración no solicita ni guarda credenciales.":"In the actual system this section changes the password. For safety the demo does not request or store credentials.","Cambios guardados en la demo.":"Changes saved in the demo.","Demo actualizada.":"Demo refreshed.","Afiche":"Poster","Acciones":"Actions","Editar":"Edit","Eliminar":"Delete","Activo":"Active","Inactivo":"Inactive","Cliente":"Customer"});
+
   // All records in this view are fixtures. A booking's seats are admitted together.
   const movies = {
     bahia: {title:'Luces de la bahía', minutes:94, rating:'PG', status:'En cartelera'},
@@ -39,6 +41,10 @@
     sunday: {movie:'horizonte', time:'2026-11-15T16:00:00-04:00', language:'Inglés con subtítulos'}
   };
   const staff = {north:'Entrada norte', south:'Entrada sur'};
+  const staffUsers = {north:'entrada_norte_demo',south:'entrada_sur_demo'};
+  const staffActive = {north:true,south:true};
+  const clients={'DEMO-104':'Cliente demo 04','DEMO-103':'Cliente demo 03','DEMO-102':'Cliente demo 02','DEMO-101':'Cliente demo 01'};
+  let movieEdit=null; let counter=0;
   const bookings = [
     {id:'DEMO-104', show:'sunday', seats:['D4','D5'], cents:1600},
     {id:'DEMO-103', show:'late', seats:['F1','F2','F3'], cents:2200},
@@ -99,12 +105,12 @@
   }
   function renderBookings() {
     const rows = bookings.filter(b => filter.value === 'all' || (filter.value === 'used') === Boolean(b.scan));
-    renderTable('bookings-table',['Reservación','Película','Tanda','Asientos','Total','Entrada'],rows.map(b => {
+    renderTable('bookings-table',['Fecha','Cliente','Reservación','Película','Tanda','Asientos','Total','Pago','Entrada'],rows.map(b => {
       const link = el('button',b.id); link.type = 'button'; link.className = 'detail-link';
       link.setAttribute('aria-haspopup','dialog');
       link.addEventListener('click', () => showDetails(b));
       const badge = el('span',t(state(b))); badge.className = b.scan ? 'state' : 'state pending';
-      return [link, film(b), dateTime(shows[b.show].time), b.seats.join(', '), money(b.cents), badge];
+      return [dateTime(shows[b.show].time),clients[b.id],link, film(b), dateTime(shows[b.show].time), b.seats.join(', '), money(b.cents), t('Pagado'), badge];
     }), 'Reservaciones');
     byId('no-results').hidden = rows.length > 0;
   }
@@ -116,15 +122,21 @@
       ['Ventas pagadas',money(bookings.reduce((sum,b) => sum + b.cents,0))], ['Entradas utilizadas',seatCount(scanned)]
     ]);
     renderBookings();
-    renderTable('movies-table',['Película','Duración','Clasificación','Estado'],
-      Object.values(movies).map(m => [m.title,m.minutes+' min',m.rating,t(m.status)]), 'Películas registradas');
-    renderTable('shows-table',['Película','Tanda','Idioma','Taquillas reservadas'],
+    const movieSelect=byId('show-movie'), previous=movieSelect.value;
+    movieSelect.replaceChildren(...Object.entries(movies).map(([key,m])=>{const o=el('option',m.title);o.value=key;return o;}));if(movies[previous])movieSelect.value=previous;
+    renderTable('movies-table',['Afiche','Película','Duración','Clasificación','Estado','Acciones'],Object.entries(movies).map(([key,m])=>{
+      const poster=el('span',m.title);poster.className='demo-poster';
+      const actions=el('div'); const edit=el('button',t('Editar'));edit.type='button';edit.className='btn btn-secondary btn-small';edit.addEventListener('click',()=>{movieEdit=key;byId('movie-name').value=m.title;byId('movie-description').value=m.description||'';byId('movie-minutes').value=m.minutes;byId('movie-rating').value=m.rating;byId('movie-form').elements.coming.checked=m.status==='Próximamente';byId('movie-name').focus();});actions.append(edit);
+      if(!Object.values(shows).some(s=>s.movie===key)){const del=el('button',t('Eliminar'));del.type='button';del.className='btn btn-danger btn-small';del.addEventListener('click',()=>{delete movies[key];render();notify('Cambios guardados en la demo.');});actions.append(del);}
+      return [poster,m.title,m.minutes+' min',m.rating,t(m.status),actions];
+    }), 'Películas registradas');
+    renderTable('shows-table',['Película','Tanda','Idioma','Taquillas reservadas','Estado'],
       Object.entries(shows).map(([id,s]) => [movies[s.movie].title,dateTime(s.time),t(s.language),
-        String(seatCount(bookings.filter(b => b.show === id)))]), 'Tandas registradas');
-    renderTable('staff-table',['Responsable','Escaneos','Taquillas','Último escaneo'],
+        String(seatCount(bookings.filter(b => b.show === id))),t(s.active===false?'Inactivo':'Activo')]), 'Tandas registradas');
+    renderTable('staff-table',['Responsable','Usuario','Estado','Escaneos','Taquillas','Último escaneo'],
       Object.entries(staff).map(([id,name]) => {
         const activity = scanned.filter(b => b.scan.staff === id);
-        return [t(name),String(activity.length),String(seatCount(activity)),activity.length ? dateTime(activity[0].scan.time) : t('Sin escaneos')];
+        return [t(name),staffUsers[id]||'demo',t(staffActive[id]?'Activo':'Inactivo'),String(activity.length),String(seatCount(activity)),activity.length ? dateTime(activity[0].scan.time) : t('Sin escaneos')];
       }), 'Empleados y escaneos');
     renderTable('scans-table',['Fecha y hora','Responsable','Película','Asientos'],
       scanned.map(b => [dateTime(b.scan.time),t(staff[b.scan.staff]),film(b),b.seats.join(', ')]), 'Historial de escaneos');
@@ -144,6 +156,14 @@
   filter.addEventListener('change',renderBookings);
   byId('close-detail').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => {selectedBooking = undefined;});
+  function notify(message){byId('demo-status').textContent=t(message);}
+  byId('refresh-demo').addEventListener('click',()=>{render();notify('Demo actualizada.');});
+  byId('reset-demo').addEventListener('click',()=>location.reload());
+  byId('movie-form').addEventListener('reset',()=>{movieEdit=null;});
+  byId('movie-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form),key=movieEdit||'movie-demo-'+(++counter);movies[key]={title:String(d.get('title')).trim(),description:String(d.get('description')),minutes:Number(d.get('minutes')),rating:String(d.get('rating')),status:d.has('coming')?'Próximamente':'En cartelera'};form.reset();render();notify('Cambios guardados en la demo.');});
+  byId('show-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form);if(!movies[d.get('movie')])return;shows['show-demo-'+(++counter)]={movie:d.get('movie'),time:d.get('date')+'T'+d.get('time')+':00-04:00',language:d.get('language'),active:d.has('active')};form.reset();render();notify('Cambios guardados en la demo.');});
+  byId('staff-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget,d=new FormData(form),id='staff-demo-'+(++counter);staff[id]=String(d.get('name')).trim();staffUsers[id]=String(d.get('user')).trim();staffActive[id]=d.has('active');form.reset();render();notify('Cambios guardados en la demo.');});
+  byId('prices-form').addEventListener('submit',e=>{e.preventDefault();notify('Cambios guardados en la demo.');});
   render();
   lang.subscribe(render);
 })();
